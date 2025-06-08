@@ -1,0 +1,32 @@
+<!-- Header Section -->
+<header class="blog-header">
+  <h1>📓 Jacob's Dev Blog</h1>
+  <p class="tagline">Tips, stories, and dev adventures 🧠💡</p>
+</header>
+
+<!-- Featured Post -->
+<section class="featured-post">
+  <div class="post-card large">
+    <h2>🚀 How to Sign Git Commits with GPG</h2>
+    <p>Secure your git history and earn the ✨[Verified]✨ badge on GitHub.</p>
+    <a routerLink="/sign-git-commits">Read More →</a>
+  </div>
+</section>
+
+<!-- Recent Posts -->
+<section class="recent-posts">
+  <h3>📰 Recent Posts</h3>
+  <div class="post-grid">
+    <div class="post-card" *ngFor="let post of recentPosts">
+      <h4>{{ post.title }}</h4>
+      <p>{{ post.excerpt }}</p>
+      <a [routerLink]="['/'+post.slug]">Read →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="blog-footer">
+  <p>Written with ☕ + 🎧 by <a href="https://fahrnbach.one" target="_blank">Jacob Fahrnbach</a></p>
+  <p><a href="https://art.fahrnbach.one" target="_blank">Explore My Art</a> | <a href="https://github.com/fahrnbach">About</a></p>
+</footer>
