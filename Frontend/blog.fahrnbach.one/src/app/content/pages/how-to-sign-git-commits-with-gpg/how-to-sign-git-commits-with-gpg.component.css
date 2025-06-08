@@ -1,0 +1,10 @@
+.text-format {
+  text-wrap: wrap;
+  line-break: auto;
+  white-space: pre-line;
+}
+
+.image-hero {
+  height: 100%;
+  width: 100%;
+}

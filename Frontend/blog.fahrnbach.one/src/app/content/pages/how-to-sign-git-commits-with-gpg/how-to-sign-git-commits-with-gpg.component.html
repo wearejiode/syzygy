@@ -1,0 +1,254 @@
+<div class="content-header">
+  BLOG//
+  <div class="content-location">HOME</div>
+</div>
+<div class="content-text-title">
+</div>
+<img class="image-hero" src="assets/BLOG-Sign-Git-CLI-Commits-on-Github-With-Gpg-HERO@2x.webp" alt="">
+
+<div class="text-format">
+<h1>How to Sign Git CLI Commits with GPG on Github and Verify Your Commits</h1>
+
+Ever wondered what this [Verified] badge means when push to Github?
+That's a _i sign_i that your commit is __Signed__. (Get it?).
+
+#It's a matter of security.
+So, why does verifying your commits matter?
+_bSigning your commits makes them more secure_b,
+increases confidence that you are who you say you are.
+
+Just imagine signing your commits as a Photo ID or passport.
+It's just a confirmation that you REALLY are you.
+
+#This is your Sign.
+To get started signing commits, you're going to need three things.
+1. A github account,
+2. Access to the git cli,
+3. A GPG signing tool.
+
+I'm going to skip over the first two for now,
+but if you'd like to know how to set up git, checkout SEE HERE LINK
+If you want to read about getting started with gitHUB, READ THIS
+
+#Really quick GPG primer
+The very first thing to know about GPG is this:
+CAUTION: NEVER SHARE YOUR SECRET KEY WITH ANYONE.
+
+So, What is GPG?
+GPG (Gnu Privacy Guard) a security protocol meant to
+allow secure transmission and signing of data.
+GPG generates two keys.
+1.) A public (pub) key and,
+2.) A secret (sec) key.
+
+Think of the public key as a lock, and the secret key as a key.
+
+
+With this lock and key set you can do two three things.
+1.) Verify; that only you can open the lock once it is locked. (Verification/Authorization)
+2.) Encrypt; your data so that only you can read it. (Integrity/Encryption)
+3.) Identify; Increase confidence that you are the one who sent the lock. (Non-Repudiation/Proof of ID)
+
+We are interested in the third one.
+If you have the key, the lock is probably yours too.
+
+PGP does three main things. I'll reiterate these with a quick story.
+
+Imagine you are buying diamonds online, and to make sure they are safe on the way, you mail an UNLOCKED lock to the jewelry dealer.
+The Jeweler then LOCKS the lock and then mails a box full of diamonds back to you with the lock on it.
+
+1.) The Jewelry dealer feels confident that the diamonds will be safe, even if they are delivered to the wrong person.
+    Only you can unlock the box with the diamonds, with your secret key. (Verification/Authorization)
+
+    Upon receiving the box, you know that:
+2.) The contents of the box haven't been tampered with. _b (Integrity/Encryption) _b
+
+3.) Upon opening the box with the key, you video call the jeweler, and show them that you are unlocking the box with the key.
+    Now, the jeweler can be very confident that the diamonds have made it to you safe and sound. (Non-Repudiation/Proof of ID)
+
+PGP works much like our story above, and can help to verify your identity.
+It's great for verifying emails, online shopping, and of course, git commits!
+
+If' you'd like to read more about PGP check out LINK https://gnupg.org/
+
+You can also read THIS LINK article about encrypting data with PGP
+
+#Lets Verify!
+There are plenty of great GPG signing tools,
+But to keep this tutorial short, I'm going to follow the LINK recommendation LINK https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits
+that Github provides.
+If you are on MacOS download GPGSuite. LINK https://gpgtools.org/
+For other operating systems, the steps are similar, but this guide may not be exact.
+Out these LINK programs for other Linux/Windows/etc. LINK https://gpgtools.tenderapp.com/kb/faq/openpgp-solutions-for-all-operating-systems
+
+If you HAVE setup GIT to use your your github email continue. If you haven't, You'll have an extra step at the end.
+
+GITHUB noreply email address LINK https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/adding-an-email-address-to-your-github-account
+
+So, to get started,
+1.) Make sure you have the Git cli installed.
+2.) Download GPGSuite.
+3.) Open GPG KeyChain, or your other GPG tool.
+4.) Create a new Key and export it to your desktop.
+--You will need to create a password. Do not lose this. You'll need it later.
+-- Note: You do not need to publish your public key if it asks you to. You can if you want.
+5.) Open the public key (pub) with a text editor. I recommend VSCode. Hold on to that a moment.
+
+6.) In your CLI type:  `gpg --list-secret-keys`
+    copy the (sec) key to your keyboard. It should look similar to :
+(sec) rsa4096 2024-11-03 [SC] [expires: 20xx-03-35]
+      XYZXZYXZYXZYXZYXZYXZYXZYXZYXZYXZYXZYXZY
+      Copy the XYZ part and continue on to step 7
+
+7.) Add the secure key to your git config:
+  7.a)git config --global user.signingkey XYZXZYXZYXZYXZYXZYXZYXZYXZYXZYXZYXZYXZY (replace XYZ with your secure key)
+    Add your gpg program to Git
+  7.b)git config --global gpg.program /usr/local/MacGPG2/bin/gpg2
+      (For Windows/Linux git config --global gpg.program &lt;location of your gpg program&gt; (remove &lt;&gt; brackets))
+  7.c)Set git to sign on every commit
+      git config --global commit.gpgsign true
+      (You can skip this step if you'd rather use the -S flag every time you want to sign a commit)
+      (git commit -S -m "Signed Example Commit")
+
+8.) Copy the public key from earlier to your clipboard.
+    It should look like this:
+    IMG of public key
+
+9.) Open Github, click your photo, and navigate to Settings>SSH and GPG keys
+10.) Click "Add GPG Key" and paste your PUBLIC key into the text box. Click Submit.
+11.) Try to push a commit! Your system will prompt you for the password you set earlier.
+12.) Start pushing Verified commits!
+
+Note: If you HAVEN'T setup your github cli to use your github email:
+
+In order for commits to appear under your github profile,
+You'll need to configure your Git cli to use your github email.
+
+I'd recommend setting up email privacy, and using your noreply email.
+It's much more secure than exposing your public email.
+
+You can do that that by clicking your Github profile photo,
+Then navigating to Settings>Emails> Check the box labeled "Keep My Emails Private"
+Follow any prompt, and return to the previous page Settings>Emails
+
+Copy the email address that looks like:
+xyzxyzxyzxyzxyz+username&#64;users.noreply.github.com
+
+Finally, git config --global user.email "xyzxyzxyzxyzxyz+username&#64;users.noreply.github.com"
+         git config --global user.name "Your Name Here"
+
+Then to confirm: git config --global user.email
+                 git config --global user.name
+
+Now when you push from your git cli you'll see this wonderful green badge that will confirm
+that you are who you say you are, and the Security Gods will smile upon you :)
+
+
+Thanks so much for reading.
+If you liked this,
+Come say hi at &#64;social,
+Share with the homies,
+Buy me a coffee,
+Or check out my shop.
+(I make really cool glitch art!).
+
+If I made a mistake, or you have any questions feel free to reach out to &#64;help
+
+Written by Jacob Fahrnbach on November 13th, 2024 9:35 PM
+
+Thanks so much!
+
+Happy Coding :)
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+</div>
