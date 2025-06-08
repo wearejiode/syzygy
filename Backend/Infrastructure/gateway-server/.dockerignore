@@ -1,0 +1,41 @@
+# Node modules and dependencies
+node_modules
+**/node_modules
+
+# Build and logs
+dist
+build
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local environment variables
+.env
+.env.*
+
+# Git
+.git
+.gitignore
+
+# IDE and editor folders
+.vscode
+.idea
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Coverage/test output
+coverage
+.nyc_output
+
+# Temporary files
+*.swp
+*.tmp
+*.bak
+
+# Other app folders outside the current context
+../**
+!./*
