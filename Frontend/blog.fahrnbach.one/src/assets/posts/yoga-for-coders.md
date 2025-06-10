@@ -2,7 +2,6 @@
 title: "Yoga for Coders: Stretch Your Spine, Save Your Sprint"
 description: "A practical yoga flow designed for developers who sit for long hours. Loosen your spine, calm your mind, and reset your posture with fun, simple moves."
 slug: yoga-for-coders-custom-flow
-cover: /assets/images/yoga-for-coders-og.webp
 author: Jacob Fahrnbach
 date: 2025-06-09
 tags:
@@ -11,6 +10,7 @@ tags:
   - productivity
   - focus
   - devlog
+cover: /assets/images/yoga-for-coders.webp
 readingTime: 6
 draft: false
 ---

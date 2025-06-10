@@ -1,0 +1,22 @@
+{
+      "openai": {
+        "title": "✨ Jacob's Pitch to OpenAI ✨",
+        "description": "Why I'm the right fit to build the future of intelligence.",
+        "image": "https://fahrnbach.one/assets/og/openai.jpg"
+      },
+      "google": {
+        "title": "✨ Jacob's Pitch to Google ✨",
+        "description": "Creative engineering, high-scale systems, and human-first design.",
+        "image": "https://fahrnbach.one/assets/og/google.jpg"
+      },
+      "open": {
+        "title": "✨ A Little Magic from Jacob ✨",
+        "description": "This personalized pitch isn’t tied to a single company — it’s for *you*, wherever you are.",
+        "image": "https://fahrnbach.one/assets/og/default.jpg"
+      },
+      "open2": {
+        "title": "✨ A Little Magic from Jacob ✨",
+        "description": "This personalized pitch isn’t tied to a single company — it’s for *you*, wherever you are.",
+        "image": "https://fahrnbach.one/assets/og/default.jpg"
+      }
+}

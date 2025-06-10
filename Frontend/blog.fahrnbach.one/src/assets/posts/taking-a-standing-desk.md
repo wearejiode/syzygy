@@ -9,6 +9,7 @@ tags:
   - productivity
   - ergonomics
   - devlog
+cover: assets/images/taking-a-standing-desk.wewbp
 readingTime: 4
 draft: false
 ---

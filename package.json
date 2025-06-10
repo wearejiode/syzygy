@@ -8,7 +8,10 @@
     "test-once": "echo \"Wish Granted 🧞‍♀️\" && exit 1",
     "clean": "rm -f ./embeddings/data.json",
     "build:embeddings": "npm run clean && node ./rag-engine/utils/embedder.js",
-    "start": "npm run build:embeddings && node ./server/server.js"
+    "start": "npm run build:embeddings && node ./server/server.js",
+    "deploy:blog": "git subtree split --prefix=Frontend/blog.fahrnbach.one -b deploy-blog && git push blog deploy-blog:main && git branch -D deploy-blog",
+    "deploy:home": "git subtree split --prefix=Frontend/fahrnbach.one -b deploy-home && git push blog deploy-home:main && git branch -D deploy-home",
+    "deploy:sesame": "npx wrangler r2 object put sesame-data/data.json --file Frontend/sesame.fahrnbach.one/data.json --remote --config Frontend/sesame.fahrnbach.one/sesame-meta-worker/wrangler.toml && npx wrangler deploy --config Frontend/sesame.fahrnbach.one/sesame-meta-worker/wrangler.toml"
   },
   "keywords": [],
   "author": "💪 😎",
