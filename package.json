@@ -11,8 +11,10 @@
     "start": "npm run build:embeddings && node ./server/server.js",
     "deploy:blog": "git subtree split --prefix=Frontend/blog.fahrnbach.one -b deploy-blog && git push blog deploy-blog:main && git branch -D deploy-blog",
     "deploy:home": "git subtree split --prefix=Frontend/fahrnbach.one -b deploy-home && git push blog deploy-home:main && git branch -D deploy-home",
-    "deploy:sesame": "npx wrangler r2 object put sesame-data/data.json --file Frontend/sesame.fahrnbach.one/data.json --remote --config Frontend/sesame.fahrnbach.one/sesame-meta-worker/wrangler.toml && npx wrangler deploy --config Frontend/sesame.fahrnbach.one/sesame-meta-worker/wrangler.toml"
-  },
+    "dev:sesame": "test -f Frontend/sesame.fahrnbach.one/sesame-meta-worker/.wrangler/state/v3/r2/sesame-data-preview/data.json && cp Frontend/sesame.fahrnbach.one/data.json Frontend/sesame.fahrnbach.one/sesame-meta-worker/.wrangler/state/v3/r2/sesame-data-preview/data.json && npx wrangler dev --local --config Frontend/sesame.fahrnbach.one/sesame-meta-worker/wrangler.toml || npx wrangler dev --remote --config Frontend/sesame.fahrnbach.one/sesame-meta-worker/wrangler.toml",
+    "stage:sesame": "npx wrangler r2 object put sesame-data-preview/data.json --file Frontend/sesame.fahrnbach.one/data.json --remote --config Frontend/sesame.fahrnbach.one/sesame-meta-worker/wrangler.toml && npx wrangler dev --remote --config Frontend/sesame.fahrnbach.one/sesame-meta-worker/wrangler.toml",
+    "upload:resume": "node Frontend/resume.fahrnbach.one/scripts/upload-resumes.js",
+    "deploy:resume": "npm run upload:resume && npx wrangler deploy --config Frontend/resume.fahrnbach.one/resume-meta-worker/wrangler.toml"},
   "keywords": [],
   "author": "💪 😎",
   "license": "ISC",

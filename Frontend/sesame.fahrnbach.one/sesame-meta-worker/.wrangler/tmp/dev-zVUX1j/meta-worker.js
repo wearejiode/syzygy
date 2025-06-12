@@ -152,9 +152,11 @@ var meta_worker_default = {
       margin: 1rem 0;
     }
 
-    .flex-container-buttons {
-      display: flex;
+    .button-grid {
+      display: grid;
       gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-auto-rows: auto;
       justify-content: center;
       width: 100%;
     }
@@ -192,10 +194,12 @@ var meta_worker_default = {
         height: 90vh;
         padding: 1rem;
       }
-      .flex-container-buttons {
-        flex-direction: column;
-        gap: 0.75rem;
+      .button-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 buttons per row */
+        grid-auto-flow: row;
+        justify-items: center
       }
+
       .btn {
         width: 100%;
       }
@@ -217,13 +221,10 @@ var meta_worker_default = {
           allowfullscreen>
         </iframe>
       </div>
-      <div class="flex-container-buttons">
+      <div class="button-grid">
         <a href="/assets/resume.pdf" target="_blank" class="btn primary">\u{1F680} Resume</a>
         <a href="https://calendly.com/jacob-fahrnbach/30min" target="_blank" class="btn tert">\u{1F4C5} Book Time</a>
         <a href="https://fahrnbach.one" target="_blank" class="btn secondary">\u2728 Portfolio</a>
-      </div>
-      <div class="flex-container-buttons">
-        </br>
         <a href="https://www.linkedin.com/in/fahrnbach/" target="_blank" class="btn pent">\u{1F517} LinkedIn</a>
         <a href="https://github.com/fahrnbach" target="_blank" class="btn quat">\u{1F639} GitHub</a>
       </div>
