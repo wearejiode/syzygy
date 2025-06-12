@@ -12,4 +12,4 @@ ENVIRONMENT = "production"
 [[r2_buckets]]
 binding = "SESAME_DATA"
 bucket_name = "sesame-data"
-preview_bucket_name = "sesame-data"
+preview_bucket_name = "sesame-data-preview"
