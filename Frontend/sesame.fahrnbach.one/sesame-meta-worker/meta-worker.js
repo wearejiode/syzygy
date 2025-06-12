@@ -45,7 +45,7 @@ export default {
       : `https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg`;
 
     const defaultLinks = [
-      { label: "🚀 Resume", url: "https://resume.fahrnbach.one", style: "first" },
+      { label: "🚀 Resume", url: `https://resume.fahrnbach.one/${slug}`, style: "first" },
       { label: "✨ Portfolio", url: "https://fahrnbach.one", style: "second" },
       { label: "📅 Book Time", url: "https://calendly.com/jacob-fahrnbach/30min", style: "third" },
       { label: "💻 GitHub", url: "https://github.com/fahrnbach", style: "fourth" },

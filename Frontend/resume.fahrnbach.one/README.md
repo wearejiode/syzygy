@@ -36,10 +36,16 @@ npm run upload:resume
 ### 🖼️ Upload or Update Preview Image
 
 Uploads the default Open Graph preview image:
-
-```bash
-wrangler r2 object put resume-data/images/default-preview.webp \
+### default-preview.webp & default-preview.png
+```
+wrangler r2 object put resume-data/hotlink-ok/default-preview.webp \
   --file Frontend/resume.fahrnbach.one/images/default-preview.webp \
+  --remote \
+  --config Frontend/resume.fahrnbach.one/resume-meta-worker/wrangler.toml
+```
+```
+wrangler r2 object put resume-data/images/hotlink-ok/default-preview.png \
+  --file Frontend/resume.fahrnbach.one/images/default-preview.png \
   --remote \
   --config Frontend/resume.fahrnbach.one/resume-meta-worker/wrangler.toml
 ```
