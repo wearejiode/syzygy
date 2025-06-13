@@ -1,0 +1,23 @@
+{
+  "name": "blog-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node blog-worker.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "graphql": "^16.11.0",
+    "graphql-yoga": "^5.13.5",
+    "gray-matter": "^4.0.3",
+    "zod": "^3.25.64"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "wrangler": "^4.20.0"
+  }
+}
