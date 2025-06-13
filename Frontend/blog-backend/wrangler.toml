@@ -1,0 +1,12 @@
+name = "blog-backend"
+main = "blog-worker.js"
+compatibility_date = "2025-06-13"
+
+[vars]
+NODE_ENV = "production"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "blog-db"
+database_id = "72ebaed8-5b9a-45d5-bd2d-6835c529e87b"
+
