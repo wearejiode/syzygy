@@ -5,6 +5,8 @@ CREATE TABLE posts (
   content TEXT NOT NULL,
   title TEXT NOT NULL,
   description TEXT,
+  level TEXT CHECK(level IN ('beginner', 'intermediate', 'advanced')),
+  audience TEXT UNIQUE NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   slug_prefix TEXT,
   created TEXT NOT NULL,
@@ -37,7 +39,7 @@ CREATE TABLE posts (
   canonical TEXT,
   auth_required BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 );
 
 -- Tags (one row per tag)

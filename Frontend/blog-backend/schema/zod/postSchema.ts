@@ -4,6 +4,8 @@ const postSchema = z.object({
   id: z.string().optional(),
   title: z.string(),
   description: z.string(),
+  level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
+  audience: z.string().optional(),
   slug: z.string(),
   slugPrefix: z.union([z.string(), z.boolean()]).optional(),
 

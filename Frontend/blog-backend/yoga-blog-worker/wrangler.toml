@@ -1,5 +1,5 @@
 name = "blog-backend"
-main = "blog-worker.js"
+main = "yoga-blog-worker.js"
 compatibility_date = "2025-06-13"
 
 [vars]

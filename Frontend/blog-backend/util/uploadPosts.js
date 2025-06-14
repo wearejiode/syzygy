@@ -4,7 +4,7 @@ import os from 'os';
 import { execSync } from 'child_process';
 import matter from 'gray-matter';
 import { fileURLToPath } from 'url';
-import { validatePost } from './zod/postSchema.js';
+import { validatePost } from '../schema/zod/postSchema.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node blog-worker.js"
+    "dev": "node yoga-blog-worker/yoga-blog-worker.js"
   },
   "author": "",
   "license": "ISC",
