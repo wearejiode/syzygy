@@ -192,6 +192,10 @@ export default {
       background-color: rgba(255, 255, 255, 0.08);
     }
 
+    .summary.expanded {
+      max-height: none;
+    }
+
     .summary-main {
       width: 100%
       height: 90%;
@@ -211,6 +215,14 @@ export default {
     .subtle-link {
       text-decoration: none;
       color:#f0ffa6
+    }
+
+    .read-more-toggle {
+      display: block;
+      margin-top: 0.5rem;
+      color: #007bff;
+      cursor: pointer;
+      font-weight: bold;
     }
 
     .video {
@@ -339,14 +351,17 @@ export default {
   <div class="background">
     <div class="info">
       <div class="title">${data.title}</div>
-      <div class="summary">
-        <div class="summary-main">
-        ${data.description}
+        <div class="summary-container">
+          <div class="summary">
+            <div class="summary-main">
+            ${data.description}
+            </div>
+            <div class="summary-footer">
+            <a href="https://fahrnbach.one" class="subtle-link">💖 Tools that spark creativity and connection.</a>
+            </div>
+          </div>
+        <span class="read-more-toggle" data-target="summary1">Read more...</span>
         </div>
-        <div class="summary-footer">
-          <a href="https://fahrnbach.one" class="subtle-link">💖 Tools that spark creativity and connection.</a>
-        </div>
-      </div>
       <div class="video">
         <iframe
           width="100%"
@@ -365,6 +380,28 @@ export default {
   </div>
 </body>
 <script>
+  document.querySelectorAll('.read-more-toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const targetId = toggle.dataset.target;
+      const summary = document.getElementById(targetId);
+
+      if (summary.classList.contains('expanded')) {
+        summary.classList.remove('expanded');
+        toggle.textContent = 'Read more';
+      } else {
+        summary.classList.add('expanded');
+        toggle.textContent = 'Show less';
+      }
+    });
+  });
+  document.querySelectorAll('.summary').forEach(summary => {
+  if (summary.scrollHeight <= summary.clientHeight) {
+    const toggle = summary.nextElementSibling;
+    if (toggle.classList.contains('read-more-toggle')) {
+      toggle.style.display = 'none';
+    }
+  }
+  });
   document.addEventListener("mousemove", (e) => {
     const sparkle = document.createElement("div");
     sparkle.className = "sparkle";
