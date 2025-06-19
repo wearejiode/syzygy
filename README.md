@@ -8,3 +8,5 @@ Welcome to **Fahrnbach One**, a unified monorepo containing all projects by [Jac
 This Monorepo is Undergoing construction and will be updated futher soon...
 
 ---
+Tidying up before unpacking
+Like sweeping the hangar before launching a rocket 🚀
