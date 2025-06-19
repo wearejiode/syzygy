@@ -1,0 +1,38 @@
+## 🚂 Day 7: All Aboard the Monorepo
+
+> ⚫️ Retrospective: “Today was about laying track, not driving the train — but we’re ready to roll.”
+
+**Highlights:**
+- Initialized and configured **Nx monorepo** structure
+- Migrated legacy Angular blog to `apps/blog-frontend`
+- Cleaned up unused files and clarified project folder conventions (`src/` vs `public/`)
+- Resolved `.zshrc` issues (including `nvm` context bugs)
+- Unified `package.json` dependencies and scripts
+- Set up `project.json` with custom build targets and assets
+- Pruned legacy `angular.json`, `.editorconfig`, and `.vscode` where appropriate
+
+**Summary:**
+Today was a foundational refactor. We took a standalone Angular blog and began its transformation into a fully modular Nx workspace. From rewriting file paths and asset references to reworking SSR/prerender logic, this was about *future-proofing*. The monorepo is now clean, aligned, and ready to scale.
++ The groundwork is laid for a successful SSG setup — now we can focus on making the blog truly shine.
+
+**Intent:**
+Prepare the groundwork for further modularization and feature development — including SSG, client-side islands, and shared component libraries.
+
+**Lessons Learned:**
++ Don’t blindly trust defaults — especially when migrating. Understand how assets, build targets, and executors behave in Nx.
+- `.zshrc` bugs can silently cascade into your CLIs (watch for broken `nvm`, especially).
+- The public vs src distinction is deeper than it looks — Read the full post ->[blog.fahrnbach.one/src-vs-public-bakery](https://blog.fahrnbach.one/src-vs-public-bakery)
+
+**Future Improvements:**
+- Scaffold `server.ts` + `main.server.ts` for SSR/SSG setup
+- Add Husky + Prettier + lint-staged for pre-commit hygiene
+- Create `HotPostsComponent` to test dynamic client-only behavior
+
+---
+✨ Curious how it all comes together?
+Explore the [Devlog Index](https://github.com/fahrnbach/one/discussions/4)
+or visit the full [portfolio site](https://fahrnbach.one)
+
+**Tags:**  `#nx` `#monorepo` `#migration` `#refactor` `#zsh` `#devlog`
+🎧 **Coding Fuel:** [Liquid Bloom - Mewowolf](https://www.youtube.com/watch?v=FaG5EFBOTpA)
+📅 *June 15 2025*
