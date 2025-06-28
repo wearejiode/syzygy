@@ -1,0 +1,73 @@
+---
+title: Hot-posts
+description: "A self-updating Angular module that surfaces trending posts from the blog API."
+tags: ["angular", "components", "blog", "hot-posts"]
+author: "Jacob Fahrnbach"
+ai_used: true
+model: "ChatGPT 4o-Turbo"
+status: "draft"
+created: "2025-06-19"
+updated: "2025-06-19"
+revision: 1.0
+alignment: 7
+confidence: 8
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+The `HotPostsComponent` is a plug-and-play Angular module designed to display the most interacted-with blog posts with 'near' (24hr) real-time updates. It’s ideal for surfacing currently popular content to increase engagement and time-on-site.
+
+<Aside type="tip">This component is especially useful on landing pages or as a sidebar insert to help users discover trending material they might otherwise miss.</Aside>
+
+## 🧠 How It Works
+
+- Fetches from the `/api/hot` endpoint.
+- Ranks posts by a combination of:
+  - Page views
+  - Time spent on page
+  - Engagement (click-throughs, reactions)
+- Includes a manual override/curation mechanism (via future AI worker or manual admin dashboard).
+- Easily styled and embeddable into any Angular page or layout.
+
+## 🧩 Integration
+
+```ts
+// app.module.ts
+import { HotPostsComponent } from './components/hot-posts/hot-posts.component';
+
+@NgModule({
+  declarations: [HotPostsComponent],
+  exports: [HotPostsComponent]
+})
+export class BlogComponentsModule {}
+```
+
+```html
+<!-- Inside any template -->
+<hot-posts></hot-posts>
+```
+
+## 🚦 Curation Pipeline (Planned)
+
+The hot feed will be curated through a combination of:
+	•	Realtime stats from the analytics layer
+	•	An AI worker process that flags emergent trends
+	•	Manual curation by admins (fallback or override)
+
+<Aside type="tip">We plan to make the AI-assisted curation logic modular, so it can be reused for tags like “featured” or “trending in category.”</Aside>
+
+## 🛠️ Future Ideas
+
+	•	Add a filter by tag or category.
+	•	Option to show hot posts per author or series.
+	•	Cross-site integration (e.g. show blog posts on nexus).
+
+<Aside>
+
+See also:<br />
+	[`/core/blog/blog-design`](/core/blog/blog-design) <br />
+	[`/core/api/graphql-schema`](/core/api/graphql-schema)<br />
+	[`/core/admin/dashboard`](/core/admin/dashboard) <br />
+</Aside>

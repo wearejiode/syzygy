@@ -1,0 +1,64 @@
+{
+  "title": "Loremap: Journey of Becoming",
+  "description": "An emotional and physical journey spanning key cities during the formative arc of the memoir.",
+  "trail": [
+    {
+      "location": "Cincinnati, OH",
+      "coordinates": [39.1031, -84.5120],
+      "label": "Origin Point",
+      "chapter": "000-(α)n intro.md",
+      "notes": "Where it all began."
+    },
+    {
+      "location": "Washington, DC",
+      "coordinates": [38.9072, -77.0369],
+      "label": "Crossroads",
+      "chapter": "001-bang.md",
+      "notes": "The beginning of transition."
+    },
+    {
+      "location": "New York City, NY",
+      "coordinates": [40.7128, -74.0060],
+      "label": "The Pulse",
+      "chapter": "002-return.md",
+      "notes": "Immersion in life, speed, and solitude."
+    },
+    {
+      "location": "Seattle, WA",
+      "coordinates": [47.6062, -122.3321],
+      "label": "Stillness",
+      "chapter": "004-root.md",
+      "notes": "Reflection and root-growing."
+    },
+    {
+      "location": "Cincinnati, OH (Return)",
+      "coordinates": [39.1031, -84.5120],
+      "label": "The Return",
+      "chapter": "005-faith.md",
+      "notes": "A deeper confrontation with self."
+    },
+    {
+      "location": "San José, Costa Rica",
+      "coordinates": [9.9281, -84.0907],
+      "label": "The Flame",
+      "chapter": "007-crush.md",
+      "notes": "Heat, growth, and eventual breaking."
+    },
+    {
+      "location": "Cincinnati, OH (Final)",
+      "coordinates": [39.1031, -84.5120],
+      "label": "Resolution",
+      "chapter": "013-ascension.md",
+      "notes": "The homecoming. Changed."
+    }
+  ],
+  "style": {
+    "pathColor": "#e63946",
+    "dotColor": "#1d3557",
+    "highlight": "#f1faee"
+  },
+  "meta": {
+    "version": "1.0",
+    "lastUpdated": "2025-06-23"
+  }
+}
