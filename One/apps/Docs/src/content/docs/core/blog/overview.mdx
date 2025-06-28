@@ -1,0 +1,61 @@
+---
+title: "Overview"
+description: "A high-level overview of the custom Angular-powered blog, its CMS features, and content federation capabilities."
+tags: ["blog", "overview", "cms", "angular", "content-federation"]
+author: "Jacob Fahrnbach"
+ai_used: true
+model: "ChatGPT 4o-Turbo"
+status: "draft"
+created: "2025-06-19"
+updated: "2025-06-19"
+revision: 1.0
+alignment: 10
+confidence: 10
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+Welcome to the central hub of the **fahrnbach.one** blog system — a fully custom, Angular-powered frontend that combines structured content with powerful visual tools. This isn't your average blog — it's a modular publishing platform with WYSIWYG authoring, programmable components, and API-driven design.
+
+<Aside type="tip">This system is designed with both maintainers and readers in mind, aiming to create a seamless balance between developer experience and content creativity.</Aside>
+
+## Architecture Highlights
+
+- **Frontend**: Built using Angular, with a structured layout and reusable components.
+- **CMS**: Fully integrated visual editor (WYSIWYG) with support for rich Markdown + frontmatter.
+- **API**: GraphQL-based content layer (via Yoga) that feeds posts, metadata, and structured queries.
+- **Component Federation**: Blog widgets and design components can be dropped into other sites.
+- **Reciprocation Engine**: Designed to support syndicated content, with federated posting on the roadmap.
+
+## Key Features
+
+- 🔄 **Reusable Blog Components**
+  Includes post cards, tag filters, trending logic, and layout elements — portable across sites.
+
+- 🧠 **Frontmatter Parsing + Metadata Hooks**
+  From SEO tags to reading time, AI usage, and featured logic — the schema is built for adaptability.
+
+- ✍️ **Live CMS Editing**
+  Real-time content creation with validation (Zod) and a backend powered by D1 + R2.
+
+- 🧩 **Federated Content Ready**
+  Designed to support reciprocal syndication — blog components can power other platforms.
+
+<Aside type="note">Our goal is to make this blog not just a place to publish — but a programmable publishing engine.</Aside>
+
+## What's Next
+
+This overview page will continue to evolve as the system matures. Expect future additions including:
+
+- Admin CMS UI screenshots
+- Component library demos
+- Real-world syndication case studies
+- Integration blueprints for other Angular sites
+
+---
+
+To learn how the blog is wired up to the GraphQL API, visit [`api/api-blog`](/api/api-blog)
+To dive into the content model, view the [`schema`](/api/schema)
+For a visual layout reference, explore [`blog-components`](/blog/blog-components)

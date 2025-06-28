@@ -1,0 +1,74 @@
+---
+title: Components
+description: "Documentation for the core components displayed in the Angular-powered component viewer."
+tags: ["angular", "components", "library", "frontmatter", "viewer"]
+author: "Jacob Fahrnbach"
+ai_used: true
+model: "ChatGPT 4o-Turbo"
+status: "draft"
+created: "2025-06-19"
+updated: "2025-06-19"
+revision: 1.0
+alignment: 9
+confidence: 9
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+This page documents the **reusable Angular components** featured in our dynamic, searchable component viewer.
+
+The library is designed for **maximum modularity** and is intended to evolve alongside our core design system and CMS tooling.
+
+---
+
+## 🔍 What It Does
+
+- Dynamically displays categorized Angular components
+- Pulls from a structured file tree with standardized metadata
+- Powers a fuzzy-search interface to browse, preview, and explore available modules
+
+<Aside type="note">All components include frontmatter that defines their category, tags, complexity level, and intended usage scope.</Aside>
+
+---
+
+## 🧱 Component Metadata Structure
+
+Each component begins with a frontmatter block like so:
+
+```ts
+// ./components/card/card.component.ts
+/*
+---
+title: "Card"
+category: "UI"
+tags: ["layout", "responsive", "themeable"]
+level: "beginner"
+audience: "frontend"
+description: "A flexible content container with optional header and footer slots."
+status: "stable"
+usedAI: false
+---
+*/
+
+```
+<Aside type="tip">This frontmatter is parsed and used by the library viewer to organize, filter, and annotate components.</Aside>
+
+## 🧪 Component Usage Guidelines
+
+Each module includes:
+	•	✅ Example markup with usage context
+	•	💡 Notes on design intent
+	•	⚙️ Extensibility or slot instructions
+	•	🧼 Accessibility checks (where relevant)
+
+## 🧬 Future Additions
+	•	Embed video previews or interactive demos
+	•	Reference patterns for CMS content blocks
+	•	Link to matching templates or snippets
+
+## 🔗 Related Pages<br />
+	[`/core/library/getting-started`](/core/library/getting-started)<br />
+	[`/core/library/toolbox`](/core/library/toolbox)<br />
+	[`/core/api/schema`](/core/api/schema)<br />

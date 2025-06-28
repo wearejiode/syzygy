@@ -1,0 +1,57 @@
+---
+title: "Pitch Pages"
+description: "Overview of the personalized outreach pages hosted via Sesame, designed to deliver tailored content to recruiters and companies."
+tags: ["sesame", "pitch", "outreach", "sparkdocs"]
+author: "Jacob Fahrnbach"
+ai_used: true
+model: "ChatGPT 4o-Turbo"
+status: "draft"
+created: "2025-06-19"
+updated: "2025-06-19"
+revision: 1.0
+alignment: 10
+confidence: 10
+---
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+The **Pitch Pages** are a core feature of [sesame.fahrnbach.one](https://sesame.fahrnbach.one) — personalized microsites designed to deliver targeted outreach to companies, recruiters, or collaborators.
+
+Each pitch page is accessible via a unique slug:
+```
+sesame.fahrnbach.one/company-name
+```
+
+These are generated dynamically using a shared `manifest.json` file that stores:
+- 📝 A personalized written pitch
+- 🎥 A link to a custom video introduction
+- 🔗 Key links: Calendly, GitHub, Resume (slug-matched), Blog, Portfolio
+
+<Aside type="note">
+The resume is dynamically matched to the slug — e.g., `sesame.fahrnbach.one/openai` serves `resume.fahrnbach.one/openai.pdf`.
+</Aside>
+
+---
+
+##  🎯 Pitch Pages
+
+This strategy allows highly targeted outreach while maintaining scale — every company gets a personal touch without manual duplication.
+
+The layout is mobile-first and includes:
+- A compelling short pitch
+- Embedded video player
+- Prominent CTA buttons for follow-up
+- Optional shareable card layout for future features
+
+---
+
+## Intent
+
+To create a seamless bridge between interest and action — making it easy for employers to engage, book, and hire, with minimal friction and maximum delight.
+
+Planned updates include smart personalization via URL parameters (e.g., adding the recruiter's name), share-with-a-colleague flow, and progressive AI feature unlocks in v2.
+
+<Aside type="tip">
+This system is perfect for freelancers, creators, or job seekers looking to scale authentic outreach with just a little magic.
+</Aside>

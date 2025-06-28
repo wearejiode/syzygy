@@ -1,0 +1,63 @@
+---
+title: "Blog"
+description: "A dynamic hub at nexus.fahrnbach.one for featured posts, quick reads, and deep dives — all powered by the Fahrnbach blog engine."
+tags: ["nexus", "blog", "integration"]
+author: "Jacob Fahrnbach"
+ai_used: true
+model: "ChatGPT 4o-Turbo"
+status: "draft"
+created: "2025-06-19"
+updated: "2025-06-19"
+revision: 1.0
+alignment: 10
+confidence: 10
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+The **Blog** tab at [nexus.fahrnbach.one](https://nexus.fahrnbach.one) is a curated, embedded portal into the broader Fahrnbach blog system. While the full content lives at [blog.fahrnbach.one](https://blog.fahrnbach.one), this section provides a window — fast access to hot takes, recent posts, and AI-suggested reads — all without leaving the Nexus experience.
+
+<Aside type="note">
+  This tab helps unify the site experience by surfacing intelligent summaries, preview cards, and quick links from the main blog without context switching.
+</Aside>
+
+---
+
+## Key Features
+
+- 📌 **Dynamic Highlights:** AI-curated hot posts and personalized recaps from the main blog.
+- 🔍 **Search Preview:** Fuzzy search and tag filters powered by shared schema and metadata.
+- 🔗 **Smart Routing:** Seamlessly deep-link into the main blog *or* stay within Nexus via embedded readers or expandable cards.
+- 🧠 **Cross-App Federation:** Blog content can link directly into projects, tools, snippets, or pitch pages.
+
+---
+
+## Architecture Notes
+
+This page is tightly integrated with:
+
+- `blog-api` (GraphQL/Yoga + D1 schema)
+- Shared metadata schema for posts
+- Hot-posts component module
+- Optional AI summarizer (for on-site snippets / TL;DR)
+
+---
+
+## Future Ideas
+
+- Embed full post previews in modal overlays
+- Highlight discussions from GitHub or other syndicated sources
+- Show a “From the Archives” rotating module
+- Feature AI-generated summaries or narrative intros
+
+<Aside type="tip">
+  The goal isn’t just to display content — it’s to *contextualize* it. Let users skim, dive, or explore — all from the same interface.
+</Aside>
+
+---
+
+## Intent
+
+To bridge the full blog with the broader Nexus interface — offering a flexible, dynamic, and user-first experience where readers can stay in flow, or leap deep into longform posts when ready.
