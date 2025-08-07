@@ -1,11 +1,11 @@
 {
-  "name": "vite-project",
+  "name": "fahrnbach.one",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "pnpm nx run fahrnbach-one:build",
+    "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
     "test-once": "vitest run"
