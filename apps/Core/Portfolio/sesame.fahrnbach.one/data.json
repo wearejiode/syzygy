@@ -1,12 +1,13 @@
 {
     "openai": {
       "title": "✨ Jacob’s Pitch to OpenAI ✨",
-      "description": "Why I’m the right fit to build the future of intelligence.This pitch isn’t tied to a single company — it’s for *you*, wherever you are.This pitch isn’t tied to a single company — it’s for *you*, wherever you are.",
+      "description": "Why I’m the right fit to build the future of intelligence. We are all made of stardust. I want to help humanity reach utopia, and I believe OpenAI is the best place to do that. Let's build the future together. All for one, one for all.",
       "videoSlug": "lPpOT_-qJl0",
       "links": [
         { "label": "🔥 Resume", "url": "https://resume.fahrnbach.one/openai", "style": "first"},
         { "label": "🧑‍🏫 Book Time", "url": "https://calendly.com/jacobfahrnbach/30min", "style": "second"},
-        { "label": "🧑‍🏫 CHOP", "url": "https://calendly.com/jacobfahrnbach/30min", "style": "second"}
+        { "label": "🎨 Portfolio", "url": "https://fahrnbach.one", "style": "third"},
+        { "label": "💌 Mail", "url": "mailto:love@jiode.one", "style": "fourth"}
       ]
     },
       "google": {
