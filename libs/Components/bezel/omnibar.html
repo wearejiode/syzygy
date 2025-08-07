@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omnibar Scaffold</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #111125;
+      color: #fff;
+      padding-top: 60px; /* reserve space for fixed omnibar */
+    }
+
+    .omnibar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo {
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #7DF9FF;
+      cursor: pointer;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .nav-links a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #7DF9FF;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .search-bar input {
+      padding: 0.3rem 0.6rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .bridge-toggle {
+      cursor: pointer;
+      background: #7DF9FF;
+      color: #111;
+      border: none;
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.85rem;
+      transition: background 0.3s;
+    }
+
+    .bridge-toggle:hover {
+      background: #5cd8e6;
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="omnibar">
+    <div class="logo" onclick="location.href='/'">✨ Jiode.one</div>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#book">Book</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="search-bar">
+      <input type="text" placeholder="Search..." />
+      <button class="bridge-toggle" onclick="toggleBridge()">Switch 🌗</button>
+    </div>
+  </div>
+
+  <main>
+    <h1>Welcome to the Omnibar Scaffold ✨</h1>
+    <p>This scaffold demonstrates a fixed omnibar with integrated navigation, search, and bridge toggle for your layered site system.</p>
+  </main>
+
+  <script>
+    function toggleBridge() {
+      alert('Bridge toggled! Here you will trigger your theme/site switch logic.');
+    }
+  </script>
+
+</body>
+</html>

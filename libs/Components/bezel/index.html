@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✨ Bezel & Mirror Flash Sandbox ✨</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #111125, #000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    overflow: hidden;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    text-align: center;
+    max-width: 80%;
+    line-height: 1.4;
+  }
+
+  .bezel {
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border: 1px solid var(--bezel-color, #7DF9FF);
+    box-sizing: border-box;
+    z-index: 9999;
+    transition: border-color 0.5s ease, opacity 0.5s ease;
+    overflow: clip;
+    border-radius: 50px 
+  }
+
+  .bezel.glow {
+    box-shadow: 0 0 20px var(--bezel-color, #7DF9FF),
+                0 0 40px var(--bezel-color, #7DF9FF),
+                inset 0 0 20px var(--bezel-color, #7DF9FF);
+  }
+
+  @keyframes mirror-flash {
+    0% { opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.2; }
+  }
+
+  @keyframes mirror-flash2 {
+    0% {   left: -200vw; }
+    100% { left: 200vw; }
+  }
+
+  .bezel.flash {
+    animation: mirror-flash 1.2s ease-in-out;
+  }
+
+  .controls {
+    position: absolute;
+    bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    background: #ffc857;
+    color: #111;
+    transition: background 0.3s;
+  }
+
+  button:hover {
+    background: #ffb347;
+  }
+
+  .mirror {
+      --size: 100vw;
+      --transition-duration: 500ms;
+      --transition-easing: ease-out;
+      
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-decoration: none;
+  color: var(--foreground-color);
+  font-size: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(2px);
+  border-radius: 0.5rem;
+  transition: transform var(--transition-duration) var(--transition-easing);
+  overflow: hidden;
+}
+
+.mirror::before {
+  content: '';
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
+  width: 33%;
+  height: 100%;
+  top: 0;
+  left: -200vw;
+
+  transform: skew(45deg);
+  position: absolute;
+
+  transition: left var(--transition-duration) var(--transition-easing);
+}
+
+.mirror2 {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
+  width: 40%;
+  height: 100%;
+  top: 0;
+  left: -200vw;
+
+  transform: skew(45deg);
+  position: fixed;
+
+  transition: left var(--transition-duration) var(--transition-easing);
+  pointer-events: none;
+}
+
+.mirror3{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
+    backdrop-filter: blur(2px);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease 0.2s
+}
+
+.reveal {
+    opacity: 1
+}
+
+.mirror2.forwards {
+    animation: mirror-flash2 1.2s ease-in-out forwards;
+}
+
+.mirror2.reversed {
+    animation: mirror-flash2 1.2s ease-in-out reverse backwards;
+}
+
+/* .mirror:hover {
+  transform: translateY(-25%);
+} */
+
+.mirror:hover::before {
+  left: 200vw;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mirror2, .mirror3, .bezel {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+</style>
+</head>
+<body>
+  <h1>✨ Bezel & Mirror Flash Sandbox ✨<br>Click a button to test theme & flash.</h1>
+  <div class="mirror2"></div>
+  <div class="mirror3"></div>
+  <div id="bezel" class="bezel glow">
+  </div>
+  <div class="controls">
+    <button onclick="setTheme('#7DF9FF')">Jiode Theme</button>
+    <button onclick="setTheme('#FF6458')">Fahrnbach Theme</button>
+    <button onclick="triggerFlash()">Trigger Mirror Flash</button>
+  </div>
+
+<script>
+let currentSite = 'jiode'; // Track which site we are on
+
+function getThemeColor() {
+  return document.documentElement.style.getPropertyValue('--bezel-color').trim() || '#7DF9FF';
+}
+
+function setTheme(color) {
+  document.documentElement.style.setProperty('--bezel-color', color);
+}
+
+// Helper: get the theme color for each site
+function getSiteColor(site) {
+//   return site === 'jiode' ? '#7DF9FF' : '#FF69B4';
+  return site === 'jiode' ? '#7DF9FF' : '#FF6458';
+}
+
+function triggerFlash() {
+  const mirror2 = document.querySelector('.mirror2');
+  const mirror3 = document.querySelector('.mirror3');
+
+  // Swap site state
+  currentSite = currentSite === 'jiode' ? 'fahrnbach' : 'jiode';
+  const newColor = getSiteColor(currentSite);
+
+  // Update theme colors and gradients
+  setTheme(newColor);
+  mirror2.style.background = `linear-gradient(135deg, ${newColor}11, ${newColor}33)`;
+  mirror3.style.background = `linear-gradient(135deg, ${newColor}05, ${newColor}11)`;
+
+  // Remove both classes before toggling
+  mirror2.classList.remove('forwards', 'reversed');
+
+  // Force reflow for immediate re-animation
+  void mirror2.offsetWidth;
+
+  // Toggle direction based on site
+  if (currentSite === 'jiode') {
+    mirror2.classList.add('forwards');
+  } else {
+    mirror2.classList.add('reversed');
+  }
+
+  // Show mirror overlay briefly
+  mirror3.classList.add('reveal');
+  setTimeout(() => mirror3.classList.remove('reveal'), 800);
+
+  // Optionally, add glow flash
+  const bezel = document.getElementById('bezel');
+  bezel.classList.add('flash');
+  setTimeout(() => bezel.classList.remove('flash'), 1200);
+}
+</script>
+</body>
+</html>
