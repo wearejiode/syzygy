@@ -923,8 +923,8 @@ const projectData = {
       blog: 'https://blog.fahrnbach.one/art-app'
     },
     blog: {
-      title: 'Blog (Python CMS)',
-      description: 'A Markdown-based blog with a custom Python CMS backend.',
+      title: 'Blog',
+      description: 'A Markdown-based blog',
       image: '/screenshots/blog-screenshot.png',
       link: 'https://blog.fahrnbach.one',
       code: 'https://github.com/fahrnbach/blog-monorepo',
