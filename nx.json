@@ -72,5 +72,10 @@
       "style": "scss",
       "unitTestRunner": "jest"
     }
+  },
+  "projects": {
+    "fahrnbach.one": {
+      "tags": []
+    }
   }
 }
