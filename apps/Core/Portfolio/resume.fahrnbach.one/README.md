@@ -39,15 +39,15 @@ Uploads the default Open Graph preview image:
 ### default-preview.webp & default-preview.png
 ```
 wrangler r2 object put resume-data/hotlink-ok/default-preview.webp \
-  --file Frontend/resume.fahrnbach.one/images/default-preview.webp \
+  --file Portfolio/resume.fahrnbach.one/images/default-preview.webp \
   --remote \
-  --config Frontend/resume.fahrnbach.one/resume-meta-worker/wrangler.toml
+  --config Portfolio/resume.fahrnbach.one/resume-meta-worker/wrangler.toml
 ```
 ```
 wrangler r2 object put resume-data/images/hotlink-ok/default-preview.png \
-  --file Frontend/resume.fahrnbach.one/images/default-preview.png \
+  --file Portfolio/resume.fahrnbach.one/images/default-preview.png \
   --remote \
-  --config Frontend/resume.fahrnbach.one/resume-meta-worker/wrangler.toml
+  --config Portfolio/resume.fahrnbach.one/resume-meta-worker/wrangler.toml
 ```
 
 ---
@@ -75,7 +75,7 @@ npm run deploy:resume
 If you want to update the Open Graph Image (like `default-preview.webp`), it may **need to be manually updated** in the Cloudflare dashboard — or uploaded using the following command:
 
 ```bash
-npx wrangler r2 object put resume-data/images/default-preview.webp --file Frontend/resume.fahrnbach.one/images/default-preview.webp --remote --config Frontend/resume.fahrnbach.one/resume-meta-worker/wrangler.toml
+npx wrangler r2 object put resume-data/images/default-preview.webp --file Portfolio/resume.fahrnbach.one/images/default-preview.webp --remote --config Portfolio/resume.fahrnbach.one/resume-meta-worker/wrangler.toml
 ```
 
 Thumbnail previews are **AUTOMATICALLY** generated and handled by the worker.

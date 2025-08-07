@@ -5,7 +5,8 @@
   "scripts": {
     "dev:docs": "nx run docs:dev",
     "build:docs": "nx run docs:build",
-    "preview:docs": "nx run docs:preview"
+    "preview:docs": "nx run docs:preview",
+    "r2:list": "wrangler r2 object list --bucket resume-data --prefix resumes/ --config apps/Core/Portfolio/resume.fahrnbach.one/resume-meta-worker/wrangler.toml"
   },
   "private": true,
   "dependencies": {
