@@ -109,7 +109,7 @@ const intersectionCallback = (entries) => {
     if (entry.isIntersecting) {
       let elem = entry.target;
       // console.log(entry)
-      
+
       if (entry.intersectionRatio > 1) {
         aboutMeIsVisible = true
         aboutIsVisible = true
@@ -167,10 +167,10 @@ for (let i = 0; i < 90; i++) { //Can Adjust Number (90)
   // i % 2 === 0 ? smokeElement.rotation.y = 180 : smokeElement.rotation.y = 0
 
   scene.add(smokeElement)
-  // smokeMaterial.color = 
+  // smokeMaterial.color =
   smokeParticles.push(smokeElement); //add to array of smoke textures
 }
-// #Smoke 
+// #Smoke
 let smokeParticles2 = []  // #Smoke Texture
 // Iterates through smoke 'Mirrors'
 for (let i = 0; i < 90; i++) { //Can Adjust Number (90)
@@ -182,7 +182,7 @@ for (let i = 0; i < 90; i++) { //Can Adjust Number (90)
   // i % 2 === 0 ? smokeElement.rotation.y = 180 : smokeElement.rotation.y = 0
 
   scene.add(smokeElement)
-  // smokeMaterial.color = 
+  // smokeMaterial.color =
   smokeParticles2.push(smokeElement); //add to array of smoke textures
 }
 
@@ -321,7 +321,7 @@ loop()
 //         (window.innerHeight/2-e.clientY)*2/window.innerHeight,
 //         -1/Math.tan(22.5*Math.PI/180)); //22.5 is half of camera frustum angle 45 degree
 //     vectorMouse.applyQuaternion(camera.quaternion);
-//     vectorMouse.normalize();        
+//     vectorMouse.normalize();
 
 //     var vectorObject = new THREE.Vector3(); //vector from camera to object
 //     vectorObject.set(moon.x - camera.position.x,
@@ -443,7 +443,7 @@ function showExploreButton() {
   gsap.to('.explore', {display: 'flex', duration: 2})
   gsap.to('.about', {opacity: 0, duration: 1})
   gsap.to('.contact', {opacity: 0, duration: 1})
-  nameAnimation();  
+  nameAnimation();
   setTimeout(() => {
     gsap.to('.about-me', {overwrite: true, y: '250vh', duration: 1})
     gsap.to(window, { overwrite: true, duration: 1, scrollTo: { y: "#explore"} });
@@ -456,7 +456,7 @@ navExploreButton.addEventListener('pointerup', () => {
   history.pushState({}, '', "/explore")
 })
 navExploreButton.addEventListener('navigate', () => {
-  
+
 })
 
 
@@ -487,8 +487,8 @@ window.addEventListener('pointerdown', (e) => {
   if (e.target == canvas) {
     gsap.to('.info', {opacity: 0})
   }
-  if (e.target == mobileButton || 
-    e.target == navAboutButton || e.target == navContactButton || 
+  if (e.target == mobileButton ||
+    e.target == navAboutButton || e.target == navContactButton ||
     e.target == navExploreButton && pointerDown){
     // nameToTransparent();
     infoClickToTransparent();
@@ -544,8 +544,8 @@ window.addEventListener('scroll', (e) => {
     // nameToTransparent();
   }
   if (
-    html.scrollTop > window.innerHeight / 2 * 1.5 && 
-    scrollPosition <= html.scrollTop && 
+    html.scrollTop > window.innerHeight / 2 * 1.5 &&
+    scrollPosition <= html.scrollTop &&
     !aboutMeIsVisible &&
     !aboutIsVisible &&
     !exploreOpen &&
@@ -562,7 +562,7 @@ window.addEventListener('scroll', (e) => {
     gsap.to(window, { duration: 0, scrollTo: { y: "#about"} });
     gsap.to('.about-me', {y: '250vh', duration: 1})
     scrollPosition = html.scrollTop
-  } 
+  }
   else if (exiting) {
     gsap.to(window, {overwrite: true, duration: .5, scrollTo: { y: '#lander'} });
     gsap.to('.about-me', {overwrite: true, y: '0', duration: .5})
@@ -580,7 +580,7 @@ setTimeout(() => {
     tl2.fromTo('.up-button', {y: '0',  opacity: 1}, {y: '-10%',  opacity: .5})
     tl2.fromTo('.up-button', {y: '-10%',  opacity: .5}, {y: '0%', opacity: 1})
     tl2.fromTo('.up-button', {y: '0',  opacity: 1}, {y: '-10%',  opacity: .5})
-    tl2.fromTo('.up-button', {y: '-10%',  opacity: .5}, {y: '0%', opacity: 1})  
+    tl2.fromTo('.up-button', {y: '-10%',  opacity: .5}, {y: '0%', opacity: 1})
     tl2.fromTo('.up-button', {y: '0',  opacity: 1}, {y: '-10%',  opacity: .5})
     tl2.fromTo('.up-button', {y: '-10%', opacity: 0}, {y: '0%', opacity: 1})
     tl2.fromTo('.up-button', {y: '0',  opacity: 1}, {y: '-10%',  opacity: .5})
@@ -588,7 +588,7 @@ setTimeout(() => {
   }
 }, 5000);
 
-let mobilePressTime = null 
+let mobilePressTime = null
 let mobileButton = document.querySelector('.mobile-continue-button')
 mobileButton.addEventListener('pointerdown', () => {
   mobilePressTime = Date.now();
@@ -690,35 +690,35 @@ exitContact.addEventListener('pointerup', () => {
 const exploreBG = document.querySelector('.explore-background')
 for (let i=0; i < 400; i++) {
   var star = document.createElement('div')
-  
+
   star.classList.add('star')
-  
+
   let size = Math.random() * 2.5 + 1
   star.style.bottom = Math.random() * html.scrollHeight / 2 + 'px'
   star.style.left = Math.random() * html.scrollWidth + 'px'
   star.style.width = size + 'px'
   star.style.height = size + 'px'
-  
+
   let delay = Math.random() * 3
   star.style.animationDelay = delay + 's'
-  
+
   exploreBG.appendChild(star)
 }
 
 for (let i=0; i < 100; i++) {
   var star = document.createElement('div')
-  
+
   star.classList.add('star-animated')
-  
+
   let size = Math.random() * 2.5 + 1
   star.style.bottom = Math.random() * html.scrollHeight / 2 + 'px'
   star.style.left = Math.random() * html.scrollWidth + 'px'
   star.style.width = size + 'px'
   star.style.height = size + 'px'
-  
+
   let delay = Math.random() * 3
   star.style.animationDelay = delay + 's'
-  
+
   exploreBG.appendChild(star)
 }
 //#endregion Explore Stars
@@ -753,7 +753,7 @@ class SVGStarComponent {
     this.defaultWidth = 500;
     this.parentRotation = 0
   }
-  
+
   drawStar() {
     // !getBoundingClientRect returns zero if the div display is set to none
     // this.parentDivBounds = this.parentDiv.getBoundingClientRect();
@@ -808,7 +808,7 @@ class SVGStarComponent {
     starSegment.style.transition = starSegment.style.WebkitTransition =
       `stroke-dashoffset ${this.drawTime}s ease-in-out`;
     // Go!
-    
+
     setTimeout(() => {
       starSegment.style.strokeDashoffset = '0';
     }, this.drawTime * 1000);
@@ -824,7 +824,7 @@ class SVGStarComponent {
 
 
   undrawStar() {
-      
+
       clearInterval(this.rotating)
       const svgEl = document.querySelector('.drawStarFXSVG')
       const hookin = document.querySelector('.contact-star-hookin')
@@ -951,7 +951,7 @@ const projectData = {
       description: 'A Single Page Application entirely made in Vanilla Javascript',
       image: '/screenshots/portfolio-screenshot.png',
       link: 'https://fahrnbach.one',
-      code: 'https://github.com/portfolio-site',
+      code: 'https://github.com/fahrnbach/',
       blog: 'https://blog.fahrnbach.one/portfolio-site'
     }
 };
@@ -1035,7 +1035,7 @@ const observer = new IntersectionObserver(entries => {
       updateTertiaryPanel(sectionKey);
       const key = entry.target.dataset.section;
       updateFloatingPreview(key);
-      
+
       orbButtons.forEach(o => {
         o.classList.toggle('active', o.dataset.section === sectionKey);
       });
