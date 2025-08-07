@@ -1,0 +1,69 @@
+---
+title: "CMS Guide"
+description: "A quick start guide for using and understanding the core features of our custom content management system."
+tags: ["cms", "content", "admin", "blog"]
+author: "Jacob Fahrnbach"
+ai_used: true
+model: "ChatGPT 4o-Turbo"
+status: "draft"
+created: "2025-06-19"
+updated: "2025-06-19"
+revision: 1.0
+alignment: 7
+confidence: 9
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+This document provides an overview of the Content Management System (CMS) used for managing blog posts, site content, and configuration within our platform.
+
+<Aside type="note">The CMS has direct integration with the GraphQL API and connects to our D1-backed post database. This system is built for both flexibility and power, and is evolving quickly!</Aside>
+
+## ✨ Key Features
+
+- **WYSIWYG Editor** – Write posts using a Markdown editor enhanced with custom components.
+- **Frontmatter Validation** – All posts follow a strict schema (Zod + SQL) to ensure consistency.
+- **Preview Before Publish** – See exactly what your post will look like with a live preview.
+- **Autosave + Drafts** – Edit safely with automatic saving and version tracking.
+- **Custom Tags/Categories** – Add or reuse tags and categories on the fly.
+- **Series Support** – Group posts into serialized series with part numbers and navigation.
+
+## 🛠️ How to Use It
+
+1. **Log in** at `/admin/login` to access the dashboard.
+2. Navigate to **Posts**.
+3. Click **Create New** or select an existing post to edit.
+4. Fill in required fields: title, slug, excerpt, etc.
+5. Add Markdown content and drag/drop media as needed.
+6. Assign tags, categories, and visibility settings.
+7. Click **Save Draft** or **Publish** to finalize your work.
+
+<Aside type="tip">You can also use the `/api/graphql` endpoint to programmatically create, update, or fetch posts if needed. See the [API Schema Guide](/api/schema) for more info.</Aside>
+
+## 📋 Field Reference
+
+Each post includes:
+- `title`, `slug`, `description`, `excerpt`
+- `tags`, `categories`, `author`
+- `readingTime`, `cover`, `images`
+- `status`, `published`, `draft`, `scheduled`
+- Optional series metadata and access flags
+
+<Aside type="caution">Always make sure slugs are unique and URLs are human-readable. Slug collisions can break routes or confuse readers!</Aside>
+
+## 🔮 What's Coming Next?
+
+- Role-based permissions for editors and contributors
+- Inline image editor for uploads to R2
+- Integrated AI assistant for content suggestions
+- Scheduled publishing and version history
+
+---
+
+See also:
+- [`api/api-blog`](/api/api-blog)
+- [`api/schema`](/api/schema)
+- [`sql-schema`](/api/sql-schema)
+- [`zod-schema`](/api/zod-schema)

@@ -1,0 +1,23 @@
+{
+  "name": "genie-session",
+  "projectType": "application",
+  "sourceRoot": "apps/Core/Api/genie-session",
+  "targets": {
+    "build": {
+      "executor": "@nx/node:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/Core/Api/genie",
+        "main": "apps/Core/Api/genie-session/src/main.ts",
+        "tsConfig": "apps/Core/Api/genie-session/tsconfig.app.json"
+      }
+    },
+    "serve": {
+      "executor": "@nx/node:execute",
+      "options": {
+        "buildTarget": "api:genie-session:build"
+      }
+    }
+  },
+  "tags": ["scope:core", "type:api"]
+}

@@ -1,0 +1,83 @@
+---
+title: "Login"
+description: "Entry point and access design for the Admin Dashboard, with future-forward authentication options."
+tags: ["admin", "login", "auth", "oauth", "crypto-passport", "dashboard", "modular"]
+author: "Jacob Fahrnbach"
+ai_used: true
+model: "ChatGPT 4o-Turbo"
+status: "draft"
+created: "2025-06-19"
+updated: "2025-06-19"
+revision: 1.1
+alignment: 10
+confidence: 9
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+The login page is the access gateway to the Admin Dashboard. This interface must strike a balance between **security**, **usability**, and **extensibility**, serving as a foundation for future enhancements like federated authentication and decentralized identity verification.
+
+<Aside type="note">This page will evolve as admin tooling and access layers become more sophisticated.</Aside>
+
+## Core Goals
+
+- 🔐 Provide secure, session-aware login for dashboard admins
+- 🪪 Prepare groundwork for OAuth and future identity integrations
+- ⚙️ Modular backend compatibility for different auth strategies
+
+## Modular Integration
+
+This authentication layer is not just for the admin dashboard — it's being engineered as a **modular, drop-in component** for any future-facing applications within the *fahrnbach.one* ecosystem.
+
+- 📦 Shared auth logic across admin, CMS, pitch apps, store, and more
+- 🔁 Unified token/session formats across services
+- 🔌 Configurable middleware hooks for custom permissions, throttling, logging
+
+<Aside type="tip">
+Think of this as your plug-and-play identity provider for internal and external tools. One login module to rule them all — secure, scalable, and portable.
+</Aside>
+
+## Current Implementation
+
+The current login interface is simple and password-protected, relying on cookie/session-based authentication to guard access to admin routes. The backend validates credentials and issues signed tokens for protected dashboard interactions.
+
+## Planned Upgrades
+
+### Federated Login
+
+We plan to introduce OAuth integrations for trusted providers like:
+
+- Google Workspace
+- GitHub (for developers)
+- Auth0 / Clerk / Supabase Auth (for broader extensibility)
+
+This would allow granular role mapping and SSO-style workflows.
+
+### Crypto Passport (Future Vision)
+
+In the longer term, this system may support **cryptographic login**:
+
+- Wallet-based signatures (e.g., MetaMask, WalletConnect)
+- Verifiable Credentials / DIDs
+- "Zero-knowledge" attestations for permissioned access
+
+<Aside type="tip">
+Future integration with Ethereum-compatible identity layers could enable passwordless access for ecosystem participants — tying permissions directly to on-chain identity.
+</Aside>
+
+## UX Notes
+
+- Autofocus and keyboard accessibility should be prioritized
+- Login errors should never reveal which part of the credential was incorrect
+- Rate-limiting and lockout strategy should be clearly defined on the backend
+
+---
+
+📌 _This file is part of the `/admin/login` module in the SparkDocs system._
+
+```md
+<!-- Prompt: Generate a SparkDoc entry for the admin login page, including modular design intentions and future login formats like OAuth and crypto identity layers. -->
+<!-- AI Notes: Be sure to wrap any `<!--` comments with backticks to avoid Astro/MDX issues -->
+```

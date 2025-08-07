@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>✨Privacy Policy✨</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="icon" type="image/svg+xml" href="./images/favicon.svg" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(ellipse at top, #111125, #000);
+      color: #fff;
+      padding: 3rem;
+      line-height: 1.7;
+	  background: #111125
+    }
+
+	.sigil {
+		aspect-ratio: 1 / 1;
+		width: 200px;
+		height: 200px;
+		/* position: absolute; */
+		display: inline-block;
+		top: 2rem;
+		right: 2rem;
+		filter: drop-shadow(0 0 10px #009dff88) drop-shadow(0 0 20px #009dff44);
+		transition: filter 0.3s ease;
+	}
+
+	.sigil:hover {
+		filter: drop-shadow(0 0 20px #009dffff) drop-shadow(0 0 40px #009dffff);
+	}
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(0,0,0,0.4);
+      border-radius: 20px;
+      padding: 3.5rem;
+      box-shadow: 0 0 30px #009dff55, inset 0 0 60px #009dff22;
+      backdrop-filter: blur(6px);
+    }
+
+	.head-container {
+	  display: flex;
+	  text-align: center;
+	  /* margin-bottom: 2rem; */
+	}
+
+	.title-container {
+	  font-size: 1rem;
+	  text-align: left;
+	  margin-bottom: 2rem;
+	  border-bottom: 2px solid #ffc85733;
+	  padding-right: 3rem;
+	}
+
+    h1, h2 {
+      color: #ffc857;
+      text-shadow: 0 0 10px #009dff88;
+    }
+
+    a {
+      color: #ffc857;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      text-align: right;
+      margin-top: 3rem;
+      opacity: 0.6;
+    }
+
+    ::selection {
+      background: #ffc85733;
+    }
+
+	.right-align {
+	  text-align: right;
+	  font-style: italic;
+	  color: #ffc857;
+	  font-size: 0.9rem;
+	}
+
+	.unsubscribe {
+	  text-align: center;
+	  margin-top: 2rem;
+	  font-size: 0.9rem;
+	  color: #ffc857;
+	  opacity: 0.35;
+	  transition: opacity 0.3s ease;
+	}
+
+	.unsubscribe:hover {
+	  opacity: 1;
+	}
+
+	.privacy-info {
+			font-size: 1rem;
+			display: inline-block;
+			position: absolute;
+			bottom: 2rem;
+			left: 2rem;
+			/* margin-top: 1rem; */
+			color: #dddddd;
+			text-decoration: none;
+			font-weight: bold;
+			/* transition: opacity 0.3s ease-in-out; */
+			animation: fade-in 5s ease-out 1 forwards;
+			opacity: .35;
+		}
+
+		@keyframes fade-in {
+			from {
+				opacity: 0;
+			}
+			to {
+				opacity: 0.75;
+			}
+		}
+		.privacy-info:visited {
+			color: #dddddd;
+		}
+
+		.privacy-info:hover {
+      text-decoration: underline;
+			opacity: 0.95;
+		}
+
+  </style>
+</head>
+<body>
+	<div class="container">
+		<div class="head-container">
+			<div class="title-container">
+				<h1>Privacy Policy</h1>
+				<p>We only collect your email address for the purpose of sending updates about our project. We do not share, sell, or use your information for anything else.</p>
+				<p>Your data is stored securely using Cloudflare KV and is only accessible to our team.</p>
+				<p class="right-align">- Made with love and intention.</p>
+			</div>
+			<img class="sigil" src="./images/sigil.svg" alt="Logo" style="width: 200px; display: block; margin: 0 auto 1rem;" />
+		</div>
+		<p class="unsubscribe">If you ever wish to unsubscribe or have your data removed, email us at <a href="mailto:mail@jiode.one">mail@jiode.one</a></p>
+    <p class="footer">Questions? Reach out: <a href="mailto:mail@jiode.one">mail@jiode.one</a><br/>
+			Return to <a href="./index.html">home</a></p>
+		<a class="privacy-info" href="./terms.html">Terms of Service</a></p>
+  </div>
+</body>
+</html>

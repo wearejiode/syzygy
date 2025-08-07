@@ -1,0 +1,30 @@
+	name = "jiode"
+	main = "src/index.js"
+	compatibility_date = "2025-06-20"
+
+	compatibility_flags = [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	]
+
+	[assets]
+	directory = "./public"
+	binding = "ASSETS"
+
+	[[kv_namespaces]]
+	binding = "EMAILS"
+	id = "6cbf045d2b7d41dc8f9e723042ecd2bb"
+
+	[observability]
+	enabled = true
+
+[env.production]
+kv_namespaces = [
+  { binding = "EMAILS", id = "6cbf045d2b7d41dc8f9e723042ecd2bb" }
+]
+route = "cherry.jiode.one/*"
+
+zone_id = "fd3fd972353850cdb4e79e5a5c8633af"
+[env.production.vars]
+ADMIN_KEY = "secret_key_doremi"
+

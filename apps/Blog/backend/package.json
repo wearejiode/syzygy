@@ -1,0 +1,20 @@
+{
+  "name": "blog-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node yoga-blog-worker/yoga-blog-worker.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "wrangler": "^4.20.0"
+  }
+}

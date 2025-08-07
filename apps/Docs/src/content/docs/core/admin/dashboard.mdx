@@ -1,0 +1,93 @@
+---
+title: "Admin Dashboard"
+description: "A central command center for monitoring and managing the backend services, health, and infrastructure across the fahrnbach.one system."
+tags: ["admin", "dashboard", "monitoring", "infrastructure", "ux", "status", "observability"]
+author: "Jacob Fahrnbach"
+ai_used: true
+model: "ChatGPT 4o-Turbo"
+status: "draft"
+created: "2025-06-19"
+updated: "2025-06-19"
+revision: 1.0
+alignment: 10
+confidence: 10
+---
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+The **Admin Dashboard** is a powerful, purpose-built interface for overseeing the operational state of all services within the *fahrnbach.one* ecosystem. It acts as both a **real-time monitor** and a **control panel**, designed with clarity, control, and responsiveness in mind.
+
+Whether you’re checking if a microservice is healthy, reviewing request metrics, or restarting a backend API — this dashboard is your launchpad. It’s not just functional, it’s intuitive — with widgets and graphs designed to surface meaningful insights at a glance.
+
+Admins should feel empowered, not overwhelmed. The dashboard provides a visual pulse of the system, helping us remain agile, informed, and confident under pressure.
+
+<Aside type="note">This system will evolve in sync with our infrastructure. Expect versioned improvements as we scale horizontally.</Aside>
+
+
+This document outlines the initial goals and structure of the admin interface. It will evolve alongside backend infrastructure and user feedback. Keep structure consistent.
+
+---
+
+## 🔍 Core Features
+
+- **System Health Overview**:
+  - Color-coded indicators for services (green/yellow/red).
+  - Aggregated metrics like response times, error rates, and CPU/memory usage.
+
+- **Uptime & Downtime Logs**:
+  - Graphical history using time-based plots (e.g. area or line charts).
+  - Drill-downs for individual services.
+
+- **Manual Controls**:
+  - Restart buttons with debounce + confirmation for microservices or containers.
+  - Triggered webhooks or infrastructure calls (with auth lock).
+
+- **Logs & Events Feed**:
+  - Stream tail for logs (maybe per-service).
+  - Filterable by severity.
+
+- **Notifications Panel**:
+  - Highlight errors, thresholds exceeded, or downtime alerts.
+
+- **Widgets**:
+  - Pluggable components for specialized graphs (e.g. user traffic, Redis cache size).
+  - Future-proofed: support drag/reorder or minimize.
+
+---
+
+## 🧠 Design Principles
+
+- **Readable**: High contrast, clearly labeled, accessible layout.
+- **Modular**: Widget-based architecture, allowing for app-specific monitors.
+- **Real-Time-ish**: Leverage polling or websocket updates without overwhelming the server.
+- **Permission-Gated**: Ensure only authorized users can perform restarts or write actions.
+
+---
+
+## 📐 Tech & Data
+
+- **UI**: Likely Angular (or Svelte/React), powered by a small SSR-compatible backend.
+- **Data Feeds**: Pulled from APIs like `/status`, `/metrics`, or custom WebSocket events.
+- **Styling**: Shared design tokens with the broader design system (e.g., buttons, cards).
+- **Auth**: Shared login system with the sesame + blog admin panel.
+
+---
+
+## 🛣️ Future Ideas
+
+- Theme-aware day/night modes
+- Full historical metrics export
+- Customizable widget layouts (user preference persistence)
+- AI Assistant: Genie could optionally help interpret anomalies or predict downtime trends
+
+<Aside type="caution">This dashboard does **not** serve as a security audit tool. That will be handled separately via specialized interfaces.</Aside>
+
+---
+
+Need a refresher on how these docs work?
+See → [`meta/content/getting-started`](/meta/content/getting-started)
+Or view the global spec → [`meta/content/template`](/meta/content/template)
+
+``` <!-- Prompt: Generate SparkDocs article for Admin Dashboard (dashboard.mdx), focused on backend monitoring, graphs, widgets, and real-time status. Expand based on system intent. --!> ```
+``` <!-- AI Notes: Use official SparkDocs markdown template. This is a system UI spec for admin monitoring. --!> ```

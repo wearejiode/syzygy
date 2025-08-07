@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🪩 Disco Party | Add to Calendar</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 0.2em;
+        }
+        p {
+            max-width: 400px;
+            line-height: 1.4;
+        }
+        .button {
+            background: white;
+            color: #3a1c71;
+            border: none;
+            padding: 12px 20px;
+            margin: 10px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .button:hover {
+            background: #ffaf7b;
+            transform: scale(1.05);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>🪩 Disco Party</h1>
+    <p>✨ We don’t send reminder emails for Disco Parties. They never work.<br>
+    If you want to join us (and we’d love that), add it to your calendar now so you don’t miss the magic.</p>
+    <p>🪩 Only the curious and prepared step onto the dance floor.<br>
+    Disco Parties aren’t recorded. If you want to be there, this is your chance.</p>
+
+    <a class="button" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Disco%20Party&dates=20250801T230000Z/20250802T000000Z&details=Join%20us%20for%20a%20live%20Disco%20Party%20celebrating%20creativity%20and%20curiosity!&location=https://twitch.tv/yourchannel" target="_blank">Add to Google Calendar</a>
+
+    <a class="button" href="./discoparty.ics">Add to Apple Calendar</a>
+
+    <a class="button" href="https://outlook.live.com/owa/?path=/calendar/action/compose&rru=addevent&subject=Disco%20Party&startdt=2025-08-01T23:00:00Z&enddt=2025-08-02T00:00:00Z&body=Join%20us%20for%20a%20live%20Disco%20Party%20celebrating%20creativity%20and%20curiosity!&location=https://twitch.tv/yourchannel" target="_blank">Add to Outlook Calendar</a>
+
+    <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">✨ See you on the dance floor ✨</p>
+</body>
+</html>

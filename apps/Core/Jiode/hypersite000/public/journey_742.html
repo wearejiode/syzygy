@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="icon" type="image/svg+xml" href="./images/favicon.svg" />
+	<title>✨ A Magical Journey Awaits</title>
+  <style>
+    :root {
+      --card-border-radius: 20px; /* Border radius for the card */
+      --card-hover-transition-duration: 3s; /* Transition duration for hover effects */
+      --vignette-brightness: 0.33; /* Adjust brightness for vignette effect */
+
+			--glow-color-light: #ff110033; /* Color for the glow effect */
+			--glow-color-medium: #ff110099; /* Color for the glow effect */
+			--glow-color-full: #ff1100ff; /* Color for the glow effect */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      background-color: #111125;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: url(./images/imagev3.png) center center / cover no-repeat;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 2rem;
+			animation: fade-in-full 3s ease-in-out 1 forwards;
+    }
+
+    .overlay {
+      content: "";
+      position: fixed;
+      width: 150vw;
+      height: 150vh;
+      /* width: 100vw;
+      height: 100vh; */
+      background: #00000099;
+      background: url(./images/imagev3.png) center center / cover no-repeat;
+      /* background: url(./images/image_blurred_slightly.png); */
+      backdrop-filter: blur(2px);
+      opacity: 1;
+      z-index: 0;
+      transition: opacity var(--card-hover-transition-duration) ease;
+      filter: brightness(var(--vignette-brightness));
+    }
+
+    .overlay:hover {
+      opacity: 0;
+    }
+
+    .container {
+      position: relative;
+      text-align: center;
+      max-width: 700px;
+      width: 100%;
+      background-color: #00000011;
+      border-radius: 20px;
+      padding: 3rem;
+      box-shadow: -1px 1px 30px var(--glow-color-light),
+      1px 1px 30px #009dff33;
+      backdrop-filter: blur(1px);
+      transition: backdrop-filter var(--card-hover-transition-duration) ease-in-out;
+      z-index: 1;
+      animation:
+			fade-in-full 3s ease-in-out 1 forwards,
+			/* pulse 6s ease-in-out infinite, */
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 30px var(--glow-color-light); }
+      50% { box-shadow: 0 0 60px var(--glow-color-medium); }
+      100% { box-shadow: 0 0 30px var(--glow-color-light); }
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0px); }
+      33% { transform: translateX(10px); }
+      67% { transform: translateX(-10px); }
+      100% { transform: translateX(0px); }
+    }
+
+		.shake {
+			animation: shake 0.1s;
+			animation-iteration-count: 3;
+		}
+
+		.container:hover {
+			backdrop-filter: blur(5px);
+		}
+
+    .container:hover {
+      backdrop-filter: blur(5px);
+    }
+
+    .container:hover::after {
+      opacity: 1;
+    }
+
+    .container::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      pointer-events: none;
+      z-index: 0;
+      box-shadow: -1px 1px 300px var(--glow-color-full),
+      1px 1px 30px var(--glow-color-full);
+      opacity: 0;
+      transition: opacity 3s;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      opacity: 0.85;
+    }
+
+    form {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    input[type="email"] {
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      outline: none;
+      width: 250px;
+    }
+
+    button {
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      background-color: #ffc857;
+      color: #1e1e2f;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #ffb347;
+    }
+
+		.response {
+  	margin-top: 1rem;
+  	margin-bottom: 0rem;
+  	font-size: 1.2rem;
+  	color: #ffc857;
+  	opacity: 0;
+  	transition: opacity 0.5s ease-in-out;
+  	height: 1.4em; /* Reserve space so layout doesn't shift */
+		rotate: 180deg;
+		}
+
+		.visible {
+  	opacity: 0.85;
+		}
+
+    .more-info {
+			font-size: 1.1rem;
+      display: inline-block;
+      margin-top: 2rem;
+      color: #ffc857;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .more-info:hover {
+      text-decoration: underline;
+		}
+
+		.privacy-info {
+			font-size: .8rem;
+			display: inline-block;
+			position: absolute;
+			bottom: 1rem;
+			left: 1rem;
+			/* margin-top: 1rem; */
+			color: #dddddd;
+			text-decoration: none;
+			font-weight: bold;
+			transition: opacity 0.3s ease-in-out;
+			opacity: .35;
+			animation: fade-in 10s ease-out 1 forwards
+		}
+
+		@keyframes fade-in {
+			from {
+				opacity: 0;
+			}
+			to {
+				opacity: 0.35;
+			}
+		}
+
+		@keyframes fade-in-full {
+			from {
+				opacity: 0;
+			}
+			to {
+				opacity: 1;
+			}
+		}
+		.privacy-info:visited {
+			color: #dddddd;
+		}
+
+		.privacy-info:hover {
+      text-decoration: underline;
+			opacity: 0.85;
+		}
+
+    span {
+      color: var(--glow-color-full);
+      text-shadow: #ffffff99 0px 0px 50px;
+    }
+
+		.magic-link {
+			color: unset;
+			display: inline;
+			text-decoration: none;
+			transition: color 0.3s ease-in-out;
+		}
+
+		.sparkle {
+			text-shadow: #ffc857 0px 0px 50px;
+			animation: sparkle 3s ease infinite;
+		}
+
+		@keyframes sparkle {
+			0% { text-shadow: #fff 0px 0px 0px; }
+			50% { text-shadow: #fff 0px 0px 30px; }
+			100% { text-shadow: #fff 0px 0px 0px; }
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+  .shake, .glow, .sparkle {
+    animation: none !important;
+    transition: none !important;
+  	}
+	}
+
+
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="container">
+    <h1>We're building something  <br>Fun, New & <span>Magical<span></h1>
+    <p>For access to <i>special</i> updates, a live look, and early access sign up here!<br> Our team of email delivery wizards will get back to you <a href="./vip.html" class="magic-link">soon.</a></p>
+    <form id="signup-form">
+      <input type="email" name="email" id="email-form" placeholder="Your email address" required />
+      <button type="submit">Are you Lost??</button>
+    </form>
+		<p class="response">Hi</p>
+    <a href="#" class="more-info">Learn more</a>
+		<a href="./privacy.html" class="privacy-info">Privacy Policy</a>
+    <script>
+			let submitCounter = 1
+			const hints = [
+				"Before you go, you must find the way...",
+				"Maybe tomorrow, maybe today, but soon you'll find the way...",
+				"Not a mistake, but a journey to take...",
+				"It's coming soon, just a little wait...",
+				"Lost? Not really, just a twist of fate...",
+				"Every step is a clue, every click a gate...",
+				"\"Soon\", You'll see, it isn't too late...",
+				"Just a riddle, just a game, but soon you'll find your way...",
+				"Soon. Soon you'll see, the magic not so far away...",
+				"We hope you find it. \"Soon!\""
+			];
+
+
+			document.getElementById('signup-form').addEventListener('submit', async (e) => {
+				e.preventDefault();
+				const form = e.target;
+				const email = form.querySelector('input[name="email"]').value;
+				const button = form.querySelector('button');
+				const msg = document.querySelector('.response');
+				const soon = document.querySelector('.magic-link');
+				const container = document.querySelector('.container');
+
+				function addAndRemoveClass(element, className, duration = 300) {
+					element.classList.add(className);
+					setTimeout(() => {
+						element.classList.remove(className);
+					}, duration);
+				}
+
+				console.log(submitCounter - 1 == hints.length)
+				if (submitCounter <= hints.length -1) {
+					submitCounter++;
+					button.textContent = "Tell me more!";
+					msg.textContent = hints[submitCounter -1];
+					msg.classList.add('visible');
+					addAndRemoveClass(container, 'shake', 300); // Add shake effect
+				}
+				else if (submitCounter -1 == hints.length - 1) {
+					submitCounter++;
+					button.textContent = "Need a Hint?";
+					msg.textContent = "Take a look around, read the hints carefully, they might lead you to the next step. Soon you'll know, all should Click Soon!";
+					addAndRemoveClass(button, 'shake', 300); // Add shake effect
+				}
+				else if (submitCounter -1 == hints.length) {
+					msg.textContent = "Seek the one that glows, the one that shines, the one that leads you to the next step. Soon you'll know, all should Click Soon!";
+					soon.classList.add('sparkle');
+					button.disabled = true; // Disable button after all riddles
+					submitCounter = hints.length; // Lock counter
+					addAndRemoveClass(button, 'shake', 300); // Add shake effect
+				}
+				// Optimistic UI updat
+
+			});
+		</script>
+  </div>
+</body>
+</html>
