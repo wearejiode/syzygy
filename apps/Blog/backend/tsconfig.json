@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",                      // Modern syntax output
+    "module": "NodeNext",                    // Required for ESM support in Node
+    "moduleResolution": "NodeNext",          // Resolves ESM correctly
+    "outDir": "schema/zod",                      // Where to output compiled .js files                          // Set root for relative imports
+    "strict": true,                          // Enables all strict type-checking options
+    "esModuleInterop": true,                 // Allows commonjs imports like `import fs from 'fs'`
+    "skipLibCheck": true,                    // Skips type checks on node_modules
+    "forceConsistentCasingInFileNames": true // Ensures consistent import casing
+  },
+  "include": ["**/*.ts"],                    // Include all .ts files in project
+  "exclude": ["node_modules", "dist"]        // Exclude build and deps
+}

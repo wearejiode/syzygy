@@ -1,0 +1,109 @@
+{
+  "name": "client-blog",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/client-blog/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/cloudflare/client-blog",
+        "browser": "apps/client-blog/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/client-blog/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/client-blog/public",
+            "output": "/"
+          }
+        ],
+        "styles": ["apps/client-blog/src/styles.css"],
+        "server": "apps/client-blog/src/main.server.ts",
+        "ssr": {
+          "entry": "apps/client-blog/src/server.ts"
+        },
+        "outputMode": "server"
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "4kb",
+              "maximumError": "8kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@angular/build:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "client-blog:build:production"
+        },
+        "development": {
+          "buildTarget": "client-blog:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular/build:extract-i18n",
+      "options": {
+        "buildTarget": "client-blog:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/client-blog/jest.config.ts",
+        "assets": [
+          "apps/client-blog/src/assets/favicon.webp",
+          "apps/client-blog/src/assets"
+        ],
+        "styles": ["apps/client-blog/src/styles.css"]
+      }
+    },
+    "serve-static": {
+      "continuous": true,
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "client-blog:build",
+        "port": 4200,
+        "staticFilePath": "dist/apps/client-blog/browser",
+        "spa": true
+      }
+    },
+    "prerender": {
+      "executor": "@angular/ssr:prerender",
+      "options": {
+        "browserTarget": "client-blog:build:production",
+        "serverTarget": "client-blog:server:production",
+        "routes": ["/", "/about", "/posts", "/contact"]
+      }
+    }
+  }
+}

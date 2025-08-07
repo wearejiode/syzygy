@@ -1,0 +1,140 @@
+---
+title: "SQL Schema"
+description: "Core database structure for the blog engine — normalized and extensible for modern CMS features."
+tags: ["sql", "schema", "cms", "blog", "database", "d1"]
+author: "Jacob Fahrnbach"
+ai_used: true
+model: "ChatGPT 4o-Turbo"
+status: "draft"
+created: "2025-06-19"
+updated: "2025-06-19"
+revision: 1.0
+alignment: 9
+confidence: 10
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+This file outlines the **primary SQL schema** used for powering our blog CMS. It's implemented on [Cloudflare D1](https://developers.cloudflare.com/d1/) and reflects the same field definitions as our GraphQL and Zod schemas.
+
+The schema includes:
+- A `posts` table with rich metadata and indexing
+- Normalized `tags` and `categories`
+- Join tables for post relationships
+- Indexes to optimize sorting and filtering
+
+<Aside type="note">
+This is a copy-paste reference designed for migrations, seed scripts, and schema validation. Minor changes (e.g. JSON column parsing) may be needed per SQL dialect.
+</Aside>
+
+<Aside type="caution">
+This schema is subject to change as new CMS features are added (e.g., multi-language support, editorial workflows, analytics).
+</Aside>
+
+## SQL Reference
+
+```sql
+-- ./schema.sql
+-- Main posts table
+CREATE TABLE posts (
+  id TEXT PRIMARY KEY,
+  content TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  level TEXT CHECK(level IN ('beginner', 'intermediate', 'advanced')),
+  audience TEXT UNIQUE NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  slug_prefix TEXT,
+  created TEXT NOT NULL,
+  edited TEXT,
+  excerpt TEXT,
+  summary_points TEXT, -- store as JSON string or normalize later
+  cover TEXT,
+  og_image_alt TEXT,
+  languages TEXT DEFAULT 'en',
+  author TEXT,
+  reading_time INTEGER,
+  is_series BOOLEAN DEFAULT false,
+  series TEXT,
+  series_part INTEGER,
+  draft BOOLEAN DEFAULT false,
+  featured BOOLEAN DEFAULT false,
+  dirty BOOLEAN DEFAULT false,
+  published BOOLEAN DEFAULT false,
+  visibility TEXT DEFAULT 'public', -- ENUM: public, internal, private
+  status TEXT DEFAULT 'draft',      -- ENUM: draft, scheduled, archived, published
+  scheduled TEXT,
+  layout TEXT,
+  indexable BOOLEAN DEFAULT true,
+  comments_enabled BOOLEAN DEFAULT true,
+  redirect_from TEXT,              -- Store as comma-separated or JSON string
+  contributors TEXT,               -- Store as comma-separated or JSON string
+  used_ai BOOLEAN DEFAULT false,
+  original_prompt TEXT,
+  source TEXT DEFAULT 'md',
+  canonical TEXT,
+  auth_required BOOLEAN DEFAULT false,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tags (one row per tag)
+CREATE TABLE tags (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT UNIQUE NOT NULL
+);
+
+-- Categories (broader than tags)
+CREATE TABLE categories (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT UNIQUE NOT NULL
+);
+
+-- Post ↔ Tag relationship
+CREATE TABLE post_tags (
+  post_id TEXT NOT NULL,
+  tag_id INTEGER NOT NULL,
+  PRIMARY KEY (post_id, tag_id),
+  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+  FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+);
+
+-- Post ↔ Category relationship
+CREATE TABLE post_categories (
+  post_id TEXT NOT NULL,
+  category_id INTEGER NOT NULL,
+  PRIMARY KEY (post_id, category_id),
+  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+  FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
+-- Helpful Indexes
+CREATE INDEX idx_posts_slug ON posts(slug);
+CREATE INDEX idx_posts_date ON posts(created);
+CREATE INDEX idx_posts_status ON posts(status);
+CREATE INDEX idx_posts_featured ON posts(featured);
+```
+
+## Notes
+
+
+<Aside>
+Full schema definitions available here:<br />
+	👉 Sql Schema [ `/core/api/sql-schema`](/core/api/sql-schema)<br />
+	👉 Zod Schema [ `core/api/zod-schema`](core/api/zod-schema)
+</Aside>
+
+<Aside type="tip">
+If you're working with this schema in D1 or SQLite, be sure to parse fields like `summary_points`, `contributors`, or `redirect_from` as **JSON** if stored in string format.
+</Aside>
+
+<Aside type="caution">
+This schema must stay aligned with both the GraphQL schema and SQL structure. Changes here should be reflected across the system to avoid type drift.
+</Aside>
+
+```md
+<!-- Prompt: Create a SparkDocs-style MDX file with a copy/paste SQL schema and inline documentation -->
+<!-- AI Notes: Tags and categories are normalized, and JSON fields are noted. Compatible with D1/SQLite. -->
+```

@@ -1,0 +1,81 @@
+---
+title: Getting Started
+description: "A guide to the dynamic, metadata-driven Angular component library for rapid reuse and visualization."
+tags: ["angular", "library", "component viewer", "search", "fuzzy search"]
+author: "Jacob Fahrnbach"
+ai_used: true
+model: "ChatGPT 4o-Turbo"
+status: "draft"
+created: "2025-06-19"
+updated: "2025-06-19"
+revision: 1.0
+alignment: 8
+confidence: 8
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+Welcome to the **Component Viewer & Library** — an extensible Angular site designed to index, display, and interactively search through reusable UI components.
+
+Built with developer efficiency and future backend integration in mind, this tool enables full-stack maintainability and rapid visual exploration of your design system.
+
+<Aside type="note">Everything in this tool is written in Angular and designed to run as a fully static or hosted app. It pairs well with monorepos or modular full-stack applications.</Aside>
+
+---
+
+## 🔍 Dynamic Fuzzy Search
+
+The search experience is powered by a browser-local fuzzy matching system that:
+
+- Crawls the component file structure.
+- Parses frontmatter-like metadata from each component.
+- Matches user queries by name, tag, or description.
+- Responds in real-time with ranked matches and live previews.
+
+<Aside type="tip">Search is powered in-browser today, but the metadata system is built to support a GraphQL or REST backend for remote querying in the future.</Aside>
+
+---
+
+## 🏗️ Current Architecture
+
+- Components live in the `/components/` directory tree.
+- Each component includes:
+  - A metadata block (name, description, tags, date)
+  - A live rendered preview
+  - A code snippet
+  - Optionally, a usage example or design notes
+
+<Aside type="caution">Ensure metadata is properly formatted. Components missing required fields may be skipped by the viewer or cause rendering issues.</Aside>
+
+---
+
+## 🛣️ Roadmap
+
+This tool is built for **iterative extensibility**. Future additions may include:
+
+- ✅ Drag-and-drop file upload support
+- ✅ File system sync for rapid prototyping
+- ☁️ Cloud-based component syncing (R2 or GCS)
+- 📂 Grouped previews by folder, tag, or type
+- 🔐 Admin-only editing mode via CMS
+
+---
+
+## 🎯 Use Cases
+
+- A visual spec doc for internal teams
+- Source of truth for consistent UI
+- Live-previewable library for CMS editors
+- Educational tool for onboarding developers
+
+<Aside type="tip">Want to embed this tool in your main app or CMS? It's modular by design — just import the core module and configure your content root!</Aside>
+
+---
+
+> See also:
+> - [`architecture`](/library/architecture)
+> - [`snippets`](/library/snippets)
+> - [`blog-components/hot-posts`](/blog/blog-components/hot-posts)
+

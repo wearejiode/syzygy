@@ -1,0 +1,113 @@
+---
+title: "Zod Schema"
+description: "Validation schema for blog posts — mirrors GraphQL and SQL field definitions with strong type safety."
+tags: ["zod", "validation", "graphql", "schema", "typescript", "cms"]
+author: "Jacob Fahrnbach"
+ai_used: true
+model: "ChatGPT 4o-Turbo"
+status: "draft"
+created: "2025-06-19"
+updated: "2025-06-19"
+revision: 1.0
+alignment: 9
+confidence: 10
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+This Zod schema validates all incoming post data at the API layer. It serves as the **source of truth for the frontend and backend**, matching our GraphQL schema and database structure.
+
+It’s used in the YOGA server to verify mutations and ensure consistent structure across all post-related operations.
+
+<Aside type="note">
+This schema uses strong typing and default fallbacks to catch edge cases early. Many fields are optional but still validated if present.
+</Aside>
+
+## Full Reference
+
+```ts
+import { z } from 'zod';
+
+const postSchema = z.object({
+  id: z.string().optional(),
+  title: z.string(),
+  description: z.string(),
+  level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
+  audience: z.string().optional(),
+  slug: z.string(),
+  slugPrefix: z.union([z.string(), z.boolean()]).optional(),
+
+  created: z.string().datetime(),
+  edited: z.string().datetime().optional(),
+
+  excerpt: z.string(),
+  summaryPoints: z.array(z.string()).optional(),
+
+  cover: z.string().url().optional(),
+  images: z.array(z.string()).optional(),
+  ogImageAlt: z.string().optional(),
+
+  languages: z.string().default('en'),
+  author: z.string(),
+
+  readingTime: z.number(),
+
+  tags: z.array(z.string()).default([]),
+  categories: z.array(z.string()).default([]),
+
+  isSeries: z.boolean().optional(),
+  series: z.string().optional(),
+  series_part: z.union([z.number(), z.string()]).optional(),
+
+  draft: z.boolean().default(false),
+  featured: z.boolean().default(false),
+  dirty: z.boolean().default(false),
+  published: z.boolean().default(false),
+
+  visibility: z.enum(['public', 'private', 'internal']).default('public'),
+  status: z.enum(['draft', 'published', 'archived', 'scheduled']).default('draft'),
+  scheduled: z.string().datetime().optional(),
+
+  layout: z.string().optional(),
+  index: z.boolean().default(true),
+  comments: z.boolean().default(true),
+
+  redirectFrom: z.array(z.string()).optional(),
+  contributors: z.array(z.string()).optional(),
+
+  usedAI: z.boolean().default(false),
+  originalPrompt: z.array(z.string()).optional(),
+
+  source: z.enum(['md', 'discussion', 'external', 'syndicated']).default('md'),
+  canonical: z.string().url().optional(),
+
+  authRequired: z.boolean().default(false),
+});
+
+export function validatePost(data: unknown) {
+  return postSchema.safeParse(data);
+}
+```
+
+## Notes
+
+<Aside>
+Full schema definitions available here:<br />
+	👉 Sql Schema [ `/core/api/sql-schema`](/core/api/sql-schema)<br />
+	👉 Zod Schema [ `core/api/zod-schema`](core/api/zod-schema)
+</Aside>
+
+<Aside type="tip">
+This schema is perfect for runtime validation in serverless environments. If you need a static type, infer it with `z.infer<typeof postSchema>`.
+</Aside>
+
+<Aside type="caution">
+This Zod schema must stay aligned with both the GraphQL schema and SQL structure. Changes here should be reflected across the system to avoid type drift.
+</Aside>
+
+```md
+<!-- Prompt: Generate a SparkDocs-style MDX file documenting the Zod schema for post validation -->
+<!-- AI Notes: Schema aligns with Yoga API, GraphQL types, and the SQL layer. Used in serverless validation. -->
+```
