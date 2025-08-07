@@ -7,7 +7,8 @@
         { "label": "🔥 Resume", "url": "https://resume.fahrnbach.one/openai", "style": "first"},
         { "label": "🧑‍🏫 Book Time", "url": "https://calendly.com/jacobfahrnbach/30min", "style": "second"},
         { "label": "🎨 Portfolio", "url": "https://fahrnbach.one", "style": "third"},
-        { "label": "💌 Mail", "url": "mailto:love@jiode.one", "style": "fourth"}
+        { "label": "💌 Mail", "url": "mailto:love@jiode.one", "style": "fourth"},
+        { "label": "❤️ Thank You", "url": "https://resume.fahrnbach.one/thankyou", "style": "fifth"}
       ]
     },
       "google": {
