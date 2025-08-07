@@ -617,6 +617,7 @@ upButton.addEventListener('pointerup', () => {
 
 const exitAbout = document.querySelector('.exit-about');
 exitAbout.addEventListener('pointerup', () => {
+  starComponent.undrawStar()
   navigateHome();
   aboutOpen = false
   gsap.to('.about', {opacity: 1})
@@ -638,6 +639,7 @@ exitAbout.addEventListener('pointerup', () => {
 
 const exitExplore = document.querySelector('.exit-explore');
 exitExplore.addEventListener('pointerup', () => {
+  starComponent.undrawStar()
   navigateHome();
   exploreOpen = false
   gsap.to('.about', {opacity: 1})
@@ -661,6 +663,7 @@ exitExplore.addEventListener('pointerup', () => {
 
 const exitContact = document.querySelector('.exit-contact');
 exitContact.addEventListener('pointerup', () => {
+  starComponent.undrawStar()
   navigateHome();
   contactOpen = false
   gsap.to('.about', {opacity: 1})
