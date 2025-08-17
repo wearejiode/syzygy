@@ -685,7 +685,6 @@ exitContact.addEventListener('pointerup', () => {
   }, 1050);
   // drawStarFxParent('contact-star-animation-container',0,0,0,0,0, true)
   console.log('exiting')
-  starComponent.undrawStar()
 })
 
 //#region Explore Stars

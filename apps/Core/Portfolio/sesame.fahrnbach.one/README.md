@@ -35,7 +35,9 @@ If the preview file isn’t there yet, it will fall back to remote mode.
 Push your updated `data.json` to the `sesame-data-preview` R2 bucket and run in remote dev mode:
 
 ```
-npm run stage:sesame
+wrangler dev --remote
+
+(local not conigured)
 ```
 
 ---
