@@ -1,82 +1,102 @@
-# Fahrnbach
+# Resume Worker – Dev Workflow
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+## Overview
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+This Cloudflare Worker serves the Resume app pages, providing HTML, CSS, JavaScript, and resume data stored in R2. It delivers a fast, serverless experience by dynamically rendering the resume content and assets from R2 storage.
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+---
 
-## Finish your CI setup
+## Build + Bundle
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/ZxPo06rJBY)
+The Worker is built from several template files:
 
+- `index.html` – The HTML scaffold for the resume app.
+- `styles.css` – CSS styles for the resume pages.
+- `client.js` – Client-side JavaScript for interactivity.
+- `data.json` – Resume data stored in R2.
 
-## Run tasks
+The build process is handled by the `scripts/build-resume.js` script, which compiles and bundles these assets into a single Worker script named `meta-worker.generated.js`. This file contains all the code and assets needed to deploy the Worker.
 
-To run the dev server for your app, use:
+To build and bundle the Worker, run:
 
-```sh
-npx nx serve blog-frontend
+```bash
+pnpm bundle-worker resume
 ```
 
-To create a production bundle:
+This produces the deployable Worker script in the `dist/` directory.
 
-```sh
-npx nx build blog-frontend
+---
+
+## Development
+
+Start the development server with:
+
+```bash
+pnpm dev:resume
 ```
 
-To see all available targets to run for a project, run:
+This runs the Worker locally with live reload on file changes. The dev environment seeds `data.json` into a local R2 bucket to simulate production data.
 
-```sh
-npx nx show project blog-frontend
-```
+Useful endpoints during development:
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+- `GET /__health` – Returns a 200 OK status to verify the Worker is running.
+- `GET /__r2list` – Lists all keys currently stored in the local R2 bucket.
+- `GET /__r2get?key=<key>` – Retrieves the contents of a specific key from R2.
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Changes to templates or styles automatically reload the Worker so you can see updates immediately.
 
-## Add new projects
+---
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
+## CI Pipeline
 
-Use the plugin's generator to create new projects.
+- **Staging**: On pushes to the repository, the CI pipeline builds the Worker and deploys to the staging environment automatically.
+- **Production**: Deployments to production are controlled via the "Promote to Prod" workflow to ensure safe releases.
 
-To generate a new application, use:
+---
 
-```sh
-npx nx g @nx/angular:app demo
-```
+## Deploy
 
-To generate a new library, use:
+To manually deploy the Worker:
 
-```sh
-npx nx g @nx/angular:lib mylib
-```
+1. Bundle the Worker script:
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+   ```bash
+   pnpm bundle-worker resume
+   ```
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+2. Deploy with Wrangler:
 
+   ```bash
+   wrangler deploy --env production
+   ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+3. Push updated `data.json` and assets to R2 using the provided upload scripts or Wrangler commands.
 
-## Install Nx Console
+---
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+## Notes & Gotchas
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- The Worker’s **current working directory (CWD)** is the root of the monorepo during local development and CI runs.
+- The `dist/` directory is disposable and overwritten on each build.
+- The resume data model in `data.json` must conform to the expected schema; otherwise, rendering errors may occur.
+- Static assets and images are referenced by their R2 keys and must be uploaded separately.
 
-## Useful links
+---
 
-Learn more:
+## Checklist
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- [ ] Run `pnpm dev:resume` and verify the Worker starts without errors.
+- [ ] Access `http://localhost:8787/__health` and confirm a 200 OK response.
+- [ ] Access `http://localhost:8787/__r2list` and verify keys are listed.
+- [ ] Modify `styles.css` and confirm the Worker reloads with updated styles.
+- [ ] Run the manual deploy steps and verify the Worker is live in production.
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
+
+## Assets
+
+Images and static assets used by the Resume app are stored under the R2 prefix `resume-data/images/`. These assets are uploaded during CI deployments or manually via Wrangler. Ensure any new images are added to this prefix and uploaded to keep the app consistent.
+
+---
+
+🚀 Happy coding! If you run into issues, check the data model and asset paths first.

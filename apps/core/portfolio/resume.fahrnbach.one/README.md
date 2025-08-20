@@ -1,99 +1,95 @@
-# 📄 resume.fahrnbach.one
+# Resume Worker – Dev Workflow
 
-This Cloudflare Worker serves personalized resumes by slug, with Open Graph meta preview support and optional fallback behavior.
+## 🚀 Overview
 
-It integrates with R2 for file storage and supports dynamic PDF routing for URLs like:
+This Cloudflare Worker serves the Resume app pages by delivering HTML, CSS, JavaScript, and data stored in R2. It dynamically responds to requests for the resume application, providing a performant and scalable front-end experience backed by R2 object storage.
 
-```
-https://resume.fahrnbach.one/google
-https://resume.fahrnbach.one/openai
-https://resume.fahrnbach.one/resume/default
-```
+## 🛠 Build + Bundle
 
-## 📦 Project Structure
+The worker is built using a set of templates and static assets:
 
-- `resumes/` — Folder containing `.pdf` files (e.g., `openai.pdf`, `default.pdf`)
-- `images/` — Folder containing the preview image used in meta tags
-- `resume-meta-worker/` — Cloudflare Worker logic
-- `scripts/upload-resumes.js` — Script to upload all resumes to R2
+- **Templates**:  
+  - `index.html` — The main HTML scaffold for the resume app  
+  - `styles.css` — CSS styles for the resume pages  
+  - `client.js` — Client-side JavaScript for interactivity and data fetching  
 
----
+- **Build Script**:  
+  Running the build script processes these templates, bundles the client JS, and generates the worker script.
 
-## 🚀 Deployment Guide
+- **Worker Output**:  
+  The final bundled worker script is output as `meta-worker.generated.js` in the `dist` directory, ready for deployment.
 
-All commands should be run from the **project root**.
+## 💻 Development
 
-### 🔁 Upload or Update Resume PDFs
-
-Uploads all resumes in the `resumes/` folder to the correct R2 bucket:
+To start development:
 
 ```bash
-npm run upload:resume
+pnpm dev:resume
 ```
+
+This command launches a local development server with live reload support. Changes to templates, styles, or client code update the served pages instantly.
+
+### Local R2 Seeding
+
+During development, the local R2 storage is seeded with `data.json` to simulate production data. This allows testing of data-driven features without deploying.
+
+### Useful Endpoints
+
+- `GET /__health` — Health check endpoint for readiness  
+- `GET /__r2list` — Lists objects currently in local R2 storage  
+- `GET /__r2get?key=<object-key>` — Retrieves the content of a specific R2 object  
+
+These endpoints assist in debugging and verifying the local R2 environment.
+
+## ⚙️ CI Pipeline
+
+- **Staging Deployments**  
+  Automatically triggered on pushes to staging branches. The pipeline builds the worker, bundles assets, and deploys to the staging environment using Wrangler.
+
+- **Production Deployments**  
+  Managed through a manual "Promote to Prod" workflow that deploys stable releases to production environments.
+
+## 📦 Deploy
+
+Manual deployment steps:
+
+1. Bundle the worker:
+
+   ```bash
+   pnpm bundle-worker
+   ```
+
+2. Deploy with Wrangler:
+
+   ```bash
+   wrangler deploy --env production
+   ```
+
+3. Push or sync updated data and assets to R2 as needed.
+
+## ⚠️ Notes & Gotchas
+
+- **Current Working Directory (CWD)**  
+  Ensure commands are run from the root of the resume worker directory to avoid path issues.
+
+- **Disposable `dist` Directory**  
+  The `dist` directory is a build artifact and can be safely deleted or regenerated.
+
+- **Data Model**  
+  The resume data model is defined in `data.json`. Keep it in sync with client expectations to avoid runtime errors.
+
+## ✅ Checklist
+
+- [ ] Start dev server with `pnpm dev:resume` and verify no errors  
+- [ ] Confirm `GET /__health` returns a successful response  
+- [ ] Use `GET /__r2list` to verify local R2 objects are seeded  
+- [ ] Modify `styles.css` and verify live reload updates the page  
+- [ ] Run full build and deploy to staging environment without errors  
+
+## 🖼 Assets
+
+Static assets such as images are stored under the R2 prefix `resume-data/images/`. These assets are uploaded during CI or manually via Wrangler commands to ensure availability in production.
 
 ---
 
-### 🖼️ Upload or Update Preview Image
-
-Uploads the default Open Graph preview image:
-### default-preview.webp & default-preview.png
-```
-wrangler r2 object put resume-data/hotlink-ok/default-preview.webp \
-  --file Portfolio/resume.fahrnbach.one/images/default-preview.webp \
-  --remote \
-  --config Portfolio/resume.fahrnbach.one/resume-meta-worker/wrangler.toml
-```
-```
-wrangler r2 object put resume-data/images/hotlink-ok/default-preview.png \
-  --file Portfolio/resume.fahrnbach.one/images/default-preview.png \
-  --remote \
-  --config Portfolio/resume.fahrnbach.one/resume-meta-worker/wrangler.toml
-```
-
----
-
-### 🌐 Deploy the Resume Worker
-
-Deploys the latest worker to Cloudflare:
-
-```bash
-npm run deploy:resume
-```
-
----
-
-## ✨ Features
-
-- 📄 Dynamic resume loading based on slug
-- 📦 R2-backed asset storage for PDFs and images
-- 🔗 OG metadata for easy sharing on social platforms
-- 📁 Graceful fallback for missing slugs
-- 🎯 Simple config and low-latency CDN delivery
-
-## 🖼️ Updating Background Image
-
-If you want to update the Open Graph Image (like `default-preview.webp`), it may **need to be manually updated** in the Cloudflare dashboard — or uploaded using the following command:
-
-```bash
-npx wrangler r2 object put resume-data/images/default-preview.webp --file Portfolio/resume.fahrnbach.one/images/default-preview.webp --remote --config Portfolio/resume.fahrnbach.one/resume-meta-worker/wrangler.toml
-```
-
-Thumbnail previews are **AUTOMATICALLY** generated and handled by the worker.
-
----
-## 🛠️ Useful Scripts
-
-| Script          | Description                                           |
-|-----------------|-------------------------------------------------------|
-| `upload:resume` | Bulk Upload Resumes from /resume to R2        |
-| `deploy:resume` | Bulk Upload Resume + deploy resume worker               |
-
----
-
-## 🔮 Future Improvements
-
-Add a smart check feature to only upload a resume if it has changed
-
----
-
-For questions or debugging tips, check out the [Devlog Index](https://github.com/fahrnbach/one/discussions/4) or explore [fahrnbach.one](https://fahrnbach.one) for more projects.
+Happy coding! 🚀

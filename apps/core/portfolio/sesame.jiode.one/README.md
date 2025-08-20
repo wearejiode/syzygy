@@ -1,7 +1,6 @@
-# Sesame Worker – Dev Workflow
+# Resume Worker – Dev Workflow
 
-This folder contains the source code and build/deploy pipeline for the
-**sesame.jiode.one** Cloudflare Worker.
+This Worker serves the Resume app pages by delivering HTML, CSS, and JS assets along with data stored in R2.
 
 ---
 
@@ -16,7 +15,7 @@ We no longer inline HTML/CSS/JS directly. Instead:
   - `client.js` → any client-side script you want injected.
 
 - `scripts/build-worker.mjs` stitches these pieces together and writes
-  `dist/apps/sesame.jiode.one/meta-worker.generated.js`.
+  `dist/apps/resume.fahrnbach.one/meta-worker.generated.js`.
 
 > **Tip:** The placeholder lines in `meta-worker.js` (`/*__INLINE_CSS__*/`,
 > `/*__INLINE_JS__*/`, `/*__RENDER_FUNCTION__*/`) get replaced automatically.
@@ -27,74 +26,86 @@ We no longer inline HTML/CSS/JS directly. Instead:
 ## 🛠 Development
 
 Run local dev server with live updates:
-Winning !
+
+1. Seed data.json into the local R2 preview bucket (`resume-data-preview`).
+2. Bundle the worker (`bundle-worker`).
+3. Watch `templates/*` for changes and re-bundle automatically.
+4. Start Wrangler dev with persistent state (`.wrangler/state`).
+
+Run the following command:
 
 ```bash
-pnpm dev:sesame
+pnpm dev:resume
 ```
 
-This does 4 things in parallel: 1. Seeds data.json into the local R2 preview bucket (sesame-data-preview). 2. Bundles the worker (bundle-worker). 3. Watches templates/\*_/_ for changes and re-bundles automatically. 4. Starts Wrangler dev with persistent state (.wrangler/state).
+This will start all the above processes in parallel.
 
 Visit http://localhost:8787 while it runs.
 
-Debug Endpoints
+### Debug Endpoints
 
 While in dev, the worker exposes helpers:
-• /**health → returns ok if the worker is alive.
-• /**r2 → checks if data.json exists in R2.
-• /**r2list → lists keys in the bound bucket.
-• /**r2get → confirms fetch of data.json.
-• /\_\_seed (POST) → lets you re-seed data.json through the worker itself.
 
-⸻
+- `/__health` → returns ok if the worker is alive.
+- `/__r2` → checks if `data.json` exists in R2.
+- `/__r2list` → lists keys in the bound bucket.
+- `/__r2get` → confirms fetch of `data.json`.
+- `/__seed` (POST) → lets you re-seed `data.json` through the worker itself.
+
+---
 
 ## 🤖 CI Pipeline
 
-For staging simply push to github and the GHActions should automatically deploy to staging.sesame.jiode.one
-And save artifact to github/artifacts
+- For **staging**, simply push to GitHub and the GitHub Actions will automatically deploy to `staging.resume.fahrnbach.one` and save artifacts to GitHub artifacts.
+- For **production**, use the "Promote to Prod" workflow within GitHub to deploy from saved artifacts.
 
-For Deploy select an artifact and deploy within Github
+---
 
 ## 🌐 Deploy
 
-(These may be deprecated -- See CI Pipeline above)
+(These may be deprecated — see CI Pipeline above)
 
 To deploy the latest bundled worker:
 
 ```bash
-pnpm -w nx run sesame.jiode.one:release
+pnpm -w nx run resume.fahrnbach.one:release
 ```
 
-This runs bundle-worker then wrangler deploy using
-wrangler.toml.
+This runs `bundle-worker` then `wrangler deploy` using `wrangler.toml`.
 
-For just pushing data (prod bucket sesame-data):
+For just pushing data (prod bucket `resume-data`):
 
 ```bash
-pnpm -w nx run sesame.jiode.one:push:data
+pnpm -w nx run resume.fahrnbach.one:push:data
 ```
+
+---
 
 ## ⚙️ Notes & Gotchas
 
-    •	CWD matters. Both wrangler dev and wrangler r2 … --local must run from
+- CWD matters. Both `wrangler dev` and `wrangler r2 … --local` must run from  
+  the workspace root so they share `.wrangler/state`.
+- Dist is disposable. Don’t commit `dist/`; the build step will blow it away  
+  and recreate cleanly.
+- Data model. `data.json` can be a map of slugs (`{ "open": {...}, "foo": {...} }`)  
+  or a single object (worker will auto-detect).
 
-the workspace root so they share .wrangler/state.
-• Dist is disposable. Don’t commit dist/; the build step will blow it away
-and recreate cleanly.
-• Data model. data.json can be a map of slugs ({ "open": {...}, "foo": {...} })
-or a single object (worker will auto-detect).
-
-⸻
+---
 
 ## ✅ Checklist
 
-    •	Run pnpm dev:sesame → confirm worker comes up and /__health works.
-    •	Visit /__r2list → confirm data.json is present.
-    •	Edit templates/styles.css → confirm changes hot-reload locally.
-    •	Deploy with release target when ready.
+- Run `pnpm dev:resume` → confirm worker comes up and `/__health` works.
+- Visit `/__r2list` → confirm `data.json` is present.
+- Edit `templates/styles.css` → confirm changes hot-reload locally.
+- Deploy with release target when ready.
 
-    Enjoy the W :)
+Enjoy the W :)
 
-⸻
+---
+
+## 📁 Assets
+
+Images and other static assets are stored in R2 under the prefix `resume-data/images/`.  
+These must be uploaded either via the CI pipeline or manually using Wrangler commands.  
 
 Happy coding ✨
