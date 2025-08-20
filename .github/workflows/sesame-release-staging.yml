@@ -82,14 +82,20 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Ensure R2 bucket (staging)
-        uses: cloudflare/wrangler-action@v3
-        continue-on-error: true
-        with:
-          wranglerVersion: '4.31.0'
-          command: r2 bucket create sesame-data-staging
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Ensure R2 bucket (staging, idempotent)
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          # Check if bucket already exists (JSON output is stable to parse)
+          if npx wrangler r2 bucket list --json | jq -e '.[] | select(.name=="sesame-data-staging")' >/dev/null; then
+            echo "Bucket 'sesame-data-staging' already exists. Skipping create."
+          else
+            echo "Creating bucket 'sesame-data-staging'..."
+            npx wrangler r2 bucket create sesame-data-staging
+          fi
 
       - name: Check data.json presence
         id: r2check
