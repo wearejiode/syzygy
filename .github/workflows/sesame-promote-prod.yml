@@ -38,7 +38,7 @@ jobs:
           node-version: '20'
 
       - name: Wrangler dry-run (no network deploy)
-        run: npx -y wrangler@3 deploy artifact/meta-worker.generated.js --config apps/Core/Portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml --no-bundle --dry-run
+        run: npx -y wrangler@3 deploy artifact/meta-worker.generated.js --config apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml --no-bundle --dry-run
 
   promote:
     name: Deploy artifact to production
@@ -65,5 +65,5 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }} # environment secret (production)
           command: >
             deploy artifact/meta-worker.generated.js
-            --config apps/Core/Portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml
+            --config apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml
             --no-bundle --no-interactive

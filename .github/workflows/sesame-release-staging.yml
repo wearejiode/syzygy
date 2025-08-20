@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'apps/Core/Portfolio/sesame.jiode.one/**'
+      - 'apps/core/portfolio/sesame.jiode.one/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
 
@@ -69,5 +69,5 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }} # repo secret
           command: >
             deploy dist/releases/${{ github.sha }}/meta-worker.generated.js
-            --config apps/Core/Portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
+            --config apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
             --no-bundle --no-interactive
