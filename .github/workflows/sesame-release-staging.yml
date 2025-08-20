@@ -107,19 +107,17 @@ jobs:
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
-
       - name: Seed data.json if absent
         if: steps.r2check.outputs.exists == 'false'
         uses: cloudflare/wrangler-action@v3
         with:
-          command: >
-            r2 object put sesame-data-staging/data.json
-            --file apps/core/portfolio/sesame.jiode.one/data.json --remote
-            r2 object put sesame-data-staging/data.json
-            --file apps/core/portfolio/sesame.jiode.one/data.json --remote
           wranglerVersion: '4.31.0'
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >
+            r2 object put sesame-data-staging/data.json
+            --file apps/core/portfolio/sesame.jiode.one/data.json
+            --remote
 
       - name: Seed images to R2 (staging)
         shell: bash
