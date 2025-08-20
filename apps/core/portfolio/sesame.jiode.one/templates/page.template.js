@@ -14,7 +14,12 @@ export function renderPage({ data, url, linksHtml, videoLink, imageLink }) {
   <meta name="description" content="${data.description}">
   <meta property="og:title" content="${data.title}">
   <meta property="og:description" content="${data.description}">
+  <link rel="preload" as="image" href="${imageLink}">
   <meta property="og:image" content="${imageLink}">
+  <meta property="og:image:secure_url" content="${imageLink}">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:alt" content="${data.title}">
+  <link rel="image_src" href="${imageLink}">
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:type" content="website">
@@ -23,6 +28,7 @@ export function renderPage({ data, url, linksHtml, videoLink, imageLink }) {
   <meta name="twitter:title" content="${data.title}">
   <meta name="twitter:description" content="${data.description}">
   <meta name="twitter:image" content="${imageLink}">
+  <meta name="twitter:image:alt" content="${data.title}">
   <meta name="twitter:image:width" content="1200" />
   <meta name="twitter:image:height" content="630" />
   <meta name="theme-color" content="#1c1c1e" media="(prefers-color-scheme: dark)">
