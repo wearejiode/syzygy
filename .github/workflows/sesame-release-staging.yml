@@ -89,7 +89,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           echo "Ensuring bucket sesame-data-staging..."
-          if npx wrangler r2 bucket create sesame-data-staging >/dev/null 2>&1; then
+          if npx wrangler r2 bucket create sesame-data-staging --remote >/dev/null 2>&1; then
             echo "Created bucket."
           else
             echo "Bucket already exists or cannot create (continuing)."
