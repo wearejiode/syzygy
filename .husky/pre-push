@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Ensure it builds
+pnpm -w nx run sesame.jiode.one:bundle-worker
+
+# Wrangler dry-run (no deploy)
+pnpm -s exec wrangler deploy dist/apps/sesame.jiode.one/meta-worker.generated.js \
+  --config apps/Core/Portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml \
+  --no-bundle --dry-run
