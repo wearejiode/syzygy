@@ -103,7 +103,7 @@ There are lots of GPG tools, but GitHub recommends this:
 7. ⚙️ Configure Git:  
    ```bash
     c ABCD1234EF567890GHIJK
-    git config --global gpg.format openpgp
+   git config --global gpg.format openpgp 
    git config --global gpg.program /usr/local/MacGPG2/bin/gpg2
    git config --global commit.gpgsign true
    ```
