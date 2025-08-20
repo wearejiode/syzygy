@@ -69,7 +69,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         with:
           command: |
-            r2 bucket create sesame-data-staging || exit 0
+            r2 bucket create sesame-data-staging
       - name: Check data.json presence
         id: r2-head
         uses: cloudflare/wrangler-action@v3
@@ -102,3 +102,4 @@ jobs:
             deploy dist/releases/${{ github.sha }}/meta-worker.generated.js
             --config apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
             --no-bundle
+          wranglerVersion: '4.31.0'
