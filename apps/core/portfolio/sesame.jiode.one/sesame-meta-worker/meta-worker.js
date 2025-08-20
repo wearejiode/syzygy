@@ -4,17 +4,17 @@ async function fetchHandler(request, env, ctx) {
   const cache = caches.default;
 
   if (url.pathname.startsWith('/images/')) {
-  const key = url.pathname.slice('/images/'.length); // "background.webp"
-  const obj = await env.SESAME_DATA.get(`images/${key}`);
-  if (!obj) return new Response('Not found', { status: 404 });
+    const key = url.pathname.slice('/images/'.length); // e.g. "background.webp"
+    const obj = await env.SESAME_DATA.get(`images/${key}`);
+    if (!obj) return new Response('Not found', { status: 404 });
 
-  return new Response(obj.body, {
-    headers: {
-      'Content-Type': obj.httpMetadata?.contentType || 'application/octet-stream',
-      'Cache-Control': 'public, max-age=31536000, immutable'
-    },
-  });
-}
+    return new Response(obj.body, {
+      headers: {
+        'Content-Type': obj.httpMetadata?.contentType || 'application/octet-stream',
+        'Cache-Control': 'public, max-age=31536000, immutable'
+      },
+    });
+  }
 
   // ---
 
@@ -68,18 +68,6 @@ if (url.pathname === '/__r2get') {
   const cached = await cache.match(request);
   if (cached) return cached;
 
-  // Images passthrough from R2
-  if (url.pathname.startsWith('/images/')) {
-    const key = url.pathname.slice(1);
-    const object = await env.SESAME_DATA.get(key);
-    if (!object) return new Response('Image not found', { status: 404 });
-    return new Response(object.body, {
-      headers: {
-        'Content-Type': object.httpMetadata?.contentType || 'image/webp',
-        'Cache-Control': 'no-store'
-      }
-    });
-  }
 
   // Load data.json safely
   const dataObj = await env.SESAME_DATA.get('data.json');
