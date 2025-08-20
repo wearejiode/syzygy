@@ -47,7 +47,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Bundle worker
-        run: pnpm -w nx run sesame.jiode.one:bundle-worker
+        run: pnpm -w nx run sesame.jiode.one:bundle-worker --cloud=false
 
       - name: Archive artifact (by commit SHA)
         run: |
