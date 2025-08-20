@@ -31,6 +31,11 @@ export function renderPage({ data, url, linksHtml, videoLink, imageLink }) {
   <meta name="twitter:image:alt" content="${data.title}">
   <meta name="twitter:image:width" content="1200" />
   <meta name="twitter:image:height" content="630" />
+  <!--
+    Note: On iOS native share (Safari -> Messages), thumbnails may not display
+    even when Open Graph tags are set correctly. This is a known limitation of iOS.
+    Most other platforms (Twitter, LinkedIn, Chrome, etc.) render correctly.
+  -->
   <meta name="theme-color" content="#1c1c1e" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>"/>
   <style>${INLINE_CSS}</style>
