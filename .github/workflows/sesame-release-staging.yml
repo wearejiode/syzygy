@@ -5,8 +5,6 @@ on:
     branches: [main]
     paths:
       - 'apps/core/portfolio/sesame.jiode.one/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
 
 # Ensure only one staging release runs per ref at a time
 concurrency:
@@ -30,24 +28,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
-
-      - uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
-      - name: Install deps (root)
-        run: pnpm install --frozen-lockfile
 
       - name: Debug - are CF secrets present?
         shell: bash
