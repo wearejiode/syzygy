@@ -93,7 +93,7 @@ or a single object (worker will auto-detect).
     •	Edit templates/styles.css → confirm changes hot-reload locally.
     •	Deploy with release target when ready.
 
-    Enjoy :) !
+    Enjoy W :)
 
 ⸻
 
