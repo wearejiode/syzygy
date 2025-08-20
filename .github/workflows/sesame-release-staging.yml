@@ -69,19 +69,29 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         with:
           command: |
-            wrangler r2 bucket create sesame-data-staging || exit 0
+            r2 bucket create sesame-data-staging || exit 0
+      - name: Check data.json presence
+        id: r2-head
+        uses: cloudflare/wrangler-action@v3
+        continue-on-error: true       # head returns non-zero if not found
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        with:
+          command: r2 object head sesame-data-staging/data.json
+          wranglerVersion: '4.31.0'
 
-      # Seed data.json only if missing (avoid clobbering)
       - name: Seed data.json if absent
+        if: steps.r2-head.outcome == 'failure'
         uses: cloudflare/wrangler-action@v3
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         with:
-          command: |
-            wrangler r2 object head sesame-data-staging/data.json >/dev/null 2>&1 \
-            || wrangler r2 object put sesame-data-staging/data.json \
-                 --file apps/core/portfolio/sesame.jiode.one/data.json
+          command: >
+            r2 object put sesame-data-staging/data.json
+            --file apps/core/portfolio/sesame.jiode.one/data.json
+          wranglerVersion: '4.31.0'
 
       - name: Deploy to staging
         uses: cloudflare/wrangler-action@v3
