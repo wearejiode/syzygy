@@ -92,4 +92,4 @@ Static assets such as images are stored under the R2 prefix `resume-data/images/
 
 ---
 
-Happy coding! 🚀
+Code 4 times as fast in half the time ;)
