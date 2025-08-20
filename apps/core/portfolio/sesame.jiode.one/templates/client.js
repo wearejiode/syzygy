@@ -87,7 +87,9 @@ function initReadMoreToggles() {
       if (handling) return;
       handling = true;
       const shareData = {
-        url: window.location.href
+        title: document.title || 'Candidate Profile',
+        text: "Here’s Jiō Azul’s profile — includes resume, cover letter, and intro video.",
+        url: window.location.href,
       };
 
       // Prefer native share when available (iOS Safari shows sheet on touch)
