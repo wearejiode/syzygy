@@ -18,9 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    environment: staging
     env:
       NODE_VERSION: '20'
       NX_CLOUD_DISABLED: 'true'
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
 
@@ -64,9 +67,6 @@ jobs:
 
       - name: Ensure R2 bucket (staging)
         uses: cloudflare/wrangler-action@v3
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         with:
           command: |
             r2 bucket create sesame-data-staging
@@ -74,9 +74,6 @@ jobs:
         id: r2-head
         uses: cloudflare/wrangler-action@v3
         continue-on-error: true       # head returns non-zero if not found
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         with:
           command: r2 object head sesame-data-staging/data.json
           wranglerVersion: '4.31.0'
@@ -84,9 +81,6 @@ jobs:
       - name: Seed data.json if absent
         if: steps.r2-head.outcome == 'failure'
         uses: cloudflare/wrangler-action@v3
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         with:
           command: >
             r2 object put sesame-data-staging/data.json
@@ -96,8 +90,6 @@ jobs:
       - name: Deploy to staging
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }} # repo secret
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }} # repo secret
           command: >
             deploy dist/releases/${{ github.sha }}/meta-worker.generated.js
             --config apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
