@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { BlogPostComponent } from './content/blog-post/blog-post.component';
+import { BlogPostComponent } from '../content/blog-post/blog-post.component';
 import { HomeComponent } from './home/home.component';
 
 export const routes: Routes = [
@@ -12,10 +12,10 @@ export const routes: Routes = [
   {
     path: ':slug',
     loadComponent: () =>
-      import('./content/blog-post/blog-post.component').then(m => m.BlogPostComponent)
+      import('../content/blog-post/blog-post.component').then(m => m.BlogPostComponent)
   },
   {
     path: '**',
-    redirectTo: 'portfolio-site'
+    redirectTo: 'home'
   }
 ];

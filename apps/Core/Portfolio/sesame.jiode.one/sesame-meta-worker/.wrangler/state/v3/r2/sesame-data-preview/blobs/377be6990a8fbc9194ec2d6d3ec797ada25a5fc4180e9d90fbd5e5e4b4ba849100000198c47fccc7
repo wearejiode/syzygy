@@ -1,0 +1,40 @@
+{
+    "openai": {
+      "title": "✨ Jacob’s Pitch to OpenAI ✨",
+      "description": "Why I’m the right fit to help build the future of intelligence: We are all made of stardust. I believe the purpose of intelligence is to uplift — to connect, to create, and to heal. I want to help humanity reach utopia, and I believe OpenAI is the best place to do that. AI is a marvelous gift to humanity, and being part of the team that builds it would be a dream come true. 🤙",
+      "videoSlug": "lPpOT_-qJl0",
+      "links": [
+        { "label": "🔥 Resume", "url": "https://resume.fahrnbach.one/openai", "style": "first"},
+        { "label": "⚡️ Book Time", "url": "https://calendly.com/jacobfahrnbach/30min", "style": "second"},
+        { "label": "🎨 Portfolio", "url": "https://fahrnbach.one", "style": "third"},
+        { "label": "💌 Mail", "url": "mailto:love@jiode.one", "style": "fourth"},
+        { "label": "❤️ Thank You", "url": "https://resume.fahrnbach.one/thankyou", "style": "fifth"},
+        { "label": "🐈‍ Github", "url": "https://github.com/fahrnbach", "style": "sixth"},
+        { "label": "🔗 Linkedin", "url": "https://www.linkedin.com/in/fahrnbach/", "style": "seventh"},
+        { "label": "📸 Youtube", "url": "https://youtube.com/@wearejiode", "style": "eighth"}
+      ]
+    },
+      "google": {
+        "title": "✨ Jacob’s Pitch to Google ✨",
+        "description": "Creative engineering :), high-scale systems, and human-first design.",
+        "videoSlug": "lPpOT_-qJl0",
+        "links": "default"
+      },
+      "open": {
+        "title": "✨ A Little Magic from Jacob ✨",
+        "description": "This pitch isn’t tied to a single company — it’s for *you*, wherever you are.This pitch isn’t tied to a single company — it’s for *you*, wherever you are.",
+        "videoSlug": "lPpOT_-qJl0",
+        "links": [
+          { "label": "🔥 Resume", "url": "/assets/resume.pdf", "style": "first"}
+        ]
+      },
+      "open2": {
+        "title": "✨ A Little Magic from Jacob ✨",
+        "description": "This personalized pitch isn’t tied to a single company — it’s for *you*, wherever you are."
+      },
+      "ricky": {
+        "title": "🎸 Never gonna give you up…",
+        "description": "We're no strangers to love...",
+        "videoSlug": "lPpOT_-qJl0"
+      }
+}

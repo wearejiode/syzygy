@@ -1,9 +1,9 @@
-name = "sesame-meta"
+name = "jiode-sesame"
 main = "meta-worker.js"
 compatibility_date = "2025-06-09"
 
 routes = [
-  { pattern = "sesame.fahrnbach.one", custom_domain = true }
+  { pattern = "sesame.jiode.one", custom_domain = true }
 ]
 
 [vars]

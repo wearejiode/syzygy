@@ -1,0 +1,15 @@
+name = "staging.jiode-sesame"
+main = "meta-worker.js"
+compatibility_date = "2025-06-09"
+
+routes = [
+  { pattern = "staging.sesame.jiode.one", custom_domain = true }
+]
+
+[vars]
+ENVIRONMENT = "staging"
+
+[[r2_buckets]]
+binding = "SESAME_DATA"
+bucket_name = "sesame-data-staging"
+preview_bucket_name = "sesame-data-staging-preview"

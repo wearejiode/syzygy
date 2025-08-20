@@ -1,92 +1,4 @@
-//meta-worker.js
-async function fetchHandler(request, env, ctx) {
-  const url = new URL(request.url);
-  const cache = caches.default;
-
-  // 🔹 Serve image from R2 if path starts with /images/
-  if (url.pathname.startsWith("/images/")) {
-    const key = url.pathname.slice(1); // remove leading slash
-    const object = await env.SESAME_DATA.get(key);
-    if (!object) {
-      return new Response("Image not found", { status: 404 });
-    }
-
-    return new Response(object.body, {
-      headers: {
-        "Content-Type": object.httpMetadata?.contentType || "image/webp",
-        "Cache-Control": "no-store"
-      }
-    });
-  }
-
-  // 🔹 Otherwise, handle the HTML metadata page
-  const dataObj = await env.SESAME_DATA.get('data.json');
-  if (!dataObj) {
-    return new Response("No data found", { status: 404 });
-  }
-
-  const json = await dataObj.text();
-  const companyData = JSON.parse(json);
-
-  const slug = url.pathname.slice(1).toLowerCase() || "open";
-
-  let response = await cache.match(request);
-  if (response) return response;
-
-  const data = companyData[slug] || companyData["open"];
-
-  const isVideoSlug = data.videoSlug
-
-  const videoLink = isVideoSlug ? `https://www.youtube.com/embed/${data.videoSlug}` : `https://www.youtube.com/embed/dQw4w9WgXcQ`;
-
-  const imageLink = isVideoSlug
-    ? `https://img.youtube.com/vi/${data.videoSlug}/hqdefault.jpg`
-    : `https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg`;
-
-  const defaultLinks = [
-    { label: "🚀 Resume", url: `https://resume.fahrnbach.one/${slug}`, style: "first" },
-    { label: "✨ Portfolio", url: "https://fahrnbach.one", style: "second" },
-    { label: "📅 Book Time", url: "https://calendly.com/jacob-fahrnbach/30min", style: "third" },
-    { label: "💻 GitHub", url: "https://github.com/fahrnbach", style: "fourth" },
-    { label: "🔗 LinkedIn", url: "https://linkedin.com/in/fahrnbach", style: "fifth" }
-  ];
-
-  const isValidLinks = Array.isArray(data.links) && data.links.length > 0;
-  // Logic for automatically updating button styling?
-  const links = isValidLinks ? data.links : defaultLinks;
-
-  const linksHtml = links.map(link => `
-    <a href="${link.url}" class="btn ${link.style}">${link.label}</a>
-  `).join('');
-
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${data.title}</title>
-  <meta name="description" content="${data.description}">
-  <meta property="og:title" content="${data.title}">
-  <meta property="og:description" content="${data.description}">
-  <meta property="og:image" content="${imageLink}">
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="${url.href}">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="${data.title}">
-  <meta name="twitter:description" content="${data.description}">
-  <meta name="twitter:image" content="${imageLink}">
-  <meta name="twitter:image:width" content="1200" />
-  <meta name="twitter:image:height" content="630" />
-  <meta name="theme-color" content="#1c1c1e" media="(prefers-color-scheme: dark)">
-  <link
-  rel="icon"
-  href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>"
-/>
-  <style>
-    :root {
+ :root {
       --global-padding: 5%;
       --btn-radius: 8px;
       --bg-dark: #1c1c1e;
@@ -123,7 +35,7 @@ async function fetchHandler(request, env, ctx) {
       display: flex;
       height: 100vh;
       width: 100vw;
-      background: url('https://sesame.fahrnbach.one/images/background.webp') no-repeat center;
+      background: url('https://sesame.jiode.one/images/background.webp') no-repeat center;
       background-repeat: repeat-y;
       background-size: 120%;
       z-index: 1;
@@ -149,12 +61,13 @@ async function fetchHandler(request, env, ctx) {
       padding: 0.1rem .1rem;
       border-radius: var(--btn-radius);
       background-color: var(--share);
-      background: linear-gradient(124deg, #ff0d00dd, #e82b1ddd, #e8a41ddd, #d7e81ddd, #1de864dd, #1de8e8dd, #311de8dd, #e700f3dd, #f300e7dd);
+      background: linear-gradient(124deg, #ff0d00dd, #e82b1ddd, #e8a41ddd, #d7e81ddd, #1de864dd, #1de8e8dd, #311de8dd, #9e00f3dd, #f30031dd);
       animation: rainbow 42s ease infinite;
       background-size: 1900% 1900%;
       margin-bottom: 1rem;
       box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
       transition: all 0.4s ease, box-shadow 0.4s ease;
+      z-index: 100;
     }
 
 
@@ -177,7 +90,7 @@ async function fetchHandler(request, env, ctx) {
     text-align: center;
     text-decoration: none;
     background-color: #1b1b1aaa;
-    background: url('https://sesame.fahrnbach.one/images/background.webp') no-repeat center;
+    background: url('https://sesame.jiode.one/images/background.webp') no-repeat center;
     background-repeat: repeat-y;
     background-size: 120%;
     color: white;
@@ -243,7 +156,7 @@ async function fetchHandler(request, env, ctx) {
       background-color: rgba(28, 28, 30, 0.72);
       background-image:
         linear-gradient(90deg, #ffffff33, #ffffff, #ffffff33),
-        url('https://sesame.fahrnbach.one/images/background.webp');
+        url('https://sesame.jiode.one/images/background.webp');
       background-size: cover;
       background-blend-mode: overlay;
 
@@ -557,197 +470,3 @@ async function fetchHandler(request, env, ctx) {
       .btn { width: 100%; }
   }
 }
-  </style>
-</head>
-<body>
-  <div class="background-fallback">
-  <div id="snackbar" class="snackbar">✅ Link copied!</div>
-  <div class="background">
-  <div class="info-container">
-    <div class="info">
-      <div class="info-content">
-        <div class="title">${data.title}</div>
-        <div class="summary-container">
-          <div class="summary" id="summary1">
-            <div class="summary-main">
-              ${data.description}
-            </div>
-            <div class="summary-footer">
-              <a href="https://fahrnbach.one" class="subtle-link">💖 Tools that spark creativity and connection.</a>
-            </div>
-          </div>
-          <span class="read-more-toggle" data-target="summary1">Read more...</span>
-        </div>
-        <div class="video">
-          <iframe
-            width="100%"
-            height="100%"
-            src="${videoLink}"
-            title="Intro Video"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen>
-          </iframe>
-        </div>
-        <div class="link-grid">
-          ${linksHtml}
-        </div>
-        </div>
-      </div>
-      <div class="share-container">
-      <button class="share">
-        <span class="share-text">✨ Share This Candidate ✨</span>
-      </button>
-      </div>
-  </div>
-  </div>
-</body>
-<script>
-  function initReadMoreToggles() {
-    function handleToggleClick(evt) {
-      const toggle = evt.currentTarget;
-      const targetId = toggle.dataset.target;
-      const summary = document.getElementById(targetId);
-      if (!summary) return;
-
-      const expanded = summary.classList.toggle('expanded');
-      toggle.textContent = expanded ? 'Show less' : 'Read more';
-    }
-
-    document.querySelectorAll('.read-more-toggle').forEach((toggle) => {
-      toggle.removeEventListener('click', handleToggleClick);
-      toggle.addEventListener('click', handleToggleClick);
-    });
-
-    document.querySelectorAll('.summary').forEach((summary) => {
-      if (summary.scrollHeight <= summary.clientHeight) {
-        const toggle = summary.nextElementSibling;
-        if (toggle && toggle.classList.contains('read-more-toggle')) {
-          toggle.style.display = 'none';
-        }
-      }
-    });
-  }
-
-  function handleMouseMove(e) {
-    const sparkle = document.createElement('div');
-    sparkle.className = 'sparkle';
-    sparkle.style.left = e.clientX + 'px';
-    sparkle.style.top = e.clientY + 'px';
-    document.body.appendChild(sparkle);
-    setTimeout(() => sparkle.remove(), 1000);
-  }
-
-  function showSnackbar(message = '✅ Link copied!') {
-    const bar = document.getElementById('snackbar');
-    if (!bar) return;
-    bar.textContent = message;
-    bar.classList.add('show');
-    setTimeout(() => bar.classList.remove('show'), 2500);
-  }
-
-  // Helper: Cross-platform copy-to-clipboard with legacy fallback
-  async function copyLinkToClipboard(url) {
-    // Try modern Clipboard API first (requires HTTPS + user gesture)
-    if (navigator.clipboard && window.isSecureContext) {
-      try {
-        await navigator.clipboard.writeText(url);
-        return true;
-      } catch (e) {
-        // fall through to legacy path
-      }
-    }
-
-    // Legacy fallback for iOS/Safari quirks
-    const input = document.createElement('input');
-    input.value = url;
-    input.setAttribute('readonly', '');
-    input.style.position = 'absolute';
-    input.style.left = '-9999px';
-    document.body.appendChild(input);
-
-    // Preserve selection
-    const selection = document.getSelection();
-    const range = selection && selection.rangeCount ? selection.getRangeAt(0) : null;
-
-    input.select();
-    input.setSelectionRange(0, input.value.length);
-    const ok = document.execCommand && document.execCommand('copy');
-
-    document.body.removeChild(input);
-    if (range) {
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
-    return !!ok;
-  }
-
-  function initShareButton() {
-    const shareBtn = document.querySelector('.share');
-    if (!shareBtn) return;
-
-    let handling = false; // guard against double-fire on touchend + click
-
-    async function doShare(evt) {
-      if (handling) return;
-      handling = true;
-      const shareData = {
-        title: document.title || 'Candidate Profile',
-        text: "Here’s Jiō Azul’s profile — includes resume, cover letter, and intro video.",
-        url: window.location.href,
-      };
-
-      // Prefer native share when available (iOS Safari shows sheet on touch)
-      if (navigator.share) {
-        try {
-          await navigator.share(shareData);
-          handling = false;
-          return; // success or user completed share — nothing else to do
-        } catch (err) {
-          // If user cancels, do nothing (don’t claim success)
-          const msg = String(err && (err.name || err.message || err));
-          if (/Abort|cancel/i.test(msg)) {
-            handling = false;
-            return;
-          }
-          // Otherwise, attempt clipboard copy
-        }
-      }
-
-      const ok = await copyLinkToClipboard(shareData.url);
-      if (ok) {
-        showSnackbar('✅ Link copied!');
-      } else {
-        showSnackbar('⚠️ Couldn’t copy link. Tap and hold to copy, or share manually.');
-      }
-      handling = false;
-    }
-
-    // iOS sometimes ties clipboard permission more strongly to touch events — wire both
-    shareBtn.addEventListener('touchend', doShare, { passive: true });
-    shareBtn.addEventListener('click', doShare);
-  }
-
-
-  function initPage() {
-    initReadMoreToggles();
-    initShareButton();
-    document.addEventListener('mousemove', handleMouseMove, { passive: true });
-  }
-
-  document.addEventListener('DOMContentLoaded', initPage);
-</script>
-</html>`;
-
-  response = new Response(html, {
-    headers: {
-      "Content-Type": "text/html;charset=UTF-8",
-      "Cache-Control": "no-store"
-    }
-  });
-
-  ctx.waitUntil(cache.put(request, response.clone()));
-  return response;
-}
-
-export default { fetch: fetchHandler };

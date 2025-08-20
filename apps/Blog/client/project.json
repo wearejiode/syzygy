@@ -1,109 +1,56 @@
 {
   "name": "client-blog",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "prefix": "app",
-  "sourceRoot": "apps/client-blog/src",
-  "tags": [],
+  "sourceRoot": "apps/Blog/client/src",
   "targets": {
     "build": {
-      "executor": "@angular/build:application",
-      "outputs": ["{options.outputPath}"],
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{workspaceRoot}/dist/apps/client-blog"],
       "options": {
-        "outputPath": "dist/apps/cloudflare/client-blog",
-        "browser": "apps/client-blog/src/main.ts",
-        "polyfills": ["zone.js"],
-        "tsConfig": "apps/client-blog/tsconfig.app.json",
-        "inlineStyleLanguage": "scss",
+        "outputPath": "dist/apps/client-blog",
+        "index": "apps/Blog/client/src/index.html",
+        "browser": "apps/Blog/client/src/main.ts",
+        "tsConfig": "apps/Blog/client/tsconfig.app.json",
+        "baseHref": "/",
         "assets": [
-          {
-            "glob": "**/*",
-            "input": "apps/client-blog/public",
-            "output": "/"
-          }
+          "apps/Blog/client/src/assets",
+          { "glob": "**/*", "input": "apps/Blog/client/src/public", "output": "/" },
+          { "glob": "favicon.*", "input": "apps/Blog/client/src", "output": "/" }
         ],
-        "styles": ["apps/client-blog/src/styles.css"],
-        "server": "apps/client-blog/src/main.server.ts",
-        "ssr": {
-          "entry": "apps/client-blog/src/server.ts"
-        },
-        "outputMode": "server"
+        "styles": ["apps/Blog/client/src/styles.css"],
+        "scripts": [],
+        "ssr": false,
+        "prerender": false
       },
       "configurations": {
         "production": {
-          "budgets": [
-            {
-              "type": "initial",
-              "maximumWarning": "500kb",
-              "maximumError": "1mb"
-            },
-            {
-              "type": "anyComponentStyle",
-              "maximumWarning": "4kb",
-              "maximumError": "8kb"
-            }
-          ],
+          "optimization": true,
+          "sourceMap": true,
           "outputHashing": "all"
         },
         "development": {
           "optimization": false,
-          "extractLicenses": false,
           "sourceMap": true
         }
       },
       "defaultConfiguration": "production"
     },
-    "serve": {
-      "continuous": true,
-      "executor": "@angular/build:dev-server",
-      "configurations": {
-        "production": {
-          "buildTarget": "client-blog:build:production"
-        },
-        "development": {
-          "buildTarget": "client-blog:build:development"
-        }
-      },
-      "defaultConfiguration": "development"
-    },
-    "extract-i18n": {
-      "executor": "@angular/build:extract-i18n",
+    "dev": {
+      "executor": "nx:run-commands",
       "options": {
-        "buildTarget": "client-blog:build"
+        "command": "wrangler dev --config apps/Blog/wrangler.toml --local",
+        "cwd": "."
       }
     },
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+    "deploy": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
       "options": {
-        "jestConfig": "apps/client-blog/jest.config.ts",
-        "assets": [
-          "apps/client-blog/src/assets/favicon.webp",
-          "apps/client-blog/src/assets"
-        ],
-        "styles": ["apps/client-blog/src/styles.css"]
-      }
-    },
-    "serve-static": {
-      "continuous": true,
-      "executor": "@nx/web:file-server",
-      "options": {
-        "buildTarget": "client-blog:build",
-        "port": 4200,
-        "staticFilePath": "dist/apps/client-blog/browser",
-        "spa": true
-      }
-    },
-    "prerender": {
-      "executor": "@angular/ssr:prerender",
-      "options": {
-        "browserTarget": "client-blog:build:production",
-        "serverTarget": "client-blog:server:production",
-        "routes": ["/", "/about", "/posts", "/contact"]
+        "command": "wrangler deploy --config apps/Blog/wrangler.toml",
+        "cwd": "."
       }
     }
-  }
+  },
+  "tags": ["scope:web", "type:spa"]
 }

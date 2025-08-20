@@ -2,7 +2,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { BlogService } from '../../services/blog.service';
+import { BlogService } from '../../app/services/blog.service';
 
 @Component({
   selector: 'app-blog-post',
