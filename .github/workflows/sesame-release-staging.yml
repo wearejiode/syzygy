@@ -1,3 +1,18 @@
+name: Release to Staging
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/core/portfolio/sesame.jiode.one/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+# Ensure only one staging release runs per ref at a time
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release-staging:
     runs-on: ubuntu-latest
