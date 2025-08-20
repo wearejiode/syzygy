@@ -4,12 +4,12 @@
     box-sizing: border-box;
     cursor: crosshair;
   }
-  
+
   body {
     overflow-y: scroll;
     background-color: black;
   }
-  
+
   svg{ overflow : visible ; }
 
 .background {
@@ -19,7 +19,7 @@
     width: 100vw;
     height: 100vh;
     /* background: url(public/models/Firefly_colorful_nebulae.jpg); */
-    background-image: url(public/models/Globular_Cluster_NGC_1850_Take_One.webp);
+    background-image: url(public/models/globular-cluster-ngc-1850-take-one.webp);
     /* background-image: url(public/models/2k_stars_milky_way.jpg); */
     background-size: cover;
     /* backdrop-filter: brightness(30%); */
@@ -144,5 +144,5 @@
         font-size: clamp(5vw, 50px, 7vw);
         transform: translate(100px, 20px);
       }
-    
+
   }

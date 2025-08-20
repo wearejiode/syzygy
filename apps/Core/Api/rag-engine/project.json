@@ -1,15 +1,15 @@
 {
   "name": "rag-engine",
   "projectType": "application",
-  "sourceRoot": "apps/Core/Api/rag-engine",
+  "sourceRoot": "apps/core/api/rag-engine",
   "targets": {
     "build": {
       "executor": "@nx/node:build",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/Core/Api/rag-engine",
-        "main": "apps/Core/Api/rag-engine/src/main.ts",
-        "tsConfig": "apps/Core/Api/rag-engine/tsconfig.app.json"
+        "outputPath": "dist/apps/core/api/rag-engine",
+        "main": "apps/core/api/rag-engine/src/main.ts",
+        "tsConfig": "apps/core/api/rag-engine/tsconfig.app.json"
       }
     },
     "serve": {

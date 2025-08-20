@@ -1,15 +1,15 @@
 {
   "name": "posts",
   "projectType": "application",
-  "sourceRoot": "apps/Core/Api/posts",
+  "sourceRoot": "apps/core/api/posts",
   "targets": {
     "build": {
       "executor": "@nx/node:build",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/Core/Api/posts",
-        "main": "apps/Core/Api/posts/src/main.ts",
-        "tsConfig": "apps/Core/Api/posts/tsconfig.app.json"
+        "outputPath": "dist/apps/core/api/posts",
+        "main": "apps/core/api/posts/src/main.ts",
+        "tsConfig": "apps/core/api/posts/tsconfig.app.json"
       }
     },
     "serve": {
