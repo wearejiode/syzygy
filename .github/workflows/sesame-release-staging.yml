@@ -70,4 +70,4 @@ jobs:
           command: >
             deploy dist/releases/${{ github.sha }}/meta-worker.generated.js
             --config apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
-            --no-bundle --no-interactive
+            --no-bundle --non-interactive
