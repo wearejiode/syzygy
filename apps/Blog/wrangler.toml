@@ -1,0 +1,23 @@
+name = "jiode-client-blog"
+main = "worker/index.ts"
+compatibility_date = "2024-11-07"
+
+routes = [
+  { pattern = "blog.jiode.one/*", zone_name = "jiode.one" }
+]
+
+[assets]
+# Angular output at: dist/apps/client-blog
+directory = "../../dist/apps/client-blog/browser"
+binding = "ASSETS"
+
+# Valid: "auto-trailing-slash" | "force-trailing-slash" | "drop-trailing-slash" | "none"
+html_handling = "auto-trailing-slash"
+
+# For SPA deep-links: serve index.html on 404
+# Valid: "none" | "single-page-application"
+not_found_handling = "single-page-application"
+
+# Either of these works — pick one:
+# routes = [ "https://blog.jiode.one/*" ]
+

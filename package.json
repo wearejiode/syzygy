@@ -1,12 +1,20 @@
 {
-  "name": "@fahrnbach/source",
+  "name": "@jiode/source",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
     "dev:docs": "nx run docs:dev",
     "build:docs": "nx run docs:build",
     "preview:docs": "nx run docs:preview",
-    "r2:list": "wrangler r2 object list --bucket resume-data --prefix resumes/ --config apps/Core/Portfolio/resume.fahrnbach.one/resume-meta-worker/wrangler.toml"
+    "build:blog": "pnpm -w nx build client-blog --configuration=production",
+    "dev:blog": "pnpm -w nx run client-blog:dev",
+    "deploy:blog": "pnpm -w nx run client-blog:deploy",
+    "cf:build:blog": "pnpm -w approve-builds && pnpm -w nx build client-blog --configuration=production",
+    "dev:sesame": "pnpm -w nx run sesame.jiode.one:dev:live",
+    "build:sesame": "node apps/Core/Portfolio/sesame.jiode.one/scripts/build-worker.mjs",
+    "release:sesame": "pnpm -w nx run sesame.jiode.one:release",
+    "r2:list": "wrangler r2 object list --bucket resume-data --prefix resumes/ --config apps/Core/Portfolio/resume.fahrnbach.one/resume-meta-worker/wrangler.toml",
+    "clean:dandelion": "rimraf dist/apps/sesame.jiode.one"
   },
   "private": true,
   "dependencies": {
@@ -24,7 +32,7 @@
     "marked": "^15.0.12",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~20.0.0",
@@ -58,6 +66,7 @@
     "angular-eslint": "^20.0.0",
     "astro": "^5.6.1",
     "autoprefixer": "^10.4.21",
+    "chokidar-cli": "^3.0.0",
     "cypress": "^14.2.1",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
@@ -76,6 +85,7 @@
     "nx": "21.2.0",
     "postcss": "^8.5.6",
     "prettier": "^2.6.2",
+    "rimraf": "^6.0.1",
     "sharp": "^0.32.5",
     "tailwindcss": "^4.1.11",
     "ts-jest": "^29.1.0",
@@ -83,6 +93,7 @@
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.29.0",
     "vite": "^7.1.0",
+    "wait-on": "^8.0.4",
     "wrangler": "^4.28.0"
   }
 }

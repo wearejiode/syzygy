@@ -1,5 +1,5 @@
 {
-  "name": "jiode.one",
+  "name": "resume.fahrnbach.one",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "build": {
