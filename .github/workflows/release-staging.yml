@@ -2,11 +2,16 @@ name: Release to Staging
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - "apps/Core/Portfolio/sesame.jiode.one/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
+      - 'apps/Core/Portfolio/sesame.jiode.one/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+# Ensure only one staging release runs per ref at a time
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   release-staging:
@@ -14,18 +19,17 @@ jobs:
     permissions:
       contents: read
     env:
-      NODE_VERSION: "20"
+      NODE_VERSION: '20'
     steps:
       - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -60,8 +64,8 @@ jobs:
       - name: Deploy to staging
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}     # repo secret
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}   # repo secret
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }} # repo secret
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }} # repo secret
           command: >
             deploy dist/releases/${{ github.sha }}/meta-worker.generated.js
             --config apps/Core/Portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
