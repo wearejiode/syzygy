@@ -16,7 +16,7 @@ import morgan from 'morgan';
 import chalk from 'chalk';
 
 //
-import adminRoutes from '../admin-panel/Public/routes/routes/adminRoutes.js';
+import adminRoutes from '../admin-panel/public/routes/routes/adminRoutes.js';
 
 // ⛏️ Setup project root and .env path
 const __filename = fileURLToPath(import.meta.url);

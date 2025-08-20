@@ -21,7 +21,7 @@
       background-color: var(--bg-dark);
       background:
         radial-gradient(circle at center, #1c1c1e 0%, #0f0f10 100%),
-        url('./public/Background.webp') no-repeat center center;
+        url('./public/background.webp') no-repeat center center;
       background-size: cover;
       background-blend-mode: overlay;
     }

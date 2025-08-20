@@ -142,7 +142,7 @@ const sizes = {
 // #region Smoke Init
 
 scene.fog = new THREE.Fog(0xc0f0ff, 0.0015)// # THREE SMOKE // Color, Near
-const smokeTexture = new THREE.TextureLoader().load("models/smoke/webp/White_Cloud.webp")// #Smoke Texture
+const smokeTexture = new THREE.TextureLoader().load("models/smoke/webp/white-cloud.webp")// #Smoke Texture
 smokeTexture.colorSpace = "srgb"; // #Smoke Texture
 const smokeGeometry = new THREE.PlaneGeometry(300,300);  // #Smoke Texture
  // #Smoke Texture
@@ -189,7 +189,7 @@ for (let i = 0; i < 90; i++) { //Can Adjust Number (90)
 // #endregion Smoke Init
 
 // #region Earth Init
-const earthTexture = new THREE.TextureLoader().load( "models/2k_earth_daymap.webp" );
+const earthTexture = new THREE.TextureLoader().load( "models/2k-earth-daymap.webp" );
 const geometry = new THREE.SphereGeometry(3, 64, 64);
 // !The Color
 const material = new THREE.MeshStandardMaterial({
@@ -205,7 +205,7 @@ scene.add(earth);
 // #endregion Earth Init
 
 // #region Moon Init
-const moonTexture = new THREE.TextureLoader().load( "models/Moon_Texture_Map_Compact.jpg" );
+const moonTexture = new THREE.TextureLoader().load( "models/moon-texture-map-compact.jpg" );
 const moonGeometry = new THREE.SphereGeometry(.5, 64, 64);
 // !The Color
 const moonMaterial = new THREE.MeshStandardMaterial({

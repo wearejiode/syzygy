@@ -1,15 +1,15 @@
 {
   "name": "auth",
   "projectType": "application",
-  "sourceRoot": "apps/Core/Api/auth",
+  "sourceRoot": "apps/core/api/auth",
   "targets": {
     "build": {
       "executor": "@nx/node:build",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/Core/Api/auth",
-        "main": "apps/Core/Api/auth/src/main.ts",
-        "tsConfig": "apps/Core/Api/auth/tsconfig.app.json"
+        "outputPath": "dist/apps/core/api/auth",
+        "main": "apps/core/api/auth/src/main.ts",
+        "tsConfig": "apps/core/api/auth/tsconfig.app.json"
       }
     },
     "serve": {

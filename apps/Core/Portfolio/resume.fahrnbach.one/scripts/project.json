@@ -6,7 +6,7 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "vite build",
-        "cwd": "apps/Core/Portfolio/fahrnbach.one"
+        "cwd": "apps/core/portfolio/fahrnbach.one"
       }
     }
   }

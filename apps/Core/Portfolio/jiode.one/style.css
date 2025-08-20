@@ -40,7 +40,7 @@ svg{ overflow : visible ; }
   width: 100vw;
   height: 100vh;
   /* background: url(public/models/Firefly_colorful_nebulae.jpg); */
-  background-image: url(public/models/Globular_Cluster_NGC_1850_Take_One.webp);
+  background-image: url(public/models/globular-cluster-ngc-1850-take-one.webp);
   /* background-image: url(public/models/2k_stars_milky_way.jpg); */
   background-size: cover;
   /* backdrop-filter: brightness(30%); */
@@ -100,7 +100,7 @@ svg{ overflow : visible ; }
   left: 50px; */
   text-decoration: none;
   color: white;
-  
+
   font-size: 9rem;
   font-size: clamp(4px, 5vw + 5rem, 250px);
   /* font-size: 9em; */
@@ -156,7 +156,7 @@ svg{ overflow : visible ; }
   top: 50px;
   text-wrap: nowrap;
   /* transform: translate(-50%, 75%); */
-  
+
 
   font-family: "myriad-pro", sans-serif, "Arial";
   font-weight: 600;
@@ -184,7 +184,7 @@ svg{ overflow : visible ; }
   background-color: #00000000;
   justify-content: end;
   gap: 4rem;
-  
+
   border: none;
   color: white;
   font-size: clamp(2vw, 2rem, 3vw);
@@ -259,7 +259,7 @@ svg{ overflow : visible ; }
 }
 
 .availability-dot {
-  position: relative; 
+  position: relative;
   display: flex;
   justify-self: end;
   align-self: center;
@@ -339,7 +339,7 @@ svg{ overflow : visible ; }
   width: 40%;
   aspect-ratio: 1/1;
   background-color: red;
-  background-image: url(public/IMG_20190122_041649_869.webp);
+  background-image: url(public/img-20190122-041649-869.webp);
   background-size: cover;
   border-radius: 50%;
   border: 5px solid white;
@@ -527,7 +527,7 @@ svg{ overflow : visible ; }
   transform: scale(1.2);
 }
 
-.orb-container {  
+.orb-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -589,9 +589,9 @@ svg{ overflow : visible ; }
     /* transform: perspective(500px) rotate3d(1, 0, 0, 30deg); */
     -ms-overflow-style: none;
   scrollbar-width: none;
-  -webkit-mask-image: -webkit-gradient(linear, left top, left bottom, 
+  -webkit-mask-image: -webkit-gradient(linear, left top, left bottom,
     from(#00000055), to(#000000ff));
-  mask-image: -webkit-gradient(linear, left top, left bottom, 
+  mask-image: -webkit-gradient(linear, left top, left bottom,
     from(#00000055), to(#000000ff));
     /* background-color: red; */
 }
@@ -1048,7 +1048,7 @@ svg{ overflow : visible ; }
   height: 50px;
   border: none;
   background-color: transparent;
-  background-image: url(public/models/Refresh.svg);
+  background-image: url(public/models/refresh.svg);
   z-index: 21;
 }
 
@@ -1065,7 +1065,7 @@ svg{ overflow : visible ; }
   /* overflow-x: clip; */
 }
 
-.about-me { 
+.about-me {
   position: fixed;
   /* top: 90vh; */
   height: 100vh;
@@ -1272,13 +1272,13 @@ svg{ overflow : visible ; }
     right: 1.5rem;
     left: auto;
   }
-  
+
   .floating-preview.visible {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
   }
-  
+
   .preview-thumb {
     width: 64px;
     height: 64px;
