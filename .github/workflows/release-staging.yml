@@ -1,0 +1,57 @@
+name: Release to Staging
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "apps/Core/Portfolio/sesame.jiode.one/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+
+jobs:
+  release-staging:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      NODE_VERSION: "20"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Bundle worker
+        run: pnpm -w nx run sesame.jiode.one:bundle-worker
+
+      - name: Archive artifact (by commit SHA)
+        run: |
+          mkdir -p dist/releases/${{ github.sha }}
+          cp dist/apps/sesame.jiode.one/meta-worker.generated.js dist/releases/${{ github.sha }}/meta-worker.generated.js
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sesame-worker-${{ github.sha }}
+          path: dist/releases/${{ github.sha }}/meta-worker.generated.js
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Deploy to staging
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}     # repo secret
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}   # repo secret
+          command: >
+            deploy dist/releases/${{ github.sha }}/meta-worker.generated.js
+            --config apps/Core/Portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
+            --no-bundle --no-interactive
