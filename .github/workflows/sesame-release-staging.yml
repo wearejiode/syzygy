@@ -49,10 +49,11 @@ jobs:
       - name: Install deps
         run: pnpm -w --filter "./apps/core/portfolio/sesame.jiode.one" install --frozen-lockfile
 
-      - name: Debug: are CF secrets present?
+      - name: Debug - are CF secrets present?
+        shell: bash
         run: |
-          echo "TOKEN len: ${#CLOUDFLARE_API_TOKEN}"
-          echo "ACCOUNT len: ${#CLOUDFLARE_ACCOUNT_ID}"
+          if [ -n "${CLOUDFLARE_API_TOKEN:-}" ]; then echo "TOKEN: present"; else echo "TOKEN: MISSING"; fi
+          if [ -n "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then echo "ACCOUNT: present"; else echo "ACCOUNT: MISSING"; fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -62,8 +63,6 @@ jobs:
         with:
           wranglerVersion: '4.31.0'
           command: whoami
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Bundle worker
         run: pnpm -w nx run sesame.jiode.one:bundle-worker --cloud=false
@@ -87,8 +86,6 @@ jobs:
         with:
           wranglerVersion: '4.31.0'
           command: r2 bucket create sesame-data-staging
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Check data.json presence
         id: r2-head
@@ -97,8 +94,6 @@ jobs:
         with:
           command: r2 object head sesame-data-staging/data.json
           wranglerVersion: '4.31.0'
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Seed data.json if absent
         if: steps.r2-head.outcome == 'failure'
@@ -108,8 +103,6 @@ jobs:
             r2 object put sesame-data-staging/data.json
             --file apps/core/portfolio/sesame.jiode.one/data.json
           wranglerVersion: '4.31.0'
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Deploy to staging
         uses: cloudflare/wrangler-action@v3
@@ -119,5 +112,3 @@ jobs:
             --config apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
             --no-bundle
           wranglerVersion: '4.31.0'
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
