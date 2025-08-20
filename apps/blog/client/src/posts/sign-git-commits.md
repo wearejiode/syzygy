@@ -102,7 +102,8 @@ There are lots of GPG tools, but GitHub recommends this:
    ```  
 7. ⚙️ Configure Git:  
    ```bash
-   git config --global user.signingkey ABCD1234EF567890GHIJK
+    c ABCD1234EF567890GHIJK
+    git config --global gpg.format openpgp
    git config --global gpg.program /usr/local/MacGPG2/bin/gpg2
    git config --global commit.gpgsign true
    ```
@@ -118,7 +119,7 @@ You should now see the glorious 🟢 **Verified** badge on your commits!
 
 ## 📫 Optional: GitHub Email Setup
 
-To link your commits to your GitHub profile:
+To link your commits to your GitHub profile: 
 
 1. 🔒 Enable email privacy:  
    - GitHub → Settings → Emails → Check "Keep my email addresses private"
@@ -169,3 +170,50 @@ Happy coding! 🚀
 - 🔗 [Live Site](https://fahrnbach.one)  
 - 💻 [Source Code](https://github.com/fahrnbach)
 - 😼 [Github](https://github.com/fahrnbach)
+
+
+🛸     gpg --list-secret-keys
+/Users/calypso/.gnupg/pubring.kbx
+---------------------------------
+sec   rsa4096 2024-11-03 [SC] [expires: 2028-11-03]
+      AFF5F...
+uid           [ultimate] Jacob Fahrnbach <167583464+fahrnbach@users.noreply.github.com>
+ssb   rsa4096 2024-11-03 [E] [expires: 2028-11-03]
+
+sec   rsa4096 2025-08-20 [SC] [expires: 2029-08-20]
+      AC61B...
+uid           [ultimate] Jiode <167583464+wearejiode@users.noreply.github.com>
+ssb   rsa4096 2025-08-20 [E] [expires: 2029-08-20]
+
+ -41  calypso  ~/Desktop/One/one  G  main  
+🛸     git config --global user.signingkey AC61B...
+ -41  calypso  ~/Desktop/One/one  G  main  
+🛸    git config --global gpg.program /usr/local/MacGPG2/bin/gpg2
+ -41  calypso  ~/Desktop/One/one  G  main  
+🛸     git config --global commit.gpgsign true
+ -41  calypso  ~/Desktop/One/one  G  main  
+🛸  git add .
+ -41  calypso  ~/Desktop/One/one  G  main  
+🛸  git commit -m "Re-verify gpg test"
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+ 1  -41  calypso  ~/Desktop/One/one  G  main  
+🛸   git commit -m "Re-verify gpg test"
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   apps/blog/client/src/posts/sign-git-commits.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+ 1  -41  calypso  ~/Desktop/One/one  G  main  ⭑ 
+🛸  git add .                         
+ -41  calypso  ~/Desktop/One/one  G  main  ⭑ 
+🛸   git commit -m "Re-verify gpg test"
+error: Couldn't load public key AC61B...: No such file or directory?
+
+fatal: failed to write commit object
