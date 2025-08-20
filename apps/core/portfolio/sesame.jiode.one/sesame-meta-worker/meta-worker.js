@@ -117,7 +117,6 @@ if (url.pathname === '/__r2get') {
 
   const videoSlug = data.videoSlug || null;
   const videoLink = videoSlug ? `https://www.youtube.com/embed/${videoSlug}` : (data.video || '');
-  let activityViewController = UIActivityViewController(activityItems: videoLink, applicationActivities: nil)
   // Select a reachable YouTube thumbnail (maxres → sd → hq), or fall back to provided image
   const imageLink = videoSlug
     ? await pickYouTubeThumb(videoSlug)
