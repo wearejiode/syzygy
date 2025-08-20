@@ -3,6 +3,19 @@ async function fetchHandler(request, env, ctx) {
   const url = new URL(request.url);
   const cache = caches.default;
 
+  if (url.pathname.startsWith('/images/')) {
+  const key = url.pathname.slice('/images/'.length); // "background.webp"
+  const obj = await env.SESAME_DATA.get(`images/${key}`);
+  if (!obj) return new Response('Not found', { status: 404 });
+
+  return new Response(obj.body, {
+    headers: {
+      'Content-Type': obj.httpMetadata?.contentType || 'application/octet-stream',
+      'Cache-Control': 'public, max-age=31536000, immutable'
+    },
+  });
+}
+
   // ---
 
   // Health + diagnostics
