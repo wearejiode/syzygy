@@ -62,6 +62,27 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Ensure R2 bucket (staging)
+        uses: cloudflare/wrangler-action@v3
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        with:
+          command: |
+            wrangler r2 bucket create sesame-data-staging || exit 0
+
+      # Seed data.json only if missing (avoid clobbering)
+      - name: Seed data.json if absent
+        uses: cloudflare/wrangler-action@v3
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        with:
+          command: |
+            wrangler r2 object head sesame-data-staging/data.json >/dev/null 2>&1 \
+            || wrangler r2 object put sesame-data-staging/data.json \
+                 --file apps/core/portfolio/sesame.jiode.one/data.json
+
       - name: Deploy to staging
         uses: cloudflare/wrangler-action@v3
         with:
