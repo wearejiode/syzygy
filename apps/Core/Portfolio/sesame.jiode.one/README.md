@@ -49,7 +49,8 @@ While in dev, the worker exposes helpers:
 
 ## 🤖 CI Pipeline
 
-For staging simply push to github and the GHActions will deploy to staging.sesame.jiode.one
+For staging simply push to github and the GHActions should automatically deploy to staging.sesame.jiode.one
+And save artifact to github/artifacts
 
 For Deploy select an artifact and deploy within Github
 
