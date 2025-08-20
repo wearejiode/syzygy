@@ -4,8 +4,8 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   build: {
     lib: {
-      entry: 'src/GenieAssistant.js',
-      name: 'GenieAssistant',
+      entry: 'src/genie-assistant.js',
+      name: 'genie-assistant',
       fileName: 'genie-assistant',
       formats: ['es', 'umd']
     },

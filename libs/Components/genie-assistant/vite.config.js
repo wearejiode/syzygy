@@ -8,8 +8,8 @@ export default defineConfig({
     outDir: '../dist',
     emptyOutDir: true,
     lib: {
-      entry: resolve(__dirname, 'src/GenieAssistant.js'),
-      name: 'GenieAssistant',
+      entry: resolve(__dirname, 'src/genie-assistant.js'),
+      name: 'genie-assistant',
       fileName: 'genie-assistant',
       formats: ['es', 'umd']
     },

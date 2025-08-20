@@ -1,15 +1,15 @@
 {
   "name": "omnibar",
   "projectType": "application",
-  "sourceRoot": "apps/Core/Api/omnibar",
+  "sourceRoot": "apps/core/api/omnibar",
   "targets": {
     "build": {
       "executor": "@nx/node:build",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/Core/Api/omnibar",
-        "main": "apps/Core/Api/omnibar/src/main.ts",
-        "tsConfig": "apps/Core/Api/omnibar/tsconfig.app.json"
+        "outputPath": "dist/apps/core/api/omnibar",
+        "main": "apps/core/api/omnibar/src/main.ts",
+        "tsConfig": "apps/core/api/omnibar/tsconfig.app.json"
       }
     },
     "serve": {
