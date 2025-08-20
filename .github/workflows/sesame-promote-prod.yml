@@ -66,4 +66,4 @@ jobs:
           command: >
             deploy artifact/meta-worker.generated.js
             --config apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml
-            --no-bundle --non-interactive
+            --no-bundle
