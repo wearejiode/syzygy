@@ -115,11 +115,21 @@ jobs:
             echo "No $BASE folder found — skipping image upload."
           fi
 
+      - name: Wrangler whoami (sanity check)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          wranglerVersion: '4.31.0'
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: whoami
+
       # Deploy to prod (no bundle, use prod wrangler.toml)
       - name: Deploy to production
         uses: cloudflare/wrangler-action@v3
         with:
           wranglerVersion: '4.31.0'
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: >
             deploy dist/releases/${{ github.event.inputs.release_sha }}/meta-worker.generated.js
             --config apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml
