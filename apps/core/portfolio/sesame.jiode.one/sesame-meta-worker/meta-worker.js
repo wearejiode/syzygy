@@ -6,7 +6,7 @@ async function fetchHandler(request, env, ctx) {
   // ---
 
   // Health + diagnostics
-  if (url.pathname === '/__health') return new Response('ok', { status: 200 });
+  if (url.pathname === '/__health') return new Response('Healthy', { status: 200 });
   if (url.pathname === '/__r2') {
     try {
       const head = await env.SESAME_DATA.head('data.json');
