@@ -15,7 +15,7 @@
     "release:sesame": "pnpm -w nx run sesame.jiode.one:release",
     "r2:list": "wrangler r2 object list --bucket resume-data --prefix resumes/ --config apps/Core/Portfolio/resume.fahrnbach.one/resume-meta-worker/wrangler.toml",
     "clean:dandelion": "rimraf dist/apps/sesame.jiode.one",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "lint-staged": {
     "*.{js,ts,tsx,mjs,cjs}": "pnpm -s eslint --fix",
