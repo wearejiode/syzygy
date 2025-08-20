@@ -88,13 +88,11 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          set -euo pipefail
-          # Check if bucket already exists (JSON output is stable to parse)
-          if npx wrangler r2 bucket list --json | jq -e '.[] | select(.name=="sesame-data-staging")' >/dev/null; then
-            echo "Bucket 'sesame-data-staging' already exists. Skipping create."
+          echo "Ensuring bucket sesame-data-staging..."
+          if npx wrangler r2 bucket create sesame-data-staging >/dev/null 2>&1; then
+            echo "Created bucket."
           else
-            echo "Creating bucket 'sesame-data-staging'..."
-            npx wrangler r2 bucket create sesame-data-staging
+            echo "Bucket already exists or cannot create (continuing)."
           fi
 
       - name: Check data.json presence
@@ -104,7 +102,6 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          set -euo pipefail
           if npx wrangler r2 object get sesame-data-staging/data.json > /dev/null 2>&1; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
@@ -129,9 +126,12 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          set -e
-          npx wrangler r2 object get sesame-data-staging/data.json > /dev/null
-          echo "✅ data.json present in sesame-data-staging"
+          if npx wrangler r2 object get sesame-data-staging/data.json > /dev/null 2>&1; then
+            echo "✅ data.json present in sesame-data-staging"
+          else
+            echo "❌ data.json missing after seed step" >&2
+            exit 1
+          fi
 
       - name: Deploy to staging
         uses: cloudflare/wrangler-action@v3
