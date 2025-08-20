@@ -1,5 +1,7 @@
+# pre-push
+cat > .husky/pre-push <<'SH'
 #!/usr/bin/env sh
-# Husky v9+: do NOT source .husky/_/husky.sh
+# Husky v9+: no .husky/_/husky.sh
 
 # Build must succeed before push
 pnpm -w nx run sesame.jiode.one:bundle-worker || exit 1
@@ -8,3 +10,4 @@ pnpm -w nx run sesame.jiode.one:bundle-worker || exit 1
 pnpm -s exec wrangler deploy dist/apps/sesame.jiode.one/meta-worker.generated.js \
   --config apps/Core/Portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml \
   --no-bundle --dry-run || exit 1
+SH
