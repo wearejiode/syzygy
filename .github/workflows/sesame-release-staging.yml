@@ -91,18 +91,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-      - name: Check data.json presence
-        id: r2-head
-        uses: cloudflare/wrangler-action@v3
-        continue-on-error: true
-        with:
-          command: r2 object head sesame-data-staging/data.json
-          wranglerVersion: '4.31.0'
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Seed data.json if absent
-        if: steps.r2-head.outcome == 'failure'
+      - name: Upload data.json to R2 (staging)
         uses: cloudflare/wrangler-action@v3
         with:
           command: >
