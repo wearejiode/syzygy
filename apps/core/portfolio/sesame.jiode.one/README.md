@@ -99,7 +99,7 @@ pnpm -w nx run resume.fahrnbach.one:push:data
 - Edit `templates/styles.css` → confirm changes hot-reload locally.
 - Deploy with release target when ready.
 
-Enjoy the W :)
+Code 4 times as fast in half the time ;)
 
 ---
 
