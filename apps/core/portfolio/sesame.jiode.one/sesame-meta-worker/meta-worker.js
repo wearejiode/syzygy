@@ -1,4 +1,20 @@
 const renderPage = /*__RENDER_FUNCTION__*/ null;
+// Try to pick a large YouTube thumbnail that actually exists (iOS share is picky)
+async function pickYouTubeThumb(videoId) {
+  const bases = [
+    'https://img.youtube.com/vi/' + videoId + '/maxresdefault.jpg',
+    'https://img.youtube.com/vi/' + videoId + '/sddefault.jpg',
+    'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg',
+  ];
+  for (const url of bases) {
+    try {
+      const res = await fetch(url, { method: 'HEAD' });
+      if (res.ok) return url;
+    } catch (_) { /* ignore */ }
+  }
+  // Fallback (usually exists even if others don't)
+  return 'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg';
+}
 async function fetchHandler(request, env, ctx) {
   const url = new URL(request.url);
   const cache = caches.default;
@@ -29,9 +45,9 @@ async function fetchHandler(request, env, ctx) {
     }
   }
 
-  // Redirect root → /open
+  // Treat root as "open" without redirect (lets iOS share sheet read OG tags on the canonical URL)
   if (url.pathname === '/' || url.pathname === '') {
-    return Response.redirect(new URL('/open', url), 302);
+    // fall through: slug logic below will render "open"
   }
 
   // List keys in the bucket (debug)
@@ -101,7 +117,10 @@ if (url.pathname === '/__r2get') {
 
   const videoSlug = data.videoSlug || null;
   const videoLink = videoSlug ? `https://www.youtube.com/embed/${videoSlug}` : (data.video || '');
-  const imageLink = videoSlug ? `https://img.youtube.com/vi/${videoSlug}/hqdefault.jpg` : (data.image || '');
+  // Select a reachable YouTube thumbnail (maxres → sd → hq), or fall back to provided image
+  const imageLink = videoSlug
+    ? await pickYouTubeThumb(videoSlug)
+    : (data.image || '');
 
   const defaultLinks = [
     { label: '🚀 Resume', url: `https://resume.fahrnbach.one/${slug}`, style: 'first' },
