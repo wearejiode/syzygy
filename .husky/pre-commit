@@ -1,6 +1,3 @@
-# pre-commit
-cat > .husky/pre-commit <<'SH'
 #!/usr/bin/env sh
 # Husky v9+: no .husky/_/husky.sh
 pnpm -s lint-staged
-SH
