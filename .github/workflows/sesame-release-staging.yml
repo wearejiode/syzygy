@@ -47,7 +47,7 @@ jobs:
             ${{ runner.os }}-pnpm-
 
       - name: Install deps
-        run: pnpm install --frozen-lockfile
+        run: pnpm -w --filter "./apps/core/portfolio/sesame.jiode.one" install --frozen-lockfile
 
       - name: Verify Wrangler auth
         uses: cloudflare/wrangler-action@v3
