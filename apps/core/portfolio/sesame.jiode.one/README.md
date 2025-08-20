@@ -27,7 +27,7 @@ We no longer inline HTML/CSS/JS directly. Instead:
 ## 🛠 Development
 
 Run local dev server with live updates:
-Winning!!!
+Winning :)
 
 ```bash
 pnpm dev:sesame

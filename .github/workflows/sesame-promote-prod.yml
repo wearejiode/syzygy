@@ -16,6 +16,7 @@ concurrency:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   preflight:
@@ -62,10 +63,14 @@ jobs:
             ${{ runner.os }}-pnpm-
 
       # We don't rebuild; we re-use the exact staging artifact
-      - name: Download staging artifact
-        uses: actions/download-artifact@v4
+
+      - name: Download staging artifact for this SHA
+        uses: dawidd6/action-download-artifact@v6
         with:
+          workflow: release-staging.yml             # file name of the staging workflow
           name: sesame-worker-${{ github.event.inputs.release_sha }}
+          commit: ${{ github.event.inputs.release_sha }}  # must be full 40-char SHA
+          workflow_conclusion: success
           path: dist/releases/${{ github.event.inputs.release_sha }}
 
       - name: Verify artifact exists
