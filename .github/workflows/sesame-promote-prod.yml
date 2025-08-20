@@ -46,12 +46,11 @@ jobs:
       - name: Download staging artifact for this SHA
         uses: dawidd6/action-download-artifact@v6
         with:
-          repo: wearejiode/one
-          workflow: Release to Staging
+          # IMPORTANT: use the actual file name in .github/workflows
+          workflow: sesame-release-staging.yml   # or sesame-release-staging.yaml if that's the file
           workflow_conclusion: success
+          commit: ${{ inputs.release_sha }}      # narrows to the exact run for that SHA
           name: sesame-worker-${{ inputs.release_sha }}
-          search_artifacts: true
-          name_is_regexp: false
           path: dist/releases/${{ inputs.release_sha }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
