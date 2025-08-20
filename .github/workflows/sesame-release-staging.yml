@@ -20,6 +20,7 @@ jobs:
       contents: read
     env:
       NODE_VERSION: '20'
+      NX_CLOUD_DISABLED: 'true'
     steps:
       - uses: actions/checkout@v4
 

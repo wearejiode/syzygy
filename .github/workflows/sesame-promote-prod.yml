@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       sha:
-        description: "Commit SHA to promote"
+        description: 'Commit SHA to promote'
         required: true
       dryrun_only:
-        description: "Run a dry-run validation only (no deploy)"
+        description: 'Run a dry-run validation only (no deploy)'
         type: boolean
         default: false
 
@@ -61,8 +61,8 @@ jobs:
       - name: Deploy to prod
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}     # environment secret (production)
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}   # environment secret (production)
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }} # environment secret (production)
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }} # environment secret (production)
           command: >
             deploy artifact/meta-worker.generated.js
             --config apps/Core/Portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml
