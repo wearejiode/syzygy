@@ -1,15 +1,15 @@
 {
   "name": "genie-assistant",
   "projectType": "application",
-  "sourceRoot": "apps/Core/Api/genie-assistant",
+  "sourceRoot": "apps/core/api/genie-assistant",
   "targets": {
     "build": {
       "executor": "@nx/node:build",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/Core/Api/genie-assistant",
-        "main": "apps/Core/Api/genie-assistant/src/main.ts",
-        "tsConfig": "apps/Core/Api/genie-assistant/tsconfig.app.json"
+        "outputPath": "dist/apps/core/api/genie-assistant",
+        "main": "apps/core/api/genie-assistant/src/main.ts",
+        "tsConfig": "apps/core/api/genie-assistant/tsconfig.app.json"
       }
     },
     "serve": {

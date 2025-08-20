@@ -2,23 +2,23 @@
   "name": "client-blog",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "sourceRoot": "apps/Blog/client/src",
+  "sourceRoot": "apps/blog/client/src",
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:application",
       "outputs": ["{workspaceRoot}/dist/apps/client-blog"],
       "options": {
         "outputPath": "dist/apps/client-blog",
-        "index": "apps/Blog/client/src/index.html",
-        "browser": "apps/Blog/client/src/main.ts",
-        "tsConfig": "apps/Blog/client/tsconfig.app.json",
+        "index": "apps/blog/client/src/index.html",
+        "browser": "apps/blog/client/src/main.ts",
+        "tsConfig": "apps/blog/client/tsconfig.app.json",
         "baseHref": "/",
         "assets": [
-          "apps/Blog/client/src/assets",
-          { "glob": "**/*", "input": "apps/Blog/client/src/public", "output": "/" },
-          { "glob": "favicon.*", "input": "apps/Blog/client/src", "output": "/" }
+          "apps/blog/client/src/assets",
+          { "glob": "**/*", "input": "apps/blog/client/src/public", "output": "/" },
+          { "glob": "favicon.*", "input": "apps/blog/client/src", "output": "/" }
         ],
-        "styles": ["apps/Blog/client/src/styles.css"],
+        "styles": ["apps/blog/client/src/styles.css"],
         "scripts": [],
         "ssr": false,
         "prerender": false
@@ -39,7 +39,7 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "wrangler dev --config apps/Blog/wrangler.toml --local",
+        "command": "wrangler dev --config apps/blog/wrangler.toml --local",
         "cwd": "."
       }
     },
@@ -47,7 +47,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["build"],
       "options": {
-        "command": "wrangler deploy --config apps/Blog/wrangler.toml",
+        "command": "wrangler deploy --config apps/blog/wrangler.toml",
         "cwd": "."
       }
     }

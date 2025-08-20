@@ -1,15 +1,15 @@
 {
   "name": "bezel",
   "projectType": "application",
-  "sourceRoot": "apps/Core/Api/bezel",
+  "sourceRoot": "apps/core/api/bezel",
   "targets": {
     "build": {
       "executor": "@nx/node:build",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/Core/Api/bezel",
-        "main": "apps/Core/Api/bezel/src/main.ts",
-        "tsConfig": "apps/Core/Api/bezel/tsconfig.app.json"
+        "outputPath": "dist/apps/core/api/bezel",
+        "main": "apps/core/api/bezel/src/main.ts",
+        "tsConfig": "apps/core/api/bezel/tsconfig.app.json"
       }
     },
     "serve": {

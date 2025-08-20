@@ -4,4 +4,4 @@ packages:
   - tools/*
   - packages/*
   - .
-  - apps/Core/Portfolio/fahrnbach.one
+  - apps/core/portfolio/fahrnbach.one

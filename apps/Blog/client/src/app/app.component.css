@@ -184,7 +184,7 @@ body{
         background-color: red;
         background-color: #ff444499;
         background: linear-gradient(#e66465, #9198e5);
-        background-image: url(../assets/themes/space/Background_Twilight.jpg);
+        background-image: url(../assets/themes/space/twilight.jpg);
         box-shadow: 0px 10px 10px 10px red;
     }
 
@@ -193,7 +193,7 @@ body{
     }
 
     .photo {
-        background: url(../assets/themes/space/Header_Firefly\ black\ background\ illustration\ of\ drawn\ planets\ with\ colorful\ shooting\ stars\ 46155.jpg);
+        background: url(../assets/themes/space/firefly-planets.jpg);
         background-size: contain;
         /* background-size: cover; */
         background-position: center;
@@ -294,7 +294,7 @@ body{
     }
 
     .content-spacer {
-        /* background-image: url(../public/models/Firefly\ black\ background\ illustration\ of\ drawn\ planets\ with\ colorful\ shooting\ stars\ 46155.jpg); */
+        /* background-image: url(../assets/themes/space/firefly-planets.jpg); */
         background-size: contain;
         position: absolute;
         /* top: -5rem; */
@@ -408,19 +408,19 @@ body{
 
     .star-bg-lg,
     .star-bg-lg-hero {
-        background-image: url(../assets/themes/space/vfx/Large-star-tile@2x.webp);
+        background-image: url(../assets/themes/space/vfx/lg-star-tile.webp);
         animation: 16s ease 3s infinite lgStarAnimate ;
     }
 
     .star-bg-md,
     .star-bg-md-hero {
-        background-image: url(../assets/themes/space/vfx/Medium-star-tile@2x.webp);
+        background-image: url(../assets/themes/space/vfx/md-star-tile.webp);
         animation: 9s ease 6s infinite mdStarAnimate ;
     }
 
     .star-bg-sm,
     .star-bg-sm-hero {
-        background-image: url(../assets/themes/space/vfx/Small-star-tile@2x.webp);
+        background-image: url(../assets/themes/space/vfx/sm-star-tile.webp);
         animation: 9s ease 9s infinite smStarAnimate ;
     }
 
@@ -484,7 +484,7 @@ body{
         /* aspect-ratio: 1/1; */
         background-color: var(--hero-trim-color);
         /* overflow: hidden; */
-        background-image: url(../assets/themes/space/SubHeader_White_Cloud.webp);
+        background-image: url(../assets/themes/space/subheader-white-cloud.webp);
         /* background: linear-gradient(#20202000, #202020); */
         background-size: cover;
     }
@@ -603,7 +603,7 @@ body{
         width: 100%;
         height: 10%;
         /* background-color: green; */
-        background-image: url(../assets/themes/space/SubHeader_White_Cloud.webp);
+        background-image: url(../assets/themes/space/subheader-white-cloud.webp);
         background-size: cover;
         background-position: 0 20%;
         font-size: 4rem;
@@ -633,7 +633,7 @@ body{
         left: -20vw;
         bottom: 0;
         overflow-y: hidden;
-        background-image: url(../assets/themes/space/Background_Twilight.jpg);
+        background-image: url(../assets/themes/space/twilight.jpg);
         background-size: cover;
         background-position: center;
     }
@@ -678,7 +678,7 @@ body{
 
     @media screen and (max-height: 580px) {
         /* .content-spacer {
-            background-image: url(../public/models/Firefly\ black\ background\ illustration\ of\ drawn\ planets\ with\ colorful\ shooting\ stars\ 46155.jpg);
+            background-image: url(../assets/themes/space/firefly-planets.jpg);
             background-size: contain;
             position: absolute;
             width: 60vw;
@@ -688,7 +688,7 @@ body{
 
         /* .spacer {
             background-size: contain;
-            background-image: url(../public/models/2k_earth_daymap.jpg)
+            background-image: url(../public/models/2k-earth-daymap.jpg)
         } */
     }
 
