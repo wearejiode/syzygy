@@ -1,0 +1,69 @@
+name: Promote to Prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit SHA to promote"
+        required: true
+      dryrun_only:
+        description: "Run a dry-run validation only (no deploy)"
+        type: boolean
+        default: false
+
+# Ensure only one run of this workflow per ref executes at a time
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  dryrun:
+    name: Dry-run artifact sanity check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Download artifact for the SHA
+        uses: actions/download-artifact@v4
+        with:
+          name: sesame-worker-${{ github.event.inputs.sha }}
+          path: ./artifact
+
+      - name: Verify artifact exists
+        run: test -f artifact/meta-worker.generated.js
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Wrangler dry-run (no network deploy)
+        run: npx -y wrangler@3 deploy artifact/meta-worker.generated.js --config apps/Core/Portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml --no-bundle --dry-run
+
+  promote:
+    name: Deploy artifact to production
+    runs-on: ubuntu-latest
+    needs: dryrun
+    if: ${{ github.event.inputs.dryrun_only != 'true' }}
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - name: Download artifact for the SHA
+        uses: actions/download-artifact@v4
+        with:
+          name: sesame-worker-${{ github.event.inputs.sha }}
+          path: ./artifact
+
+      - name: Verify artifact exists
+        run: test -f artifact/meta-worker.generated.js
+
+      - name: Deploy to prod
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}     # environment secret (production)
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}   # environment secret (production)
+          command: >
+            deploy artifact/meta-worker.generated.js
+            --config apps/Core/Portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml
+            --no-bundle --no-interactive
