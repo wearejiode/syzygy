@@ -29,17 +29,18 @@ jobs:
         run: corepack enable
 
       # If jiode.one needs deps, install them **scoped** to just that app
-      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 20
           cache: 'pnpm'
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            apps/core/portfolio/jiode.one/**/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
+
+      - uses: pnpm/action-setup@v4
+
 
       # If you keep a root lockfile, build via Nx filtered to that app:
       - run: pnpm -w --filter "apps/core/portfolio/jiode.one/" install --frozen-lockfile
-      - run: pnpm --filter @jiode/jiode.one:build
+      - run: pnpm -w --filter "@jiode/jiode.one" run build
 
       # Deploy via Cloudflare Pages action
       - name: Deploy to Cloudflare Pages

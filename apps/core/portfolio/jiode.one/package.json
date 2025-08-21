@@ -1,11 +1,11 @@
 {
-  "name": "jiode.one",
+  "name": "@jiode/jiode.one",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "build": "nx run jiode.one:build",
     "preview": "vite preview",
     "test": "vitest",
     "test-once": "vitest run"
