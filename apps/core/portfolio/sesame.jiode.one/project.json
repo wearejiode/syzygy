@@ -1,5 +1,5 @@
 {
-  "name": "@jiode/sesame.jiode.one",
+  "name": "@jiode/sesame",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "sourceRoot": "apps/core/portfolio/sesame.jiode.one",
