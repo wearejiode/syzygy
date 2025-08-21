@@ -1,0 +1,94 @@
+# .github/workflows/pages-jiode.one.yml
+name: jiode.one-pages-pr
+
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/core/portfolio/jiode.one/**"
+      - ".github/workflows/pages-jiode.one.yml"
+      - "pnpm-lock.yaml"
+      - "package.json"
+  pull_request:
+    paths:
+      - "apps/core/portfolio/jiode.one/**"
+      - ".github/workflows/pages-jiode.one.yml"
+      - "pnpm-lock.yaml"
+      - "package.json"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      # Use pnpm version from package.json `packageManager`
+      - name: Enable Corepack (pnpm)
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      # Install root deps (don’t filter unless the app has its own package.json)
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      # OPTION A — build with Nx target (preferred if project.json defines it)
+      - name: Build (Nx target)
+        run: pnpm -w --filter @jiode/jiode.one run build
+
+      - name: Debug -- show built files
+        run: |
+          ls -la
+          ls -la dist/apps/jiode.one/
+          ls -la dist/apps/jiode.one/ || true
+
+      - name: Ensure app deps are installed
+        run: pnpm --filter @jiode/jiode.one install --frozen-lockfile
+
+      # If you don’t have an Nx target, comment the step above and use:
+      # - name: Build (plain Vite)
+      #   working-directory: apps/core/portfolio/jiode.one
+      #   run: pnpm exec vite build
+
+      # Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: jiode-one
+          # Use the directory that your build actually produced:
+          # If Nx outputPath is dist/apps/jiode.one, keep this:
+          # directory: dist/apps/jiode.one
+          # If using plain Vite in the app folder, use this instead:
+          directory: dist/apps/jiode.one/
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          # Good default: preview on PRs, prod on main
+          branch: ${{ github.head_ref || github.ref_name }}
+          # If you *don’t* want a GitHub Deployment record, add:
+          # gitHubDeployment: false
+
+  mark-deployment:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mark Deployment Preview
+        uses: ./.github/actions/mark-deployment/mark-deployment-preview

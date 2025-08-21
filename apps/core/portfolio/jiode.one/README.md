@@ -17,7 +17,7 @@ Follow the journey, from early architecture to UI polish.
 I’m documenting daily progress here:
 
 👉 [📡 View the Devlog Index](https://github.com/fahrnbach/portfolio-site/discussions/2)
-
+ :)
 ---
 
 ## ✨ Features
