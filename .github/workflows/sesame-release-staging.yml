@@ -1,124 +1,80 @@
-name: Release to Staging
-
+name: sesame-release-staging
+env:
+  APP_ID: sesame.jiode.one
+  APP_PATH: apps/core/portfolio/sesame.jiode.one
+  PUBLIC_DIR: apps/core/portfolio/sesame.jiode.one/public
+  WRANGLER_CONFIG: apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
+  STAGING_BUCKET: sesame-data-staging
+  STAGING_HOST: ${{ vars.STAGING_HOST || 'staging.sesame.jiode.one' }}
+  # Ensure this is set in your GitHub Environment
 on:
   push:
     branches: [main]
     paths:
       - 'apps/core/portfolio/sesame.jiode.one/**'
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
-  release-staging:
-    runs-on: ubuntu-latest
+  staging:
+    uses: ./.github/workflows/_worker-ci.yml
     permissions:
       contents: read
-    environment: staging
-    env:
-      NODE_VERSION: '20'
-      NX_CLOUD_DISABLED: 'true'
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      id-token: write
+      attestations: write
+    with:
+      app_id:          ${{ env.APP_ID }}
+      app_path:        ${{ env.APP_PATH }}
+      wrangler_config: ${{ env.WRANGLER_CONFIG }}
+      environment:     staging
+      deploy:          true
+    secrets:
+      CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+  post_sync:
+    needs: staging
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - name: Push public assets + data.json to R2 (staging)
+        uses: ./.github/actions/sesame/r2-push
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          bucket:           ${{ env.STAGING_BUCKET }}
+          public_dir:       ${{ env.PUBLIC_DIR }}
+          data_json_path:   ${{ env.APP_PATH }}/data.json
+          wrangler_config:  ${{ env.WRANGLER_CONFIG }}
+          wrangler_version: '4.31.0'
 
-      - name: Debug - are CF secrets present?
-        shell: bash
-        run: |
-          [ -n "${CLOUDFLARE_API_TOKEN:-}" ] && echo "TOKEN: present" || echo "TOKEN: MISSING"
-          [ -n "${CLOUDFLARE_ACCOUNT_ID:-}" ] && echo "ACCOUNT: present" || echo "ACCOUNT: MISSING"
+# app specific testing goes here
+  smoke-test:
+      needs: staging
+      runs-on: ubuntu-latest
+      env:
+        HOST: ${{ vars.STAGING_HOST }}
+      steps:
+        - name: test /health
+          run: |
+            set -euo pipefail
+            code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/health")
+            echo "HTTP ${code} /health"
+            test "$code" = "200"
+            body=$(curl -s "https://${HOST}/health")
+            echo "Body: $body"
+            [[ "$body" =~ OK|ok ]]
 
-      - name: Verify Wrangler auth
-        shell: bash
-        run: npx -y wrangler@4.31.0 whoami
+        - name: test R2 control endpoints
+          run: |
+            set -euo pipefail
+            # These should be safe GETs that your worker exposes for diagnostics (adjust to your routes)
+            curl -fsSL "https://${HOST}/__r2get" | grep -qi "GET: OK"
+            curl -fsSL "https://${HOST}/__r2list" | grep -qi "data.json"
 
-      # Build directly (no pnpm / nx)
-      - name: Bundle worker
-        shell: bash
-        run: node apps/core/portfolio/sesame.jiode.one/scripts/build-worker.mjs
-
-      - name: Archive artifact (by commit SHA)
-        shell: bash
-        run: |
-          mkdir -p dist/releases/${{ github.sha }}
-          cp dist/apps/sesame.jiode.one/meta-worker.generated.js \
-             dist/releases/${{ github.sha }}/meta-worker.generated.js
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: sesame-worker-${{ github.sha }}
-          path: dist/releases/${{ github.sha }}/meta-worker.generated.js
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Ensure R2 bucket (staging, idempotent)
-        shell: bash
-        run: |
-          echo "Ensuring bucket sesame-data-staging..."
-          if npx -y wrangler@4.31.0 r2 bucket create sesame-data-staging --remote >/dev/null 2>&1; then
-            echo "Created bucket."
-          else
-            echo "Bucket already exists or cannot create (continuing)."
-          fi
-
-      - name: Check data.json presence
-        id: r2check
-        shell: bash
-        run: |
-          if npx -y wrangler@4.31.0 r2 object get sesame-data-staging/data.json --remote >/dev/null 2>&1; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Seed data.json if absent
-        if: steps.r2check.outputs.exists == 'false'
-        shell: bash
-        run: |
-          npx -y wrangler@4.31.0 r2 object put sesame-data-staging/data.json \
-            --file apps/core/portfolio/sesame.jiode.one/data.json \
-            --remote
-
-      - name: Seed images to R2 (staging)
-        shell: bash
-        run: |
-          set -euo pipefail
-          BASE="apps/core/portfolio/sesame.jiode.one/public"
-          if [ -d "$BASE" ]; then
-            find "$BASE" -type f -print0 | while IFS= read -r -d '' f; do
-              key="images/${f#$BASE/}"
-              ctype=$(file --mime-type -b "$f" || echo application/octet-stream)
-              echo "→ R2 put sesame-data-staging/$key"
-              npx -y wrangler@4.31.0 r2 object put "sesame-data-staging/$key" \
-                --file "$f" --content-type "$ctype" --remote
-            done
-          else
-            echo "No $BASE folder found — skipping image seed."
-          fi
-
-      - name: Verify data.json present
-        if: always()
-        shell: bash
-        run: |
-          if npx -y wrangler@4.31.0 r2 object get sesame-data-staging/data.json --remote >/dev/null 2>&1; then
-            echo "✅ data.json present in sesame-data-staging"
-          else
-            echo "❌ data.json missing after seed step" >&2
-            exit 1
-          fi
-
-      - name: Deploy to staging
-        shell: bash
-        run: |
-          npx -y wrangler@4.31.0 deploy \
-            dist/releases/${{ github.sha }}/meta-worker.generated.js \
-            --config apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml \
-            --no-bundle
+        - name: test image exists
+          run: |
+            set -euo pipefail
+            # Check one representative image you seeded
+            code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/images/background.webp")
+            echo "HTTP ${code} /images/background.webp"
+            test "$code" = "200"

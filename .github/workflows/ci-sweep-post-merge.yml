@@ -1,0 +1,14 @@
+# .github/workflows/full-ci-post-merge.yml
+name: ci-sweep-post-merge
+
+on:
+  workflow_run:
+    workflows:
+      - "pages-jiode.one"     # your sesame workflow
+      - "sesame-release-staging"      # your pages workflow
+    types: [completed]
+
+jobs:
+  run-full-ci-if-success:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.branch == 'main' }}
+    uses: ./.github/workflows/full-ci.yml

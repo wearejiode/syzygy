@@ -1,0 +1,92 @@
+name: R2 Push
+description: Upload files to a Cloudflare R2 bucket via Wrangler
+
+inputs:
+  bucket:
+    description: R2 bucket name (e.g. sesame-data-staging)
+    required: true
+  public_dir:
+    description: Directory to upload (will map to images/<relative path>)
+    required: false
+  data_json_path:
+    description: Optional path to data.json to upload to <bucket>/data.json
+    required: false
+  wrangler_version:
+    description: Wrangler version to use
+    required: false
+    default: '4.31.0'
+  wrangler_config:
+    description: Optional Wrangler config file path
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Ensure code present
+      uses: actions/checkout@v4
+
+    - name: Ensure Wrangler
+      shell: bash
+      run: |
+        if ! command -v wrangler >/dev/null 2>&1; then
+          echo "Installing wrangler ${{ inputs.wrangler_version }}..."
+          npm i -g "wrangler@${{ inputs.wrangler_version }}"
+        fi
+
+    - name: Upload public_dir (if provided)
+      if: ${{ inputs.public_dir != '' }}
+      shell: bash
+      env:
+        WRANGLER_CONFIG: ${{ inputs.wrangler_config }}
+      run: |
+        set -euo pipefail
+        BASE="${{ inputs.public_dir }}"
+        if [ ! -d "$BASE" ]; then
+          echo "Public dir '$BASE' not found, skipping."
+          exit 0
+        fi
+        echo "Uploading files under $BASE to bucket=${{ inputs.bucket }} as images/* ..."
+        while IFS= read -r -d '' f; do
+          rel="${f#$BASE/}"
+          key="images/$rel"
+          ctype="$(file --mime-type -b "$f" || echo application/octet-stream)"
+          echo "→ $key ($ctype)"
+          if [ -n "${WRANGLER_CONFIG:-}" ]; then
+            wrangler r2 object put "${{ inputs.bucket }}/$key" --file "$f" --content-type "$ctype" --config "$WRANGLER_CONFIG"
+          else
+            wrangler r2 object put "${{ inputs.bucket }}/$key" --file "$f" --content-type "$ctype"
+          fi
+        done < <(find "$BASE" -type f -print0)
+
+    - name: Upload data.json (if provided)
+      if: ${{ inputs.data_json_path != '' }}
+      shell: bash
+      env:
+        WRANGLER_CONFIG: ${{ inputs.wrangler_config }}
+      run: |
+        set -euo pipefail
+        FILE="${{ inputs.data_json_path }}"
+        if [ ! -f "$FILE" ]; then
+          echo "data.json path '$FILE' not found"
+          exit 1
+        fi
+        echo "Uploading data.json to bucket=${{ inputs.bucket }}"
+        if [ -n "${WRANGLER_CONFIG:-}" ]; then
+          wrangler r2 object put "${{ inputs.bucket }}/data.json" --file "$FILE" --config "$WRANGLER_CONFIG"
+        else
+          wrangler r2 object put "${{ inputs.bucket }}/data.json" --file "$FILE"
+        fi
+
+    - name: Verify data.json (if provided)
+      if: ${{ inputs.data_json_path != '' }}
+      shell: bash
+      env:
+        WRANGLER_CONFIG: ${{ inputs.wrangler_config }}
+      run: |
+        set -euo pipefail
+        if [ -n "${WRANGLER_CONFIG:-}" ]; then
+          wrangler r2 object get "${{ inputs.bucket }}/data.json" --config "$WRANGLER_CONFIG" >/dev/null
+        else
+          wrangler r2 object get "${{ inputs.bucket }}/data.json" >/dev/null
+        fi
+        echo "✅ data.json present in ${{ inputs.bucket }}"
