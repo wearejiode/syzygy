@@ -90,4 +90,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Mark Deployment Preview
-        uses: ./.github/actions/mark-deployment/mark-deployment-preview.yml
+        uses: ./.github/actions/mark-deployment/mark-deployment-preview

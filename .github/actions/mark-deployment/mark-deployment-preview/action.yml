@@ -10,7 +10,7 @@ runs:
   using: composite
   steps:
     - name: Ensure code present
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4it a
 
     - name: Create GitHub Deployment (preview)
       id: create
