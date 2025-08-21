@@ -55,8 +55,8 @@ jobs:
       - name: Debug -- show built files
         run: |
           ls -la
-          ls -la apps/core/portfolio/jiode.one
-          ls -la apps/core/portfolio/jiode.one/dist || true
+          ls -la dist/apps/jiode.one/
+          ls -la dist/apps/jiode.one/ || true
 
       - name: Ensure app deps are installed
         run: pnpm --filter @jiode/jiode.one install --frozen-lockfile
@@ -77,7 +77,7 @@ jobs:
           # If Nx outputPath is dist/apps/jiode.one, keep this:
           # directory: dist/apps/jiode.one
           # If using plain Vite in the app folder, use this instead:
-          directory: apps/core/portfolio/jiode.one/dist
+          directory: dist/apps/jiode.one/
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           # Good default: preview on PRs, prod on main
           branch: ${{ github.head_ref || github.ref_name }}
