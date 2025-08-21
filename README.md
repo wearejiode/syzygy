@@ -1,5 +1,11 @@
 # Resume Worker – Dev Workflow
 
+| Workflow      | Status |
+|---------------|--------|
+| PR / Preview  | [![jiode.one — PR](https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-pr.yml/badge.svg?branch=main)](https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-pr.yml) |
+| Staging       | [![jiode.one — Staging](https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-release-staging.yml/badge.svg?branch=main)](https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-release-staging.yml) |
+| Production    | [![jiode.one — Production](https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-promote-prod.yml/badge.svg?branch=main)](https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-promote-prod.yml) |
+
 ## Overview
 
 This Cloudflare Worker serves the Resume app pages, providing HTML, CSS, JavaScript, and resume data stored in R2. It delivers a fast, serverless experience by dynamically rendering the resume content and assets from R2 storage.
