@@ -109,3 +109,5 @@ Images and other static assets are stored in R2 under the prefix `resume-data/im
 These must be uploaded either via the CI pipeline or manually using Wrangler commands.  
 
 Happy coding ✨
+
+P.S. CI automation in progress...
