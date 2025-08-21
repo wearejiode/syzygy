@@ -5,10 +5,16 @@ inputs:
   wrangler_config:
     description: Optional Wrangler config file path
     required: false
+  preview_host:
+    description: The host for the preview environment
+    required: false
+    default: 'preview.jiode.one'
+
 
 runs:
   using: composite
   steps:
+
     - name: Ensure code present
       uses: actions/checkout@v4it a
 
@@ -40,6 +46,6 @@ runs:
             deployment_id,
             state: 'success',
             // If you have a stable preview URL, put it here:
-            // environment_url: 'https://${{ env.PREVIEW_HOST }}',
+            environment_url: 'https://${{ inputs.preview_host }}',
             log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
           });
