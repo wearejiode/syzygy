@@ -84,7 +84,7 @@ jobs:
     if: ${{ false }} # flip to true when you want to run via "Re-run job" with inputs
     runs-on: ubuntu-latest
     needs: promote
-    environment: production
+    environment: $ {{ inputs.environment }}
     steps:
       - name: Rollback (example)
         uses: cloudflare/wrangler-action@v3
