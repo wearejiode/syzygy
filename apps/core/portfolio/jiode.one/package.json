@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "nx run @jiode/jiode.one:build",
+    "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
     "test-once": "vitest run"
