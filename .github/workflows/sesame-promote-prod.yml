@@ -1,10 +1,17 @@
-name: Promote to Prod
+name: sesame-promote-prod
+env:
+  APP_ID: sesame.jiode.one
+  APP_PATH: apps/core/portfolio/sesame.jiode.one
+  PUBLIC_DIR: apps/core/portfolio/sesame.jiode.one/public
+  WRANGLER_CONFIG: apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml
+  PRODUCTION_BUCKET: sesame-data
+  PRODUCTION_HOST: ${{ vars.PRODUCTION_HOST || 'sesame.jiode.one' }}
 
 on:
   workflow_dispatch:
     inputs:
       release_sha:
-        description: "Commit SHA to promote (must match an uploaded staging artifact)"
+        description: "Commit SHA to promote (must exist in staging artifacts)"
         required: true
       confirm:
         description: 'Type "I understand" to deploy to prod'
@@ -14,137 +21,88 @@ concurrency:
   group: ${{ github.workflow }}-prod
   cancel-in-progress: false
 
-permissions:
-  contents: read
-  actions: read
-
 jobs:
   preflight:
     runs-on: ubuntu-latest
     steps:
-      - name: Validate confirmation
-        run: |
+      - run: |
           if [ "${{ github.event.inputs.confirm }}" != "I understand" ]; then
             echo "Confirmation mismatch. Aborting."; exit 1; fi
-      - name: Echo release SHA
-        run: echo "Promoting ${{ github.event.inputs.release_sha }}"
 
-  deploy:
+  promote:
     needs: preflight
-    runs-on: ubuntu-latest
-    # Protect prod via GitHub Environments (branch protection / required reviewers)
-    environment: production
-    env:
-      NODE_VERSION: '20'
-      NX_CLOUD_DISABLED: 'true'
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    uses: ./.github/workflows/_worker-promote.yml
+    with:
+      app_id:          ${{ env.APP_ID }}
+      wrangler_config: ${{ env.WRANGLER_CONFIG }}
+      release_sha:     ${{ inputs.release_sha }}
+      verify_slsa:     true
+      environment:     production
+      deploy:          true
+      seed_r2:         true
+      r2_bucket:       ${{ env.PRODUCTION_BUCKET }}
+      seed_public_dir: ${{ env.PUBLIC_DIR }}
+    secrets:
+      CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    # This targets the protected "production" environment defined inside _worker-promote.yml
 
+  # SESAME POST-PROMOTE STEPS
+  # These are specific to Sesame and not part of the generic worker promotion workflow.
+  post_sync:
+    needs: promote
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      RELEASE_SHA: ${{ github.event.inputs.release_sha }}
     steps:
       - uses: actions/checkout@v4
-      # We don't rebuild; we re-use the exact staging artifact
-      - name: Download staging artifact for this SHA
-        uses: dawidd6/action-download-artifact@v6
+
+      - name: Download promoted artifact
+        uses: actions/download-artifact@v4
         with:
-          # IMPORTANT: use the actual file name in .github/workflows
-          workflow: sesame-release-staging.yml   # or sesame-release-staging.yaml if that's the file
-          workflow_conclusion: success
-          commit: ${{ inputs.release_sha }}      # narrows to the exact run for that SHA
-          name: sesame-worker-${{ inputs.release_sha }}
-          path: dist/releases/${{ inputs.release_sha }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          name: sesame-worker-${{ env.RELEASE_SHA }}
+          path: dist/releases/${{ env.RELEASE_SHA }}
 
-      - name: Verify artifact exists
-        run: |
-          test -f "dist/releases/${{ github.event.inputs.release_sha }}/meta-worker.generated.js" \
-            || (echo "Artifact missing for SHA" && exit 1)
-
-      # Optional: ensure prod R2 exists (idempotent)
-      - name: Ensure R2 bucket (prod, idempotent)
-        shell: bash
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          npx wrangler r2 bucket create sesame-data --remote >/dev/null 2>&1 || true
-
-      # Optional: seed data.json only if missing
-      - name: Check data.json in prod
-        id: r2-head
-        shell: bash
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          if npx wrangler r2 object get sesame-data/data.json --remote > /dev/null 2>&1; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Seed data.json to prod (first-time only)
-        if: steps.r2-head.outputs.exists == 'false'
-        uses: cloudflare/wrangler-action@v3
+      - name: Push public assets + data.json to R2 (prod)
+        uses: ./.github/actions/sesame/r2-push
         with:
-          wranglerVersion: '4.31.0'
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: >
-            r2 object put sesame-data/data.json
-            --file apps/core/portfolio/sesame.jiode.one/data.json
+          bucket:           ${{ env.PRODUCTION_BUCKET }}
+          public_dir:       ${{ env.PUBLIC_DIR }}
+          data_json_path:   ${{ env.APP_PATH }}/data.json
+          wrangler_config:  ${{ env.WRANGLER_CONFIG }}
+          wrangler_version: '4.31.0'
 
-      # Optional: sync prod images folder (only new/changed)
-      # Comment out if you prefer manual management.
-# Optional: sync prod images (public/**/* -> images/*)
-      - name: Upload public/* to prod R2
-        shell: bash
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          set -euo pipefail
-          BASE="apps/core/portfolio/sesame.jiode.one/public"
-          if [ -d "$BASE" ]; then
-            find "$BASE" -type f -print0 | while IFS= read -r -d '' f; do
-              key="images/${f#$BASE/}"
-              ctype=$(file --mime-type -b "$f" || echo application/octet-stream)
-              echo "→ R2 put sesame-data/$key"
-              npx wrangler r2 object put "sesame-data/$key" --file "$f" --content-type "$ctype" --remote
-            done
-          else
-            echo "No $BASE folder found — skipping image upload."
-          fi
 
-      - name: Wrangler whoami (sanity check)
-        uses: cloudflare/wrangler-action@v3
-        with:
-          wranglerVersion: '4.31.0'
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: whoami
+# app specific testing goes here
+  smoke-test:
+      needs: promote
+      runs-on: ubuntu-latest
+      env:
+        HOST: ${{ vars.PRODUCTION_HOST }}
+      steps:
+        - name: test /health
+          run: |
+            set -euo pipefail
+            code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/health")
+            echo "HTTP ${code} /health"
+            test "$code" = "200"
+            body=$(curl -s "https://${HOST}/health")
+            echo "Body: $body"
+            [[ "$body" =~ OK|ok ]]
 
-      # Deploy to prod (no bundle, use prod wrangler.toml)
-      - name: Deploy to production
-        uses: cloudflare/wrangler-action@v3
-        with:
-          wranglerVersion: '4.31.0'
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: >
-            deploy dist/releases/${{ github.event.inputs.release_sha }}/meta-worker.generated.js
-            --config apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml
-            --no-bundle
+        - name: test R2 control endpoints
+          run: |
+            set -euo pipefail
+            # These should be safe GETs that your worker exposes for diagnostics (adjust to your routes)
+            curl -fsSL "https://${HOST}/__r2get" | grep -qi "GET: OK"
+            curl -fsSL "https://${HOST}/__r2list" | grep -qi "data.json"
 
-  # (Optional) quick rollback using a version id
-  rollback:
-    if: ${{ false }} # flip to true when you want to run via "Re-run job" with inputs
-    runs-on: ubuntu-latest
-    needs: deploy
-    environment: production
-    steps:
-      - name: Rollback (example)
-        uses: cloudflare/wrangler-action@v3
-        with:
-          wranglerVersion: '4.31.0'
-          command: >
-            rollback
+        - name: test image exists
+          run: |
+            set -euo pipefail
+            # Check one representative image you seeded
+            code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/images/background.webp")
+            echo "HTTP ${code} /images/background.webp"
+            test "$code" = "200"

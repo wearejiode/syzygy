@@ -1,0 +1,94 @@
+# Reusable workflow for promoting Workers to production
+# This workflow is designed to be called from other workflows, such as sesame-promote-prod.yml
+# It handles the deployment of a Worker to production, verifies the build, and can optionally verify SLSA provenance.
+# It also supports rollback functionality if needed.
+
+name: worker-promote
+
+on:
+  workflow_call:
+    inputs:
+      app_id:             { required: true,  type: string } # e.g. sesame.jiode.one
+      wrangler_config:    { required: true,  type: string } # prod wrangler.toml
+      release_sha:        { required: true,  type: string }
+      artifact_name:      { required: false, type: string, default: "" } # override if needed
+      sha_artifact_name:  { required: false, type: string, default: "" }
+      environment:        { required: false, type: string, default: "production" }
+      verify_slsa:        { required: false, type: boolean, default: true }
+      wrangler_version:   { required: false, type: string,  default: "4.31.0" }
+    secrets:
+      CLOUDFLARE_API_TOKEN:  { required: true }
+      CLOUDFLARE_ACCOUNT_ID: { required: true }
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      actions: read
+      attestations: read
+      id-token: write
+    env:
+      SHA: ${{ inputs.release_sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Download artifacts produced by staging
+      - name: Download worker artifact
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: sesame-release-staging.yml
+          name: ${{ inputs.app_id }}-worker-${{ inputs.release_sha }}
+          commit: ${{ inputs.release_sha }}
+          path: dist/releases/${{ env.SHA }}
+
+      - name: Download checksum
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: sesame-release-staging.yml
+          name: ${{ inputs.app_id }}-sha256-${{ inputs.release_sha }}
+          commit: ${{ inputs.release_sha }}
+          path: dist/releases/${{ env.SHA }}
+
+      - name: Verify checksum
+        run: |
+          cd dist/releases/${{ env.SHA }}
+          sha256sum -c meta-worker.sha256
+
+      - name: Verify SLSA attestation
+        if: inputs.verify_slsa
+        uses: actions/setup-gh@v4
+      - if: inputs.verify_slsa
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh attestation verify \
+            --repo "${{ github.repository }}" \
+            --subject-path "dist/releases/${{ env.SHA }}/meta-worker.generated.js" \
+            --predicate-type slsaprovenance \
+            --workflow-ref "${{ github.repository }}/.github/workflows/sesame-release-staging.yml@refs/heads/main"
+
+      - name: Deploy to production
+        uses: cloudflare/wrangler-action@v3
+        with:
+          wranglerVersion: ${{ inputs.wrangler_version }}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >
+            deploy dist/releases/${{ env.SHA }}/meta-worker.generated.js
+            --config ${{ inputs.wrangler_config }}
+            --no-bundle
+  # (Optional) quick rollback using a version id
+  rollback:
+    if: ${{ false }} # flip to true when you want to run via "Re-run job" with inputs
+    runs-on: ubuntu-latest
+    needs: promote
+    environment: $ {{ inputs.environment }}
+    steps:
+      - name: Rollback (example)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          wranglerVersion: '4.31.0'
+          command: >
+            rollback
