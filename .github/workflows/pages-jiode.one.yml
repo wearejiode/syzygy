@@ -56,7 +56,7 @@ jobs:
         run: |
           ls -la
           ls -la apps/core/portfolio/jiode.one
-          ls -la apps/core/portfolio/jiode.one/dist || true"
+          ls -la apps/core/portfolio/jiode.one/dist || true
 
       - name: Ensure app deps are installed
         run: pnpm --filter @jiode/jiode.one install --frozen-lockfile
