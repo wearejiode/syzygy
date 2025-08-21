@@ -40,7 +40,7 @@ jobs:
 
       # If you keep a root lockfile, build via Nx filtered to that app:
       - run: pnpm -w --filter "apps/core/portfolio/jiode.one/" install --frozen-lockfile
-      - run: pnpm -w nx run jiode.one:build
+      - run: pnpm -w nx run jiode.one:build -no-cloud
 
       # Deploy via Cloudflare Pages action
       - name: Deploy to Cloudflare Pages
