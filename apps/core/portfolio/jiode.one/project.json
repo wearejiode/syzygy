@@ -5,8 +5,12 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "vite build",
-        "cwd": "apps/core/portfolio/jiode.one"
+        "commands": [
+          {
+            "command": "vite build",
+            "cwd": "apps/core/portfolio/jiode.one"
+          }
+        ]
       }
     }
   }

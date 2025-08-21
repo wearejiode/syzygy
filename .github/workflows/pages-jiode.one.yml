@@ -52,6 +52,15 @@ jobs:
       - name: Build (Nx target)
         run: pnpm -w --filter @jiode/jiode.one run build
 
+      - name: Debug -- show built files
+        run: |
+          ls -la
+          ls -la apps/core/portfolio/jiode.one
+          ls -la apps/core/portfolio/jiode.one/dist || true"
+
+      - name: Ensure app deps are installed
+        run: pnpm --filter @jiode/jiode.one install --frozen-lockfile
+
       # If you don’t have an Nx target, comment the step above and use:
       # - name: Build (plain Vite)
       #   working-directory: apps/core/portfolio/jiode.one
