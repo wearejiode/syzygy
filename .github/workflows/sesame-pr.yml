@@ -1,4 +1,4 @@
-name: sesame PR Checks & Preview
+name: sesame PR Checks & preview
 env:
   APP_ID: sesame.jiode.one
   APP_PATH: apps/core/portfolio/sesame.jiode.one
