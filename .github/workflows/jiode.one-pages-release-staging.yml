@@ -1,4 +1,4 @@
-name: jiode.one — Staging
+name: jiode.one-pages-release-staging
 
 on:
   push:
@@ -20,6 +20,7 @@ permissions:
 
 jobs:
   build-and-deploy-staging:
+    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     env:
       NODE_VERSION: 20
@@ -64,6 +65,7 @@ jobs:
           # (optional) gitHubDeployment: false
 
   mark-deployment:
+    if: ${{ github.event_name == 'push' }}
     needs: build-and-deploy-staging
     runs-on: ubuntu-latest
     steps:
