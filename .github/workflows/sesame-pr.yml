@@ -74,7 +74,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
   mark-deployment:
-    needs: build-and-deploy
+    needs: preview
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
