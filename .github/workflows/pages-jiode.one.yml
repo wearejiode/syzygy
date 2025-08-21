@@ -66,9 +66,9 @@ jobs:
           projectName: jiode-one
           # Use the directory that your build actually produced:
           # If Nx outputPath is dist/apps/jiode.one, keep this:
-          directory: dist/apps/jiode.one
+          # directory: dist/apps/jiode.one
           # If using plain Vite in the app folder, use this instead:
-          # directory: apps/core/portfolio/jiode.one/dist
+          directory: apps/core/portfolio/jiode.one/dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           # Good default: preview on PRs, prod on main
           branch: ${{ github.head_ref || github.ref_name }}
