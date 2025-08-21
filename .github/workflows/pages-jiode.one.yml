@@ -52,4 +52,4 @@ jobs:
           directory: dist/apps/jiode.one      # folder that build produced
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           # For production deploys only on main:
-          branch: ${{ github.ref_name }}
+          branch: ${{ github.head_ref || github.ref_name }}
