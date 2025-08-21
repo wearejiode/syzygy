@@ -1,0 +1,103 @@
+name: Common Verify (tsc/eslint/tests)
+description: Reusable verify step for apps (typecheck, lint, optional tests)
+inputs:
+  app_path:
+    description: Path to the app root (e.g. apps/core/portfolio/sesame.jiode.one)
+    required: true
+  tsc_project:
+    description: Path to tsconfig.json (defaults to <app_path>/tsconfig.json if present)
+    required: false
+  eslint_target:
+    description: Path(s)/globs to lint (defaults to <app_path> if eslint is present)
+    required: false
+  test_cmd:
+    description: Shell command to run tests (skip if empty)
+    required: false
+    default: ""
+  node_version:
+    description: Node version
+    required: false
+    default: "20"
+  pnpm_version:
+    description: pnpm version
+    required: false
+    default: "10"
+  install_args:
+    description: Extra args for pnpm install
+    required: false
+    default: "--frozen-lockfile"
+  fail_lint_on_warnings:
+    description: If true, eslint fails on warnings
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node
+    # cache=pnpm works even inside a composite
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node_version }}
+        cache: pnpm
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: ${{ inputs.pnpm_version }}
+
+    - name: Install deps
+      shell: bash
+      run: pnpm install ${{ inputs.install_args }}
+
+    # --- Type check (tsc) ---
+    - name: Type check
+      id: tsc
+      shell: bash
+      run: |
+        set -euo pipefail
+        # Resolve project file: explicit input wins; else use <app_path>/tsconfig.json if it exists.
+        PROJ="${{ inputs.tsc_project }}"
+        if [ -z "$PROJ" ]; then
+          CAND="${{ inputs.app_path }}/tsconfig.json"
+          if [ -f "$CAND" ]; then PROJ="$CAND"; fi
+        fi
+
+        if [ -n "${PROJ:-}" ] && [ -f "$PROJ" ]; then
+          echo "→ tsc --noEmit -p $PROJ"
+          pnpm -w exec tsc --noEmit -p "$PROJ"
+        else
+          echo "↷ Skipping tsc (no project file)"
+        fi
+
+    # --- Lint (eslint) ---
+    - name: Lint
+      id: lint
+      shell: bash
+      run: |
+        set -euo pipefail
+        TARGET="${{ inputs.eslint_target }}"
+        if [ -z "$TARGET" ]; then TARGET="${{ inputs.app_path }}"; fi
+
+        # Heuristic: only run if eslint is installed
+        if pnpm -w exec eslint -v >/dev/null 2>&1; then
+          if [ "${{ inputs.fail_lint_on_warnings }}" = "true" ]; then
+            EXTRA="--max-warnings=0"
+          else
+            EXTRA=""
+          fi
+          echo "→ eslint $TARGET $EXTRA"
+          pnpm -w exec eslint "$TARGET" $EXTRA
+        else
+          echo "↷ Skipping eslint (eslint not found)"
+        fi
+
+    # --- Tests (optional) ---
+    - name: Tests
+      id: test
+      if: ${{ inputs.test_cmd != '' }}
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "→ ${{ inputs.test_cmd }}"
+        bash -lc "${{ inputs.test_cmd }}"

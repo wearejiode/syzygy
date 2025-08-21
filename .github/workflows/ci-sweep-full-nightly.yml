@@ -1,0 +1,42 @@
+# .github/workflows/full-ci.yml
+name: ci-sweep-full-nightly
+
+on:
+  schedule:
+    - cron: "30 3 * * *"     # nightly UTC
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    env:
+      NODE_VERSION: 20
+      NX_CLOUD_DISABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+
+      # Run everything (adjust targets to your repo)
+      # Option A: brute force across all projects
+      - run: pnpm nx run-many -t lint,test,build --all --parallel=3
+
+      # Option B: if you want integration/E2E after build:
+      # - run: pnpm nx run-many -t e2e --all --parallel=2
+
+      # Optional: upload junit/coverage artifacts
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: coverage
+      #     path: coverage/

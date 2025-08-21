@@ -52,11 +52,11 @@ gsap.registerPlugin(ScrollToPlugin)
 
 console.warn("Hi, Thanks So much for Visiting!", "\n", "I am available for hire, and seeking work!")
 // console.log('%c Contact Info:', 'background: #222; color: #ff0808')
-// console.log('%c jacob@fahrnbach.one', 'background: #222; color: #bada55')
+// console.log('%c love@jiode.one', 'background: #222; color: #bada55')
 
 let welcome = () => {
   let message =
-    '%c 🔥 Thanks For Visiting! I`m Seeking work, and available for hire \n Email jacob@fahrnbach.one 🔥';
+    '%c 🔥 Thanks For Visiting! I`m Seeking work, and available for hire \n Email love@jiode.one 🔥';
   let styles = [
     'font-size: 12px',
     'color: #fffce1',
@@ -920,41 +920,41 @@ const projectData = {
       title: 'Art App',
       description: 'A visually rich app with custom Illustrator UI and AI-enhanced art.',
       image: '/screenshots/art-screenshot.png',
-      link: 'https://art.fahrnbach.one',
-      code: 'https://github.com/fahrnbach/art-app',
-      blog: 'https://blog.fahrnbach.one/art-app'
+      link: 'https://art.jiode.one',
+      code: 'https://github.com/jiode/art-app',
+      blog: 'https://blog.jiode.one/art-app'
     },
     blog: {
       title: 'Blog',
       description: 'A Markdown-based blog',
       image: '/screenshots/blog-screenshot.png',
-      link: 'https://blog.fahrnbach.one',
-      code: 'https://github.com/fahrnbach/blog-monorepo',
-      blog: 'https://blog.fahrnbach.one/blog-monorepo'
+      link: 'https://blog.jiode.one',
+      code: 'https://github.com/jiode/blog-monorepo',
+      blog: 'https://blog.jiode.one/blog-monorepo'
     },
     library: {
       title: 'Component Library',
       description: 'Reusable Angular components built with a custom Node.js backend.',
       image: '/screenshots/library-screenshot.png',
-      link: 'https://library.fahrnbach.one', // optional custom frontend link
-      code: 'https://github.com/fahrnbach/angular-library',
-      blog: 'https://blog.fahrnbach.one/angular-library'
+      link: 'https://library.jiode.one', // optional custom frontend link
+      code: 'https://github.com/jiode/angular-library',
+      blog: 'https://blog.jiode.one/angular-library'
     },
     ongoing: {
       title: 'Ongoing Projects',
       description: 'A responsive site (github 🤣) showcasing my design, dev, and UI skills.',
       image: '/screenshots/ongoing-screenshot.png',
-      link: 'https://github.com/fahrnbach',
-      code: 'https://github.com/fahrnbach',
-      blog: 'https://blog.fahrnbach.one/sign-git-commits'
+      link: 'https://github.com/wearejiode',
+      code: 'https://github.com/wearejiode',
+      blog: 'https://blog.jiode.one/sign-git-commits'
     },
     portfolio: {
       title: 'My Portfolio [You are Here 📍]',
       description: 'A Single Page Application entirely made in Vanilla Javascript',
       image: '/screenshots/portfolio-screenshot.png',
-      link: 'https://fahrnbach.one',
-      code: 'https://github.com/fahrnbach/',
-      blog: 'https://blog.fahrnbach.one/portfolio-site'
+      link: 'https://jiode.one',
+      code: 'https://github.com/jiode/',
+      blog: 'https://blog.jiode.one/portfolio-site'
     }
 };
 

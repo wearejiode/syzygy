@@ -1,8 +1,8 @@
 {
-  "name": "@jiode/source",
+  "name": "@jiode/syzygy",
   "version": "0.0.0",
   "license": "MIT",
-  "packageManager": "pnpm@9",
+  "packageManager": "pnpm@10.12.1",
   "scripts": {
     "dev:docs": "nx run docs:dev",
     "build:docs": "nx run docs:build",
@@ -14,7 +14,7 @@
     "dev:sesame": "pnpm -w nx run sesame.jiode.one:dev:live",
     "build:sesame": "node apps/core/portfolio/sesame.jiode.one/scripts/build-worker.mjs",
     "release:sesame": "pnpm -w nx run sesame.jiode.one:release",
-    "r2:list": "wrangler r2 object list --bucket resume-data --prefix resumes/ --config apps/core/portfolio/resume.fahrnbach.one/resume-meta-worker/wrangler.toml",
+    "r2:list": "wrangler r2 object list --bucket resume-data --prefix resumes/ --config apps/core/portfolio/resume.jiode.one/resume-meta-worker/wrangler.toml",
     "clean:dandelion": "rimraf dist/apps/sesame.jiode.one",
     "prepare": "husky"
   },
@@ -32,7 +32,6 @@
     "@angular/platform-browser": "~20.0.7",
     "@angular/platform-browser-dynamic": "~20.0.7",
     "@angular/router": "~20.0.7",
-    "chalk": "^5.6.0",
     "express": "^4.21.2",
     "front-matter": "^4.0.2",
     "marked": "^15.0.12",
@@ -72,6 +71,7 @@
     "angular-eslint": "^20.1.1",
     "astro": "^5.13.2",
     "autoprefixer": "^10.4.21",
+    "chalk": "^5.6.0",
     "chokidar-cli": "^3.0.0",
     "cypress": "^14.5.4",
     "eslint": "^9.33.0",
