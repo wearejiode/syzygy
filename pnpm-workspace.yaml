@@ -1,7 +1,8 @@
 packages:
-  - apps/*
-  - libs/*
-  - tools/*
-  - packages/*
+  - apps/**
+  - libs/**
+  - tools/**
+  - packages/**
   - .
-  - apps/core/portfolio/fahrnbach.one
+  - apps/core/portfolio/jiode.one
+  - apps/core/portfolio/sesame.jiode.one
