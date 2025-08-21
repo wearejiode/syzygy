@@ -26,8 +26,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: 'pnpm' }
+      - name: Enable Corepack (uses package.json packageManager)
+        run: corepack enable
       - uses: pnpm/action-setup@v4
-        with: { version: 10 }
       - run: pnpm install --frozen-lockfile
 
       # Add whatever is relevant/fast for this worker
