@@ -1,5 +1,6 @@
 # .github/workflows/pages-jiode.one.yml
-name: pages-jiode.one
+name: jiode.one-pages-pr
+
 
 on:
   push:

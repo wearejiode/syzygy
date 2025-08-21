@@ -25,7 +25,7 @@ runs:
         script: |
           const res = await github.request('POST /repos/{owner}/{repo}/deployments', {
             owner: context.repo.owner,
-            repo: context.repo.repo,
+            repo: context.repo.repo,gt
             ref: context.sha,                // PR head SHA
             environment: 'preview',          // <-- must match your protected env name
             auto_merge: false,
