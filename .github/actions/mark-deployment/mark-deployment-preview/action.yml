@@ -16,7 +16,7 @@ runs:
   steps:
 
     - name: Ensure code present
-      uses: actions/checkout@v4it a
+      uses: actions/checkout@v4
 
     - name: Create GitHub Deployment (preview)
       id: create
