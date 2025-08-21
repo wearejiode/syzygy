@@ -83,3 +83,16 @@ jobs:
           branch: ${{ github.head_ref || github.ref_name }}
           # If you *don’t* want a GitHub Deployment record, add:
           # gitHubDeployment: false
+
+  mark-deployment:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark Deployment Preview
+        uses: ./.github/actions/mark-deployment/mark-deployment-preview.yml
+        with:
+          bucket:           ${{ env.PRODUCTION_BUCKET }}
+          public_dir:       ${{ env.PUBLIC_DIR }}
+          data_json_path:   ${{ env.APP_PATH }}/data.json
+          wrangler_config:  ${{ env.WRANGLER_CONFIG }}
+          wrangler_version: '4.31.0'
