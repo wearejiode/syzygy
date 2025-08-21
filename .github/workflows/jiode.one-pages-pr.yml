@@ -3,19 +3,14 @@ name: jiode.one-pages-pr
 
 
 on:
-  push:
+  pull_request:
     branches: [main]
     paths:
       - "apps/core/portfolio/jiode.one/**"
-      - ".github/workflows/pages-jiode.one.yml"
+      - ".github/workflows/jiode.one-pages-pr.yml"
       - "pnpm-lock.yaml"
       - "package.json"
-  pull_request:
-    paths:
-      - "apps/core/portfolio/jiode.one/**"
-      - ".github/workflows/pages-jiode.one.yml"
-      - "pnpm-lock.yaml"
-      - "package.json"
+
   workflow_dispatch:
 
 concurrency:
@@ -28,6 +23,7 @@ permissions:
 
 jobs:
   build-and-deploy:
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     env:
       NODE_VERSION: 20
@@ -86,6 +82,7 @@ jobs:
           # gitHubDeployment: false
 
   mark-deployment:
+    if: ${{ github.event_name == 'pull_request' }}
     needs: build-and-deploy
     runs-on: ubuntu-latest
     steps:
