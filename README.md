@@ -1,47 +1,41 @@
 # Resume Worker – Dev Workflow
 
 <!-- ===== Syzygy: Build & Security Status ===== -->
-
 <p align="center">
-  <!-- PR / Preview -->
+  <!-- Preview -->
   <a href="https://github.com/wearejiode/syzygy/actions/workflows/sesame-pr.yml">
-    <img alt="Sesame PR Checks" src="https://github.com/wearejiode/syzygy/actions/workflows/sesame-pr.yml/badge.svg?branch=main">
-  </a>
+    <img alt="Sesame PR Checks" src="https://github.com/wearejiode/syzygy/actions/workflows/sesame-pr.yml/badge.svg?branch=main"></a>
   <a href="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-pr.yml">
-    <img alt="jiode.one Preview (PR)" src="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-pr.yml/badge.svg?branch=main">
-  </a>
-  <a href="https://github.com/wearejiode/syzygy/actions/workflows/codeql.yml">
-    <img alt="CodeQL" src="https://github.com/wearejiode/syzygy/actions/workflows/codeql.yml/badge.svg?branch=main">
-  </a>
-  <a href="https://github.com/wearejiode/syzygy/security/dependabot">
-    <img alt="Dependabot" src="https://img.shields.io/badge/Dependabot-Enabled-brightgreen?logo=dependabot">
-  </a>
+    <img alt="jiode.one Preview (PR)" src="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-pr.yml/badge.svg?branch=main"></a>
 </p>
 
 <p align="center">
-  <!-- Staging / Production -->
+  <!-- Staging -->
   <a href="https://github.com/wearejiode/syzygy/actions/workflows/sesame-release-staging.yml">
-    <img alt="Sesame Deploy (Staging)" src="https://github.com/wearejiode/syzygy/actions/workflows/sesame-release-staging.yml/badge.svg?branch=main">
-  </a>
+    <img alt="Sesame Deploy (Staging)" src="https://github.com/wearejiode/syzygy/actions/workflows/sesame-release-staging.yml/badge.svg?branch=main"></a>
   <a href="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-release-staging.yml">
-    <img alt="jiode.one Deploy (Staging)" src="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-release-staging.yml/badge.svg?branch=main">
-  </a>
+    <img alt="jiode.one Deploy (Staging)" src="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-release-staging.yml/badge.svg?branch=main"></a>
+</p>
+
+  <!-- Production -->
+
+<p align="center">
   <a href="https://github.com/wearejiode/syzygy/actions/workflows/sesame-promote-prod.yml">
-    <img alt="Sesame Promote → Prod" src="https://github.com/wearejiode/syzygy/actions/workflows/sesame-promote-prod.yml/badge.svg?branch=main">
-  </a>
+    <img alt="Sesame Promote → Prod" src="https://github.com/wearejiode/syzygy/actions/workflows/sesame-promote-prod.yml/badge.svg?branch=main"></a>
   <a href="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-promote-prod.yml">
-    <img alt="jiode.one Promote → Prod" src="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-promote-prod.yml/badge.svg?branch=main">
-  </a>
+    <img alt="jiode.one Promote → Prod" src="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-promote-prod.yml/badge.svg?branch=main"></a>
 </p>
 
 <p align="center">
   <!-- Repo meta (optional) -->
   <a href="https://github.com/wearejiode/syzygy/commits/main">
-    <img alt="Last commit" src="https://img.shields.io/github/last-commit/wearejiode/syzygy/main">
-  </a>
+    <img alt="Last commit" src="https://img.shields.io/github/last-commit/wearejiode/syzygy/main"></a>
   <a href="https://github.com/wearejiode/syzygy">
     <img alt="CI Minutes" src="https://img.shields.io/github/actions/workflow/status/wearejiode/syzygy/sesame-pr.yml?label=CI%20Status&branch=main">
-  </a>
+  <a href="https://github.com/wearejiode/syzygy/actions/workflows/codeql.yml">
+    <img alt="CodeQL" src="https://github.com/wearejiode/syzygy/actions/workflows/codeql.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/wearejiode/syzygy/security/dependabot">
+    <img alt="Dependabot" src="https://img.shields.io/badge/Dependabot-Enabled-brightgreen?logo=dependabot"></a></a>
 </p>
 
 <!-- Notes:
