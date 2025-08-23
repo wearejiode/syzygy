@@ -1,0 +1,6 @@
+# Only non-secret config here
+SESAME_PREVIEW_APP_ID: "sesame.jiode.one"
+SESAME_PREVIEW_PUBLIC_DIR: "apps/core/portfolio/sesame.jiode.one/public"
+SESAME_PREVIEW_WRANGLER_CONFIG: "apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.preview.toml"
+SESAME_PREVIEW_R2_BUCKET: "sesame-data-preview"
+SESAME_PREVIEW_HOST: "*.jiode.workers.dev"

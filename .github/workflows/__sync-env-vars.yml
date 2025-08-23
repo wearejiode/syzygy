@@ -1,0 +1,82 @@
+name: Sync Environment Variables
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Which environment to sync"
+        type: choice
+        required: true
+        options: [preview, staging, production]
+      confirm:
+        description: 'Type exactly: I understand (leave blank to PLAN only)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  actions: write # needed to upsert environment variables via REST
+
+concurrency:
+  group: __sync-env-vars
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    # Route this job into the chosen protected environment for required reviewers/approvals
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pick vars file
+        id: pick
+        run: |
+          case "${{ inputs.environment }}" in
+            preview)    echo "FILE=.github/env/preview.vars.yml"    >> "$GITHUB_OUTPUT" ;;
+            staging)    echo "FILE=.github/env/staging.vars.yml"    >> "$GITHUB_OUTPUT" ;;
+            production) echo "FILE=.github/env/production.vars.yml" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - name: Install YAML parser (js-yaml)
+        run: npm i js-yaml@4
+
+      - name: Plan (read-only)
+        uses: actions/github-script@v7
+        env:
+          FILE: ${{ steps.pick.outputs.FILE }}
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+            const file = process.env.FILE;
+            core.info(`\nPlan for ${file}\n-----------------`);
+            core.info(fs.readFileSync(file, 'utf8'));
+            if (core.getInput('confirm') !== 'I understand') {
+              core.info('\nRead-only run (no changes applied). To apply, re-run with confirm="I understand".');
+            }
+
+      - name: Apply variables (upsert)
+        if: ${{ inputs.confirm == 'I understand' }}
+        uses: actions/github-script@v7
+        env:
+          FILE: ${{ steps.pick.outputs.FILE }}
+          ENV_NAME: ${{ inputs.environment }}
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+            const file = process.env.FILE;
+            const envName = process.env.ENV_NAME;
+            const desired = yaml.load(fs.readFileSync(file, 'utf8')) || {};
+
+            for (const [name, value] of Object.entries(desired)) {
+              core.info(`Upserting ${name}`);
+              await github.request(
+                'PUT /repos/{owner}/{repo}/environments/{environment_name}/variables/{name}',
+                { owner: context.repo.owner, repo: context.repo.repo, environment_name: envName, name, value: String(value) }
+              );
+            }
+
+            core.info(`\nApplied ${Object.keys(desired).length} variables to environment "${envName}" ✅`);
