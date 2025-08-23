@@ -1,0 +1,6 @@
+# Only non-secret config here
+SESAME_STAGING_APP_ID: "sesame.jiode.one"
+SESAME_STAGING_PUBLIC_DIR: "apps/core/portfolio/sesame.jiode.one/public"
+SESAME_STAGING_WRANGLER_CONFIG: "apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml"
+SESAME_STAGING_R2_BUCKET: "sesame-data-staging"
+SESAME_STAGING_HOST: "*.jiode.workers.dev"

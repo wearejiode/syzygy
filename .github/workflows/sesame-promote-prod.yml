@@ -1,4 +1,10 @@
 name: sesame-promote-prod
+
+# Principle of least privilege for this workflow
+permissions:
+  contents: read
+  id-token: write  # in case downstream reusable workflow uses OIDC (safe to keep)
+
 env:
   APP_ID: sesame.jiode.one
   APP_PATH: apps/core/portfolio/sesame.jiode.one
@@ -13,9 +19,11 @@ on:
       release_sha:
         description: "Commit SHA to promote (must exist in staging artifacts)"
         required: true
+        type: string
       confirm:
         description: 'Type "I understand" to deploy to prod'
         required: true
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-prod
@@ -25,9 +33,15 @@ jobs:
   preflight:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          if [ "${{ github.event.inputs.confirm }}" != "I understand" ]; then
-            echo "Confirmation mismatch. Aborting."; exit 1; fi
+      - name: Validate confirmation & inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event.inputs.confirm }}" != "I understand" ]]; then
+            echo "Confirmation mismatch. Aborting." >&2; exit 1; fi
+          sha='${{ github.event.inputs.release_sha }}'
+          if [[ ! "$sha" =~ ^[a-f0-9]{7,40}$ ]]; then
+            echo "Invalid release_sha: must be 7–40 hex characters." >&2; exit 1; fi
 
   promote:
     needs: preflight
@@ -47,8 +61,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     # This targets the protected "production" environment defined inside _worker-promote.yml
 
-  # SESAME POST-PROMOTE STEPS
-  # These are specific to Sesame and not part of the generic worker promotion workflow.
+  # SESAME POST-PROMOTE STEPS (app-specific)
   post_sync:
     needs: promote
     runs-on: ubuntu-latest
@@ -57,13 +70,15 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       RELEASE_SHA: ${{ github.event.inputs.release_sha }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo (required for local composite actions)
+        uses: actions/checkout@v4
 
       - name: Download promoted artifact
         uses: actions/download-artifact@v4
         with:
           name: sesame-worker-${{ env.RELEASE_SHA }}
           path: dist/releases/${{ env.RELEASE_SHA }}
+          if-no-files-found: error
 
       - name: Push public assets + data.json to R2 (prod)
         uses: ./.github/actions/sesame/r2-push
@@ -74,35 +89,37 @@ jobs:
           wrangler_config:  ${{ env.WRANGLER_CONFIG }}
           wrangler_version: '4.31.0'
 
-
-# app specific testing goes here
+  # Basic smoke tests against production host
   smoke-test:
-      needs: promote
-      runs-on: ubuntu-latest
-      env:
-        HOST: ${{ vars.PRODUCTION_HOST }}
-      steps:
-        - name: test /health
-          run: |
-            set -euo pipefail
-            code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/health")
-            echo "HTTP ${code} /health"
-            test "$code" = "200"
-            body=$(curl -s "https://${HOST}/health")
-            echo "Body: $body"
-            [[ "$body" =~ OK|ok ]]
+    needs: promote
+    runs-on: ubuntu-latest
+    env:
+      HOST: ${{ vars.PRODUCTION_HOST }}
+    steps:
+      - name: test /health
+        shell: bash
+        run: |
+          set -euo pipefail
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/health")
+          echo "HTTP ${code} /health"
+          test "$code" = "200"
+          body=$(curl -s "https://${HOST}/health")
+          echo "Body: $body"
+          [[ "$body" =~ OK|ok ]]
 
-        - name: test R2 control endpoints
-          run: |
-            set -euo pipefail
-            # These should be safe GETs that your worker exposes for diagnostics (adjust to your routes)
-            curl -fsSL "https://${HOST}/__r2get" | grep -qi "GET: OK"
-            curl -fsSL "https://${HOST}/__r2list" | grep -qi "data.json"
+      - name: test R2 control endpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          # These should be safe GETs that your worker exposes for diagnostics (adjust to your routes)
+          curl -fsSL "https://${HOST}/__r2get" | grep -qi "GET: OK"
+          curl -fsSL "https://${HOST}/__r2list" | grep -qi "data.json"
 
-        - name: test image exists
-          run: |
-            set -euo pipefail
-            # Check one representative image you seeded
-            code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/images/background.webp")
-            echo "HTTP ${code} /images/background.webp"
-            test "$code" = "200"
+      - name: test image exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Check one representative image you seeded
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/images/background.webp")
+          echo "HTTP ${code} /images/background.webp"
+          test "$code" = "200"

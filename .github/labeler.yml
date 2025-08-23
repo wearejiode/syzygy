@@ -1,0 +1,17 @@
+# area labels by path
+area:sesame:
+  - apps/core/portfolio/sesame.jiode.one/**
+
+area:jiode.one:
+  - apps/core/portfolio/jiode.one/**
+
+area:genie-session:
+  - apps/core/api/genie-session/**
+
+type:ci:
+  - .github/workflows/**
+  - .github/actions/**
+
+type:docs:
+  - '**/*.md'
+  - apps/**/README.md

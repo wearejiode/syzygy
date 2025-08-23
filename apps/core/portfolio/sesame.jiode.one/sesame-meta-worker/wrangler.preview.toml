@@ -1,0 +1,11 @@
+name = "preview-jiode-sesame"
+main = "meta-worker.js"
+compatibility_date = "2025-06-09"
+
+[vars]
+ENVIRONMENT = "preview"
+
+[[r2_buckets]]
+binding = "SESAME_DATA"
+bucket_name = "sesame-data-preview"
+preview_bucket_name = "sesame-data-preview-preview"
