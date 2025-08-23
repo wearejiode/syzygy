@@ -6,3 +6,4 @@ packages:
   - .
   - apps/core/portfolio/jiode.one
   - apps/core/portfolio/sesame.jiode.one
+  - apps/core/api/auth/genie-session

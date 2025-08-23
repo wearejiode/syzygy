@@ -1,5 +1,6 @@
 # Resume Worker – Dev Workflow
 
+## CI / CD Status
 <!-- ===== Syzygy: Build & Security Status ===== -->
 <p align="center">
   <!-- Preview -->

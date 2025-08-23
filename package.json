@@ -16,7 +16,14 @@
     "release:sesame": "pnpm -w nx run sesame.jiode.one:release",
     "r2:list": "wrangler r2 object list --bucket resume-data --prefix resumes/ --config apps/core/portfolio/resume.jiode.one/resume-meta-worker/wrangler.toml",
     "clean:dandelion": "rimraf dist/apps/sesame.jiode.one",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint:ghwf": "actionlint -color",
+    "lint:ghwf:loose": "actionlint -shellcheck=never -color",
+    "test": "vitest",
+    "test:ci": "vitest run --reporter=default",
+    "verify:sesame": "pnpm -w -F @jiode/sesame test:ci && pnpm -w -F @jiode/sesame build",
+    "verify:jiode.one": "pnpm -w -F @jiode/jiode.one build && vitest run --passWithNoTests",
+    "verify:genie-session": "pnpm -w -F @jiode/genie-session build && pnpm -w -F @jiode/genie-session test:ci"
   },
   "lint-staged": {
     "*.{js,ts,tsx,mjs,cjs}": "pnpm -s eslint --fix",

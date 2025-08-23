@@ -1,0 +1,50 @@
+name: Lint Workflows (fast-fail)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+
+# Cancel older runs for the same PR quickly
+concurrency:
+  group: lint-wf-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write  # needed for PR annotations
+
+jobs:
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Runs rhysd/actionlint via reviewdog so you get inline annotations on PRs
+      - name: Lint GitHub Actions
+        uses: reviewdog/action-actionlint@v1
+        with:
+          # Fail fast on errors; warnings are okay. Change to 'warning' if you want softer gates.
+          # If you want to block on warnings too, set level: warning (reviewdog treats it as failing the check).
+          level: error
+          reporter: github-pr-check
+          filter_mode: added
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: .github/actions
