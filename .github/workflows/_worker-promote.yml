@@ -36,7 +36,7 @@ jobs:
 
       # Download artifacts produced by staging
       - name: Download worker artifact
-        uses: dawidd6/action-download-artifact@v6
+        uses: dawidd6/action-download-artifact@v11
         with:
           workflow: sesame-release-staging.yml
           name: ${{ inputs.app_id }}-worker-${{ inputs.release_sha }}
@@ -44,7 +44,7 @@ jobs:
           path: dist/releases/${{ env.SHA }}
 
       - name: Download checksum
-        uses: dawidd6/action-download-artifact@v6
+        uses: dawidd6/action-download-artifact@v11
         with:
           workflow: sesame-release-staging.yml
           name: ${{ inputs.app_id }}-sha256-${{ inputs.release_sha }}
