@@ -37,6 +37,8 @@
     <img alt="CodeQL" src="https://github.com/wearejiode/syzygy/actions/workflows/codeql.yml/badge.svg?branch=main"></a>
   <a href="https://github.com/wearejiode/syzygy/security/dependabot">
     <img alt="Dependabot" src="https://img.shields.io/badge/Dependabot-Enabled-brightgreen?logo=dependabot"></a></a>
+<a href="https://docs.github.com/authentication/managing-commit-signature-verification/signing-commits">
+<img alt="Signed-Commits" src="https://img.shields.io/badge/Commits-Signed-brightgreen"></a>
 </p>
 
 <!-- Notes:
