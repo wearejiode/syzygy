@@ -18,7 +18,7 @@ jobs:
       NODE_VERSION: 20
       NX_CLOUD_DISABLED: 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Enable Corepack (uses package.json packageManager)
         run: corepack enable

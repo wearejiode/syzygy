@@ -25,7 +25,7 @@ jobs:
     name: actionlint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Runs rhysd/actionlint via reviewdog so you get inline annotations on PRs
       - name: Lint GitHub Actions
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: ShellCheck
         uses: ludeeus/action-shellcheck@master
         with:

@@ -34,7 +34,7 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' || matrix.env_name == github.event.inputs.environment }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Pick vars file
         id: pick

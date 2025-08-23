@@ -29,7 +29,7 @@ jobs:
             previewBucket: "sesame-data-preview"
             previewHost: "${{ vars.PREVIEW_HOST || 'preview.sesame.jiode.one' }}"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Enable Corepack (uses package.json packageManager)
         run: corepack enable
@@ -103,6 +103,6 @@ jobs:
     needs: preview
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Mark Deployment Preview
         uses: ./.github/actions/mark-deployment/mark-deployment-preview

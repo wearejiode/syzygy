@@ -71,7 +71,7 @@ jobs:
       RELEASE_SHA: ${{ github.event.inputs.release_sha }}
     steps:
       - name: Checkout repo (required for local composite actions)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download promoted artifact
         uses: actions/download-artifact@v4

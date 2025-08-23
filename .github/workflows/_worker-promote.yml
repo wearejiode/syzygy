@@ -32,7 +32,7 @@ jobs:
     env:
       SHA: ${{ inputs.release_sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Download artifacts produced by staging
       - name: Download worker artifact

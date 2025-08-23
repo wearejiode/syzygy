@@ -31,7 +31,7 @@ jobs:
     env:
       NODE_VERSION: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Use pnpm version from package.json `packageManager`
       - name: Enable Corepack (pnpm)
@@ -88,6 +88,6 @@ jobs:
     needs: build-and-deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Mark Deployment Preview
         uses: ./.github/actions/mark-deployment/mark-deployment-preview
