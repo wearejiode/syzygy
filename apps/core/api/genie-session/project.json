@@ -1,5 +1,5 @@
 {
-  "name": "genie-session",
+  "name": "@jiode/genie-session",
   "projectType": "application",
   "sourceRoot": "apps/core/api/genie-session",
   "targets": {
@@ -7,7 +7,7 @@
       "executor": "@nx/node:build",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/core/api/genie",
+        "outputPath": "dist/apps/core/api/genie-session",
         "main": "apps/core/api/genie-session/src/main.ts",
         "tsConfig": "apps/core/api/genie-session/tsconfig.app.json"
       }
@@ -15,7 +15,7 @@
     "serve": {
       "executor": "@nx/node:execute",
       "options": {
-        "buildTarget": "api:genie-session:build"
+        "buildTarget": "@jiode/genie-session:build"
       }
     }
   },

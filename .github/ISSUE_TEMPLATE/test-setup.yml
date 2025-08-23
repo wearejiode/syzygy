@@ -1,0 +1,22 @@
+# .github/ISSUE_TEMPLATE/test-setup.yml
+name: 🧪 Test Setup
+description: Scaffold testing harnesses or add minimal example tests
+title: "[Test] "
+labels:
+  - type:test
+  - near-term
+assignees:
+  - wearejiode
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing! Fill in the checklist below.
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: What is this issue about?
+      placeholder: Describe what you want to achieve...
+    validations:
+      required: true

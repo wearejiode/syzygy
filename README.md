@@ -1,10 +1,12 @@
 # Resume Worker – Dev Workflow
 
-| Workflow      | Status |
-|---------------|--------|
-| PR / Preview  | [![jiode.one — PR](https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-pr.yml/badge.svg?branch=main)](https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-pr.yml) |
-| Staging       | [![jiode.one — Staging](https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-release-staging.yml/badge.svg?branch=main)](https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-release-staging.yml) |
-| Production    | [![jiode.one — Production](https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-promote-prod.yml/badge.svg?branch=main)](https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-promote-prod.yml) |
+## CI / CD Status
+
+| Workflow | Status |
+|----------|--------|
+| **PR Checks** | ![PR Checks](https://github.com/wearejiode/syzygy/actions/workflows/sesame-pr.yml/badge.svg?branch=main) |
+| **Staging Deploy** | ![Staging Deploy](https://github.com/wearejiode/syzygy/actions/workflows/sesame-release-staging.yml/badge.svg?branch=main) |
+| **Production Deploy** | ![Production Deploy](https://github.com/wearejiode/syzygy/actions/workflows/sesame-promote-prod.yml/badge.svg?branch=main) |
 
 ## Overview
 
