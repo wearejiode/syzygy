@@ -66,6 +66,12 @@ jobs:
 
       - name: Unit tests (if you have any)
         run: pnpm -w test --filter @jiode/sesame || echo "no tests yet"
+
+      - name: Ensure preview R2 bucket exists
+        run: npx -y wrangler@4.33.0 r2 bucket create sesame-data-preview || true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
   ci:
     name: sesame / CI build
     uses: ./.github/workflows/_worker-ci.yml
