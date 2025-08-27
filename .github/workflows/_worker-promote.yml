@@ -3,7 +3,7 @@
 # It handles the deployment of a Worker to production, verifies the build, and can optionally verify SLSA provenance.
 # It also supports rollback functionality if needed.
 
-name: worker-promote
+name: Worker for Production Promotion
 
 on:
   workflow_call:

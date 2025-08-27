@@ -1,4 +1,4 @@
-name: project / priority-auto
+name: Auto-Label Project Priority from P0/P1/P2 labels
 on:
   issues:
     types: [labeled, unlabeled, opened, edited]
@@ -27,9 +27,11 @@ jobs:
             const PROJECT_NUMBER = 1;             // your project number
             const PRIORITY_FIELD_NAME = 'Priority'; // must match your field exactly
             const labelToPriority = {
-              'P0': 'P0',
-              'P1': 'P1',
-              'P2': 'P2'
+              'P0:Blocking': 'P0',
+              'P1:Critical': 'P1',
+              'P2:High': 'P2',
+              'P3:Med': 'P3',
+              'PZ:Low': 'PZ',
             };
             // ----------------
 
@@ -38,7 +40,7 @@ jobs:
 
             // Determine desired priority from labels
             const lbls = issue.labels.map(l => (typeof l === 'string' ? l : l.name));
-            const desired = ['P0','P1','P2'].find(p => lbls.includes(p)) || null;
+            const desired = ['P0:Blocking','P1:Critical','P2:High', 'P3:Med', 'PZ:Low'].find(p => lbls.includes(p)) || null;
 
             // GraphQL helpers
             const gql = (query, variables) => github.graphql(query, variables);

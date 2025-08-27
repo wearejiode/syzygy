@@ -1,5 +1,5 @@
 # .github/workflows/full-ci-post-merge.yml
-name: ci-sweep-post-merge
+name: CI-sweep-post-merge
 
 on:
   workflow_run:

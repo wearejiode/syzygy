@@ -1,5 +1,5 @@
 # .github/workflows/issues-default-label.yml
-name: issues / default-label
+name: Default Issue Labeler
 on:
   issues:
     types: [opened]
