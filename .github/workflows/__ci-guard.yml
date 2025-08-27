@@ -1,5 +1,5 @@
 # .github/workflows/_guard-ci-plumbing.yml
-name: Is Label "ci-ok" present for CI related changes?
+name: Is Label "ci-ok" Present for CI Related Changes?
 on:
   pull_request:
     paths:
