@@ -56,6 +56,11 @@ jobs:
   ci:
     name: sesame / CI build
     uses: ./.github/workflows/_worker-ci.yml
+    permissions:
+      contents: read
+      deployments: write
+      id-token: write
+      attestations: write
     strategy:
       matrix:
         app:
@@ -78,6 +83,11 @@ jobs:
     if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: ci
     uses: ./.github/workflows/_worker-ci.yml
+    permissions:
+      contents: read
+      deployments: write
+      id-token: write
+      attestations: write
     strategy:
       matrix:
         app:

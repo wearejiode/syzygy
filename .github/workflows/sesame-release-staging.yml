@@ -1,12 +1,4 @@
 name: sesame-release-staging
-env:
-  APP_ID: sesame.jiode.one
-  APP_PATH: apps/core/jiode/sesame.jiode.one
-  PUBLIC_DIR: apps/core/jiode/sesame.jiode.one/public
-  WRANGLER_CONFIG: apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
-  STAGING_BUCKET: sesame-data-staging
-  STAGING_HOST: ${{ vars.STAGING_HOST || 'staging.sesame.jiode.one' }}
-  # Ensure this is set in your GitHub Environment
 on:
   push:
     branches: [main]
@@ -15,15 +7,22 @@ on:
 
 jobs:
   staging:
+    strategy:
+      matrix:
+        APP_ID: [sesame.jiode.one]
+        APP_PATH: [apps/core/jiode/sesame.jiode.one]
+        PUBLIC_DIR: [apps/core/jiode/sesame.jiode.one/public]
+        WRANGLER_CONFIG: [apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml]
+        STAGING_BUCKET: [sesame-data-staging]
     uses: ./.github/workflows/_worker-ci.yml
     permissions:
       contents: read
       id-token: write
       attestations: write
     with:
-      app_id:          ${{ env.APP_ID }}
-      app_path:        ${{ env.APP_PATH }}
-      wrangler_config: ${{ env.WRANGLER_CONFIG }}
+      app_id:          ${{ matrix.APP_ID }}
+      app_path:        ${{ matrix.APP_PATH }}
+      wrangler_config: ${{ matrix.WRANGLER_CONFIG }}
       environment:     staging
       deploy:          true
     secrets:
@@ -32,6 +31,13 @@ jobs:
 
   post_sync:
     needs: staging
+    strategy:
+      matrix:
+        APP_ID: [sesame.jiode.one]
+        APP_PATH: [apps/core/jiode/sesame.jiode.one]
+        PUBLIC_DIR: [apps/core/jiode/sesame.jiode.one/public]
+        WRANGLER_CONFIG: [apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml]
+        STAGING_BUCKET: [sesame-data-staging]
     runs-on: ubuntu-latest
     env:
       CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -41,18 +47,18 @@ jobs:
       - name: Push public assets + data.json to R2 (staging)
         uses: ./.github/actions/sesame/r2-push
         with:
-          bucket:           ${{ env.STAGING_BUCKET }}
-          public_dir:       ${{ env.PUBLIC_DIR }}
-          data_json_path:   ${{ env.APP_PATH }}/data.json
-          wrangler_config:  ${{ env.WRANGLER_CONFIG }}
+          bucket:           ${{ matrix.STAGING_BUCKET }}
+          public_dir:       ${{ matrix.PUBLIC_DIR }}
+          data_json_path:   ${{ matrix.APP_PATH }}/data.json
+          wrangler_config:  ${{ matrix.WRANGLER_CONFIG }}
           wrangler_version: '4.31.0'
 
 # app specific testing goes here
   smoke-test:
-      needs: staging
+      needs: [staging, post_sync]
       runs-on: ubuntu-latest
       env:
-        HOST: ${{ vars.STAGING_HOST }}
+        HOST: ${{ vars.STAGING_HOST || 'staging.sesame.jiode.one' }}
       steps:
         - name: test /health
           run: |
