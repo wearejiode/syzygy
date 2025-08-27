@@ -5,7 +5,7 @@ on:
 
 permissions:
   contents: read
-  issues: write
+  # repository-projects is for classic Projects; Projects v2 uses "projects"
 
 env:
   # Set these two to your user project’s owner + number
