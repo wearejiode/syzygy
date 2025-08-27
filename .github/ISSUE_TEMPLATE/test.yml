@@ -1,0 +1,31 @@
+name: "Test"
+description: "Add/Improve unit, integration, or e2e tests"
+title: "test: <area> — <short summary>"
+labels: ["type:test", "near-term"]
+assignees: []
+body:
+  - type: dropdown
+    id: level
+    attributes:
+      label: Test level
+      options: ["unit", "integration", "e2e"]
+    validations:
+      required: true
+  - type: input
+    id: scope
+    attributes:
+      label: Affected area (e.g., sesame, jiode.one, genie-session)
+      placeholder: "@jiode/<pkg> or path pattern"
+  - type: textarea
+    id: details
+    attributes:
+      label: What to test
+      description: List cases, fixtures, and acceptance criteria.
+      placeholder: "Given/When/Then..."
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: Tests reproduce a real bug or guard a real path
+        - label: CI passes locally

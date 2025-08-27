@@ -1,0 +1,25 @@
+name: "Security"
+description: "Hardening, secret hygiene, SCA/CodeQL, provenance"
+title: "sec: <area> — <short summary>"
+labels: ["type:security", "near-term"]
+assignees: []
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options: ["Secrets", "Least privilege", "SCA (deps)", "CodeQL", "Supply chain"]
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: Proposed change
+      placeholder: "Rotate token X, restrict Y, enable Z…"
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: Risk documented
+        - label: Rollback ready
