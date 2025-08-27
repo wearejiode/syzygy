@@ -9,7 +9,7 @@ on:
   workflow_call:
     inputs:
       app_id:           { required: true,  type: string } # e.g. sesame.jiode.one
-      app_path:         { required: true,  type: string } # e.g. apps/core/portfolio/sesame.jiode.one
+      app_path:         { required: true,  type: string } # e.g. apps/core/jiode/sesame.jiode.one
       wrangler_config:  { required: true,  type: string } # e.g. apps/.../wrangler.staging.toml
       environment:      { required: true,  type: string } # preview|staging|prod
       worker_name:      { required: false, type: string } # for preview overrides

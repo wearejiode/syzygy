@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "apps/core/portfolio/jiode.one/**"
+      - "apps/core/jiode/jiode.one/**"
       - ".github/workflows/jiode.one-pages-pr.yml"
       - "pnpm-lock.yaml"
       - "package.json"
@@ -60,7 +60,7 @@ jobs:
 
       # If you don’t have an Nx target, comment the step above and use:
       # - name: Build (plain Vite)
-      #   working-directory: apps/core/portfolio/jiode.one
+      #   working-directory: apps/core/jiode/jiode.one
       #   run: pnpm exec vite build
 
       # Deploy to Cloudflare Pages

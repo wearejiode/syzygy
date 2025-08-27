@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'apps/core/portfolio/sesame.jiode.one/**'
+      - 'apps/core/jiode/sesame.jiode.one/**'
       - '.github/workflows/**'
 
 permissions:
@@ -23,9 +23,9 @@ jobs:
       matrix:
         app:
           - id: "sesame.jiode.one"
-            path: "apps/core/portfolio/sesame.jiode.one"
-            publicDir: "apps/core/portfolio/sesame.jiode.one/public"
-            wranglerConfig: "apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.preview.toml"
+            path: "apps/core/jiode/sesame.jiode.one"
+            publicDir: "apps/core/jiode/sesame.jiode.one/public"
+            wranglerConfig: "apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.preview.toml"
             previewBucket: "sesame-data-preview"
             previewHost: "${{ vars.PREVIEW_HOST || 'preview.sesame.jiode.one' }}"
     steps:
@@ -60,9 +60,9 @@ jobs:
       matrix:
         app:
           - id: "sesame.jiode.one"
-            path: "apps/core/portfolio/sesame.jiode.one"
-            publicDir: "apps/core/portfolio/sesame.jiode.one/public"
-            wranglerConfig: "apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.preview.toml"
+            path: "apps/core/jiode/sesame.jiode.one"
+            publicDir: "apps/core/jiode/sesame.jiode.one/public"
+            wranglerConfig: "apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.preview.toml"
             previewBucket: "sesame-data-preview"
             previewHost: "${{ vars.PREVIEW_HOST || 'preview.sesame.jiode.one' }}"
     with:
@@ -82,9 +82,9 @@ jobs:
       matrix:
         app:
           - id: "sesame.jiode.one"
-            path: "apps/core/portfolio/sesame.jiode.one"
-            publicDir: "apps/core/portfolio/sesame.jiode.one/public"
-            wranglerConfig: "apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.preview.toml"
+            path: "apps/core/jiode/sesame.jiode.one"
+            publicDir: "apps/core/jiode/sesame.jiode.one/public"
+            wranglerConfig: "apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.preview.toml"
             previewBucket: "sesame-data-preview"
             previewHost: "${{ vars.PREVIEW_HOST || 'preview.sesame.jiode.one' }}"
     with:
