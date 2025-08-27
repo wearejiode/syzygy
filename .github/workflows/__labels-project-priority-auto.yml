@@ -6,7 +6,7 @@ on:
 permissions:
   issues: write
   contents: read
-  projects: write
+  repository-projects: write
   # repository-projects is for classic Projects; Projects v2 uses "projects"
 
 env:
