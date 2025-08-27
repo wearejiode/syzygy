@@ -6,7 +6,8 @@ on:
 permissions:
   issues: write
   contents: read
-  repository-projects: write
+  projects: write
+  # repository-projects is for classic Projects; Projects v2 uses "projects"
 
 env:
   # Set these two to your user project’s owner + number
@@ -61,7 +62,8 @@ jobs:
             async function getUserProject({ login, title, number }) {
               if (title) {
                 const data = await gql(
-                  `query($login:String!) {
+                  `query($login:String!, $title:String!) {
+
                     user(login:$login) {
                       projectsV2(first: 50, query: $title) { nodes { id title fields(first:50) {
                         nodes { ... on ProjectV2FieldCommon { id name }
@@ -93,7 +95,7 @@ jobs:
             async function getOrgProject({ login, title, number }) {
               if (title) {
                 const data = await gql(
-                  `query($login:String!) {
+                  `query($login:String!, $title:String!) {
                     organization(login:$login) {
                       projectsV2(first: 50, query: $title) { nodes { id title fields(first:50) {
                         nodes { ... on ProjectV2FieldCommon { id name }
