@@ -4,7 +4,7 @@
 # by setting `allow_hotfix: true` in the workflow call.
 # This is used by sesame.jiode.one
 
-name: worker-ci
+name: Shared Worker for Preview and Staging CI
 on:
   workflow_call:
     inputs:

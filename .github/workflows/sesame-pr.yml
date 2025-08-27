@@ -1,4 +1,4 @@
-name: sesame PR Checks & preview
+name: Sesame PR Preview
 
 on:
   pull_request:

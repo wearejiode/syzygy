@@ -1,4 +1,4 @@
-name: Semantic PR Title
+name: Validate PR Title is Semantic
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, edited]
@@ -20,15 +20,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           types: |
-            feat
-            fix
-            perf
-            chore
-            docs
-            refactor
-            test
-            build
-            ci
+            Feat
+            Fix
+            Perf
+            Chore
+            Docs
+            Refactor
+            Test
+            Build
+            CI
           requireScope: true
           scopes: |
             sesame

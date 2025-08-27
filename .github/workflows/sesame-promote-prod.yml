@@ -1,4 +1,4 @@
-name: sesame-promote-prod
+name: Sesame Promote to Production
 
 # Principle of least privilege for this workflow
 permissions:

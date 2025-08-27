@@ -1,4 +1,4 @@
-name: sesame-release-staging
+name: Sesame Release to Staging
 on:
   push:
     branches: [main]

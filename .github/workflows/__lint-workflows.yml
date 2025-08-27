@@ -1,4 +1,4 @@
-name: Lint Workflows (fast-fail)
+name: Lint CI Workflows (fast-fail)
 
 on:
   pull_request:

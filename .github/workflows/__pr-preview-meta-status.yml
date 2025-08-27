@@ -1,7 +1,7 @@
 #A job that runs on any docs/ci PRs to set their deployment status to "true". This prevents
 #the PR from being blocked on a preview deployment that will never happen.
 #This is a workaround for GitHub not allowing per-path required checks.
-name: pr / meta-preview
+name: PR Auto-Add Deployment Status for Non-App Changes
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review, edited]

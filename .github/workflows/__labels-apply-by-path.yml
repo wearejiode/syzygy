@@ -1,4 +1,4 @@
-name: PR Labels by Path
+name: Apply PR Labels by Path
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review, edited]

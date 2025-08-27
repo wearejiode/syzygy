@@ -1,5 +1,5 @@
 # .github/workflows/full-ci.yml
-name: ci-sweep-full-nightly
+name: CI-sweep-full-nightly
 
 on:
   workflow_call: {}

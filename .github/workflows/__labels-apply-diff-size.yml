@@ -12,7 +12,7 @@ jobs:
   size:
     runs-on: ubuntu-latest
     steps:
-      - name: Compute PR size and (re)label
+      - name: Compute PR size then (re)label
         uses: actions/github-script@v7
         with:
           script: |

@@ -1,4 +1,4 @@
-name: R2 Push
+name: Push to Cloudflare R2 via Wrangler
 description: Upload files to a Cloudflare R2 bucket via Wrangler
 
 inputs:
