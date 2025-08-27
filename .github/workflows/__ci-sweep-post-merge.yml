@@ -11,4 +11,4 @@ on:
 jobs:
   run-full-ci-if-success:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.branch == 'main' }}
-    uses: ./.github/workflows/full-ci.yml
+    uses: ./.github/workflows/__ci-sweep-full-nightly.yml
