@@ -8,15 +8,15 @@ name: Shared Worker for Preview and Staging CI
 on:
   workflow_call:
     inputs:
-      app_id:           { required: true,  type: string } # e.g. sesame.jiode.one
-      app_path:         { required: true,  type: string } # e.g. apps/core/jiode/sesame.jiode.one
-      wrangler_config:  { required: true,  type: string } # e.g. apps/.../wrangler.staging.toml
-      environment:      { required: true,  type: string } # preview|staging|prod
-      worker_name:      { required: false, type: string } # for preview overrides
-      deploy:           { required: false,  type: boolean, default: false } # whether to deploy or just build/test
-      allow_hotfix:     { required: false, type: boolean, default: false } # for emergency hotfixes
-      preview_host:     { required: false, type: string,  default: '' } # for preview hostname
-      artifact_name:    { required: false, type: string,  default: '' } # optional explicit artifact name
+      app_id: { required: true, type: string } # e.g. sREBASE;)
+      app_path: { required: true, type: string } # e.g. Simulate REBASE
+      wrangler_config: { required: true, type: string } # e.g. apps/.../wrangler.staging.toml
+      environment: { required: true, type: string } # preview|staging|prod
+      worker_name: { required: false, type: string } # for preview overrides
+      deploy: { required: false, type: boolean, default: false } # whether to deploy or just build/test
+      allow_hotfix: { required: false, type: boolean, default: false } # for emergency hotfixes
+      preview_host: { required: false, type: string, default: '' } # for preview hostname
+      artifact_name: { required: false, type: string, default: '' } # optional explicit artifact name
 
     secrets:
       CLOUDFLARE_API_TOKEN: { required: false }
@@ -32,8 +32,8 @@ jobs:
       attestations: write
     env:
       APP_PATH: ${{ inputs.app_path }}
-      CONFIG:   ${{ inputs.wrangler_config }}
-      ENV:      ${{ inputs.environment }}
+      CONFIG: ${{ inputs.wrangler_config }}
+      ENV: ${{ inputs.environment }}
       PREVIEW_HOST: ${{ inputs.preview_host != '' && inputs.preview_host || vars.PREVIEW_HOST }}
       ARTIFACT_NAME: ${{ inputs.artifact_name != '' && inputs.artifact_name || format('{0}-worker-{1}', inputs.app_id, github.sha) }}
     steps:
@@ -81,7 +81,7 @@ jobs:
       - name: Deploy (Workers)
         if: inputs.deploy == true && (inputs.environment != 'prod' || inputs.allow_hotfix == true)
         env:
-          CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           NAME_OPT=""
