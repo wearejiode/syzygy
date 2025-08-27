@@ -6,13 +6,18 @@ on:
 permissions:
   issues: write
   contents: read
-  repository-projects: write
+  projects: write
 
 env:
   # Set these two to your user project’s owner + number
   PROJECT_OWNER: wearejiode          # user login (not an org)
   PROJECT_NUMBER: 3                  # <-- replace with the number from your project URL
+  PROJECT_TITLE: Luna - Planned Improvements
   PRIORITY_FIELD_NAME: Priority
+
+# NOTE: For *private* user Projects (Projects v2), you must open the Project → Share →
+# “Add repositories”, and add this repository. Otherwise the GITHUB_TOKEN cannot
+# read/write the project and you’ll see GraphQL NOT_FOUND errors.
 
 # When an issue is opened/edited/labeled/unlabeled, we check for labels P0/P1/P2/P3/PZ.
 # We ensure the issue is in your Project, then set the Project’s Priority single-select field accordingly.
@@ -24,6 +29,7 @@ jobs:
   sync-priority:
     runs-on: ubuntu-latest
     steps:
+
       - name: Apply Priority from labels -> Project field
         uses: actions/github-script@v7
         with:
@@ -51,32 +57,97 @@ jobs:
 
             const gql = (query, variables) => github.graphql(query, variables);
 
-            // Helper: get ProjectV2 node for either ORG or USER owners
-            async function getProjectNode(owner, number) {
-              const data = await gql(
-                `query($login:String!, $num:Int!) {
-
-                  user: user(login:$login) { projectV2(number:$num) { id fields(first:50) {
-                    nodes {
-                      ... on ProjectV2FieldCommon { id name }
-                      ... on ProjectV2SingleSelectField { id name options { id name } }
+            // Helper: resolve a ProjectV2 by title (preferred) or by number for a USER owner
+            async function getUserProject({ login, title, number }) {
+              if (title) {
+                const data = await gql(
+                  `query($login:String!) {
+                    user(login:$login) {
+                      projectsV2(first: 50, query: $title) { nodes { id title fields(first:50) {
+                        nodes { ... on ProjectV2FieldCommon { id name }
+                                ... on ProjectV2SingleSelectField { id name options { id name } } }
+                      } } }
                     }
-                  } } }
-                }`,
-                { login: owner, num: number }
-              );
-              return data.user?.projectV2 || null;
+                  }`,
+                  { login, title }
+                );
+                const node = data.user?.projectsV2?.nodes?.find(p => p.title === title) || null;
+                if (node) return node;
+              }
+              if (number) {
+                const data = await gql(
+                  `query($login:String!, $num:Int!) {
+                    user(login:$login) { projectV2(number:$num) { id title fields(first:50) {
+                      nodes { ... on ProjectV2FieldCommon { id name }
+                              ... on ProjectV2SingleSelectField { id name options { id name } } }
+                    } } }
+                  }`,
+                  { login, num: number }
+                );
+                return data.user?.projectV2 || null;
+              }
+              return null;
             }
 
-            const project = await getProjectNode(OWNER, PROJECT_NUMBER);
+            // Helper: resolve a ProjectV2 by title/number for an ORG owner (optional)
+            async function getOrgProject({ login, title, number }) {
+              if (title) {
+                const data = await gql(
+                  `query($login:String!) {
+                    organization(login:$login) {
+                      projectsV2(first: 50, query: $title) { nodes { id title fields(first:50) {
+                        nodes { ... on ProjectV2FieldCommon { id name }
+                                ... on ProjectV2SingleSelectField { id name options { id name } } }
+                      } } }
+                    }
+                  }`,
+                  { login, title }
+                );
+                const node = data.organization?.projectsV2?.nodes?.find(p => p.title === title) || null;
+                if (node) return node;
+              }
+              if (number) {
+                const data = await gql(
+                  `query($login:String!, $num:Int!) {
+                    organization(login:$login) { projectV2(number:$num) { id title fields(first:50) {
+                      nodes { ... on ProjectV2FieldCommon { id name }
+                              ... on ProjectV2SingleSelectField { id name options { id name } } }
+                    } } }
+                  }`,
+                  { login, num: number }
+                );
+                return data.organization?.projectV2 || null;
+              }
+              return null;
+            }
+
+            // Resolve the Project node (supports private *user* projects if shared with this repo)
+            const ownerLogin = OWNER;
+            const titlePref = process.env.PROJECT_TITLE?.trim() || '';
+            const numberPref = Number.isFinite(PROJECT_NUMBER) ? PROJECT_NUMBER : undefined;
+
+            let project = await getUserProject({ login: ownerLogin, title: titlePref || undefined, number: titlePref ? undefined : numberPref });
+
+            // If not found on user, optionally try org with the same login (no-op if not an org)
             if (!project) {
-              core.setFailed(`Project #${PROJECT_NUMBER} not found for owner '${OWNER}' (user).`);
+              try {
+                project = await getOrgProject({ login: ownerLogin, title: titlePref || undefined, number: titlePref ? undefined : numberPref });
+              } catch (_) { /* ignore */ }
+            }
+
+            if (!project) {
+              core.setFailed(
+                `Project not found. Looked for user/org '${ownerLogin}' by ` +
+                (titlePref ? `title "${titlePref}"` : `number #${numberPref}`) +
+                `.\n` +
+                `• If this is a *private user project*, open it in GitHub → "Share" → ` +
+                `add repository ${context.repo.owner}/${context.repo.repo} (required for GITHUB_TOKEN).`);
               return;
             }
 
             const priorityField = project.fields.nodes.find(f => f.name === PRIORITY_FIELD_NAME && f.options);
             if (!priorityField) {
-              core.setFailed(`Field "${PRIORITY_FIELD_NAME}" not found or not single-select.`);
+              core.setFailed(`Field "${PRIORITY_FIELD_NAME}" not found or not single-select in project "${project.title}".`);
               return;
             }
 
@@ -91,10 +162,8 @@ jobs:
             );
             const issueId = itemLookup.repository.issue.id;
 
-            // We need the Project ID too
             const projectId = project.id;
 
-            // Try to find an existing project item via items query
             const searchItem = await gql(
               `query($proj:ID!, $q:String!) {
                 node(id:$proj) { ... on ProjectV2 { items(first:100, query:$q) { nodes { id content { ... on Issue { id } } } } } }
@@ -111,7 +180,6 @@ jobs:
               itemId = addItem.addProjectV2ItemById.item.id;
             }
 
-            // Update or clear the Priority field
             if (desiredOptionId) {
               await gql(
                 `mutation($proj:ID!, $item:ID!, $field:ID!, $option:String!) {
