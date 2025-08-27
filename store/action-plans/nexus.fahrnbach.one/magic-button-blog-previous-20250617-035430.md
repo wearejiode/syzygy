@@ -60,7 +60,7 @@ Enter: The Magic Button.
 
 Some call it a toggle. Others call it the nav trigger. I call it what it is: a **slam dunk**. Positioned ergonomically on mobile, animated with sparkles to catch the eye, and functioning as both an experience toggle and a navigation gateway—it’s the Swiss army knife of interaction.
 
-And it’s not just a tap. We're imagining a **drag-to-slot** interaction too—pull the button toward a highlighted ring and release it to trigger the nav. It's playful. It's physical. It's unforgettable. One part UX innovation, one part Kobe fadeaway.
+And it’s not just a tap. We're imagining a **drag-to-slot** interaction to pull the button toward a highlighted ring and release it to trigger the nav. It's playful. It's physical. It's unforgettable. One part UX innovation, one part Kobe fadeaway.
 
 ---
 
@@ -68,6 +68,6 @@ And it’s not just a tap. We're imagining a **drag-to-slot** interaction too—
 
 As this vision takes shape, the next step is to scaffold the full Angular rewrite: a real "home base" for the portfolio. The original micro-site will live on—as the hero component at the top of the homepage—but the rest of the site will be structured, performant, and inviting.
 
-We're building out components for a full experience: `MagicButton`, `HeroCanvas`, `CrawlMenu`, `ExplorePage`, and more. The goal is to craft something that doesn’t just *look* futuristic, but *feels* like the next evolution of the web. No more compromises between art and clarity. We're making something that’s both beautiful and useful. Something *me*.
+We're building out components for a full experience: `MagicButton`, `HeroCanvas`, `CrawlMenu`, `ExplorePage`, and more. The goal is to craft something that doesn’t just *look* futuristic, but *feels* like the next evolution of the web. No more compromises between art and clarity. We're making something that’s both beautiful and useful. Something *new*.
 
 And that’s just the beginning.
