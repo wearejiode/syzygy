@@ -1,47 +1,44 @@
-<<<<<<< HEAD
-# areas labeled by path
-=======
-# area labels by path
-area:sesame:
-  - apps/core/portfolio/sesame.jiode.one/**
+# GitHub Labeler v5 config — use matcher objects (no bare strings)
+# Labels are applied when ANY of the listed globs match changed files.
 
-area:jiode.one:
-  - apps/core/portfolio/jiode.one/**
-
-area:genie-session:
-  - apps/core/api/genie-session/**
->>>>>>> f4095271f0f4f8404b0356126de3e3e744f09078
-
-type:ci:
-  - .github/workflows/**
-  - .github/actions/**
-
-type:docs:
-  - '**/*.md'
-  - apps/**/README.md
-<<<<<<< HEAD
-
-type-deps:
-  - changed-files:
-      - any-glob-to-any-file: ["pnpm-lock.yaml", "**/package.json", ".github/workflows/**"]
-
-scope-root:
-  - changed-files:
-      - any-glob-to-any-file: ["package.json", "pnpm-lock.yaml"]
-
-scope-sesame:
+"type:ci":
   - changed-files:
       - any-glob-to-any-file:
-          - "apps/core/portfolio/sesame.jiode.one/**"
+          - ".github/workflows/**"
+          - ".github/actions/**"
 
-scope-jiode-one:
+"type:docs":
   - changed-files:
       - any-glob-to-any-file:
-          - "apps/core/portfolio/jiode.one/**"
+          - "**/*.md"
+          - "apps/**/README.md"
 
-scope-genie-session:
+"type:deps":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "pnpm-lock.yaml"
+          - "**/package.json"
+          - ".github/workflows/**"
+
+"area:root":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "package.json"
+          - "pnpm-lock.yaml"
+
+"area:sesame":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "apps/core/jiode/sesame.jiode.one/**"
+
+"area:jiode.one":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "apps/core/jiode/jiode.one/**"
+
+"area:genie-session":
   - changed-files:
       - any-glob-to-any-file:
           - "apps/core/api/genie-session/**"
-=======
->>>>>>> f4095271f0f4f8404b0356126de3e3e744f09078
+
+# Note: This note is just to trigger CI for a test. Remove it when adding additional globs.

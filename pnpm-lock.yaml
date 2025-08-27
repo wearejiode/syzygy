@@ -387,6 +387,43 @@ importers:
         specifier: ^4.21.2
         version: 4.31.0(@cloudflare/workers-types@4.20250821.0)
 
+  apps/core/jiode/jiode.one:
+    dependencies:
+      gsap:
+        specifier: ^3.12.5
+        version: 3.13.0
+      three:
+        specifier: ^0.169.0
+        version: 0.169.0
+    devDependencies:
+      happy-dom:
+        specifier: ^15.11.1
+        version: 15.11.7
+      jest-canvas-mock:
+        specifier: ^2.5.2
+        version: 2.5.2
+      jsdom:
+        specifier: ^25.0.1
+        version: 25.0.1
+      vite:
+        specifier: ^5.4.19
+        version: 5.4.19(@types/node@18.16.9)(less@4.4.1)(sass-embedded@1.90.0)(sass@1.90.0)(stylus@0.64.0)(terser@5.39.1)
+      vitest:
+        specifier: ^2.1.4
+        version: 2.1.9(@types/node@18.16.9)(happy-dom@15.11.7)(jsdom@25.0.1)(less@4.4.1)(sass-embedded@1.90.0)(sass@1.90.0)(stylus@0.64.0)(terser@5.39.1)
+
+  apps/core/portfolio/resume.fahrnbach.one/scripts:
+    devDependencies:
+      wrangler:
+        specifier: ^4.28.1
+        version: 4.31.0(@cloudflare/workers-types@4.20250821.0)
+
+  apps/core/jiode/sesame.jiode.one:
+    dependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20230606.0
+        version: 4.20250821.0
+        
   apps/docs:
     dependencies:
       '@astrojs/starlight':

@@ -1,9 +1,9 @@
 name: sesame-release-staging
 env:
   APP_ID: sesame.jiode.one
-  APP_PATH: apps/core/portfolio/sesame.jiode.one
-  PUBLIC_DIR: apps/core/portfolio/sesame.jiode.one/public
-  WRANGLER_CONFIG: apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
+  APP_PATH: apps/core/jiode/sesame.jiode.one
+  PUBLIC_DIR: apps/core/jiode/sesame.jiode.one/public
+  WRANGLER_CONFIG: apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
   STAGING_BUCKET: sesame-data-staging
   STAGING_HOST: ${{ vars.STAGING_HOST || 'staging.sesame.jiode.one' }}
   # Ensure this is set in your GitHub Environment
@@ -11,7 +11,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'apps/core/portfolio/sesame.jiode.one/**'
+      - 'apps/core/jiode/sesame.jiode.one/**'
 
 jobs:
   staging:
