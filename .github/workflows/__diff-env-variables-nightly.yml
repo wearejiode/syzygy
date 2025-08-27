@@ -33,141 +33,133 @@ jobs:
       matrix:
         env_name: [preview, staging, production]
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Pick vars file
-        id: pick
-        run: echo "FILE=.github/env/${{ matrix.env_name }}.vars.yml" >> "$GITHUB_OUTPUT"
+    - name: Pick vars file
+      id: pick
+      run: echo "FILE=.github/env/${{ matrix.env_name }}.vars.yml" >> "$GITHUB_OUTPUT"
 
-      - name: Install YAML parser (js-yaml)
-        run: npm i js-yaml@4
+    - name: Install yq
+      uses: mikefarah/yq@v4.44.3
 
-      - name: Diff ${{ matrix.env_name }}
-        uses: actions/github-script@v7
-        env:
-          FILE: ${{ steps.pick.outputs.FILE }}
-          ENV_NAME: ${{ matrix.env_name }}
-        with:
-          script: |
-            const fs = require('fs');
-            const yaml = require('js-yaml');
+    - name: Load YAML → JSON (desired)
+      id: desired
+      env:
+        FILE: ${{ steps.pick.outputs.FILE }}
+      run: |
+        echo "json=$(yq -o=json '.' "$FILE" | tr -d '\n' | jq -c .)" >> "$GITHUB_OUTPUT"
 
-            const file = process.env.FILE;
-            const envName = process.env.ENV_NAME;
+    - name: Diff ${{ matrix.env_name }}
+      uses: actions/github-script@v7
+      env:
+        ENV_NAME: ${{ matrix.env_name }}
+        DESIRED_JSON: ${{ steps.desired.outputs.json }}
+      with:
+        script: |
+          const desired = JSON.parse(process.env.DESIRED_JSON || '{}');
 
-            const desired = yaml.load(fs.readFileSync(file, 'utf8')) || {};
+          const { data: list } = await github.request(
+            'GET /repos/{owner}/{repo}/environments/{environment_name}/variables',
+            { owner: context.repo.owner, repo: context.repo.repo, environment_name: process.env.ENV_NAME, per_page: 100 }
+          );
 
-            const { data: list } = await github.request(
-              'GET /repos/{owner}/{repo}/environments/{environment_name}/variables',
-              { owner: context.repo.owner, repo: context.repo.repo, environment_name: envName, per_page: 100 }
+          const actual = {};
+          for (const v of list.variables || []) {
+            const { data } = await github.request(
+              'GET /repos/{owner}/{repo}/environments/{environment_name}/variables/{name}',
+              { owner: context.repo.owner, repo: context.repo.repo, environment_name: process.env.ENV_NAME, name: v.name }
             );
+            actual[v.name] = data.value ?? '';
+          }
 
-            const actual = {};
-            for (const v of list.variables || []) {
-              const { data } = await github.request(
-                'GET /repos/{owner}/{repo}/environments/{environment_name}/variables/{name}',
-                { owner: context.repo.owner, repo: context.repo.repo, environment_name: envName, name: v.name }
-              );
-              actual[v.name] = data.value ?? '';
-            }
+          const added = [], removed = [], changed = [];
+          const all = new Set([...Object.keys(desired), ...Object.keys(actual)]);
+          for (const k of all) {
+            if (!(k in actual)) added.push([k, desired[k]]);
+            else if (!(k in desired)) removed.push([k, actual[k]]);
+            else if (String(actual[k]) !== String(desired[k])) changed.push([k, actual[k], desired[k]]);
+          }
 
-            const added = [];
-            const removed = [];
-            const changed = [];
+          const toTbl = (rows, hdrs) => rows.length
+            ? '|' + hdrs.join('|') + '|\n|' + hdrs.map(()=>'---').join('|') + '|\n' +
+              rows.map(r => '|' + r.map(x => String(x)).join('|') + '|').join('\n') + '\n'
+            : '(none)\n';
 
-            const allKeys = new Set([...Object.keys(desired), ...Object.keys(actual)]);
-            for (const k of allKeys) {
-              if (!(k in actual)) added.push([k, desired[k]]);
-              else if (!(k in desired)) removed.push([k, actual[k]]);
-              else if (String(actual[k]) !== String(desired[k])) changed.push([k, actual[k], desired[k]]);
-            }
+          core.info(`\n=== Diff for environment: ${process.env.ENV_NAME} ===\n`);
+          core.info('Added (in YAML, not in Environment):\n' + toTbl(added, ['key','yaml']));
+          core.info('Removed (in Environment, not in YAML):\n' + toTbl(removed, ['key','env']));
+          core.info('Changed (value mismatch):\n' + toTbl(changed, ['key','env','yaml']));
 
-            const toTbl = (rows, headers) => {
-              if (!rows.length) return '(none)\n';
-              const h = '|' + headers.join('|') + '|\n|' + headers.map(()=>'---').join('|') + '|\n';
-              const b = rows.map(r => '|' + r.map(x => String(x)).join('|') + '|').join('\n') + '\n';
-              return h + b;
-            };
-
-            core.info(`\n=== Diff for environment: ${envName} ===\n`);
-            core.info('Added (in YAML, not in Environment):\n' + toTbl(added, ['key','yaml']));
-            core.info('Removed (in Environment, not in YAML):\n' + toTbl(removed, ['key','env']));
-            core.info('Changed (value mismatch):\n' + toTbl(changed, ['key','env','yaml']));
-
-            if (added.length || removed.length || changed.length) {
-              core.setFailed(`Drift detected in ${envName}`);
-            } else {
-              core.info(`No drift detected in ${envName} ✅`);
-            }
+          if (added.length || removed.length || changed.length) {
+            core.setFailed(`Drift detected in ${process.env.ENV_NAME}`);
+          } else {
+            core.info(`No drift detected in ${process.env.ENV_NAME} ✅`);
+          }
 
   # Runs on manual dispatch for ONE env (no matrix, so no 'matrix' refs)
   drift-one:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Pick vars file
-        id: pick
-        run: echo "FILE=.github/env/${{ github.event.inputs.environment }}.vars.yml" >> "$GITHUB_OUTPUT"
+    - name: Pick vars file
+      id: pick
+      run: echo "FILE=.github/env/${{ matrix.env_name }}.vars.yml" >> "$GITHUB_OUTPUT"
 
-      - name: Install YAML parser (js-yaml)
-        run: npm i js-yaml@4
+    - name: Install yq
+      uses: mikefarah/yq@v4.44.3
 
-      - name: Diff ${{ github.event.inputs.environment }}
-        uses: actions/github-script@v7
-        env:
-          FILE: .github/env/${{ github.event.inputs.environment }}.vars.yml
-          ENV_NAME: ${{ github.event.inputs.environment }}
-        with:
-          script: |
-            const fs = require('fs');
-            const yaml = require('js-yaml');
+    - name: Load YAML → JSON (desired)
+      id: desired
+      env:
+        FILE: ${{ steps.pick.outputs.FILE }}
+      run: |
+        echo "json=$(yq -o=json '.' "$FILE" | tr -d '\n' | jq -c .)" >> "$GITHUB_OUTPUT"
 
-            const file = process.env.FILE;
-            const envName = process.env.ENV_NAME;
+    - name: Diff ${{ github.event.inputs.environment }}
+      uses: actions/github-script@v7
+      env:
+        ENV_NAME: ${{ github.event.inputs.environment }}
+        DESIRED_JSON: ${{ steps.desired.outputs.json }}
+      with:
+        script: |
+          const desired = JSON.parse(process.env.DESIRED_JSON || '{}');
 
-            const desired = yaml.load(fs.readFileSync(file, 'utf8')) || {};
+          const { data: list } = await github.request(
+            'GET /repos/{owner}/{repo}/environments/{environment_name}/variables',
+            { owner: context.repo.owner, repo: context.repo.repo, environment_name: process.env.ENV_NAME, per_page: 100 }
+          );
 
-            const { data: list } = await github.request(
-              'GET /repos/{owner}/{repo}/environments/{environment_name}/variables',
-              { owner: context.repo.owner, repo: context.repo.repo, environment_name: envName, per_page: 100 }
+          const actual = {};
+          for (const v of list.variables || []) {
+            const { data } = await github.request(
+              'GET /repos/{owner}/{repo}/environments/{environment_name}/variables/{name}',
+              { owner: context.repo.owner, repo: context.repo.repo, environment_name: process.env.ENV_NAME, name: v.name }
             );
+            actual[v.name] = data.value ?? '';
+          }
 
-            const actual = {};
-            for (const v of list.variables || []) {
-              const { data } = await github.request(
-                'GET /repos/{owner}/{repo}/environments/{environment_name}/variables/{name}',
-                { owner: context.repo.owner, repo: context.repo.repo, environment_name: envName, name: v.name }
-              );
-              actual[v.name] = data.value ?? '';
-            }
+          const added = [], removed = [], changed = [];
+          const all = new Set([...Object.keys(desired), ...Object.keys(actual)]);
+          for (const k of all) {
+            if (!(k in actual)) added.push([k, desired[k]]);
+            else if (!(k in desired)) removed.push([k, actual[k]]);
+            else if (String(actual[k]) !== String(desired[k])) changed.push([k, actual[k], desired[k]]);
+          }
 
-            const added = [];
-            const removed = [];
-            const changed = [];
+          const toTbl = (rows, hdrs) => rows.length
+            ? '|' + hdrs.join('|') + '|\n|' + hdrs.map(()=>'---').join('|') + '|\n' +
+              rows.map(r => '|' + r.map(x => String(x)).join('|') + '|').join('\n') + '\n'
+            : '(none)\n';
 
-            const allKeys = new Set([...Object.keys(desired), ...Object.keys(actual)]);
-            for (const k of allKeys) {
-              if (!(k in actual)) added.push([k, desired[k]]);
-              else if (!(k in desired)) removed.push([k, actual[k]]);
-              else if (String(actual[k]) !== String(desired[k])) changed.push([k, actual[k], desired[k]]);
-            }
+          core.info(`\n=== Diff for environment: ${process.env.ENV_NAME} ===\n`);
+          core.info('Added (in YAML, not in Environment):\n' + toTbl(added, ['key','yaml']));
+          core.info('Removed (in Environment, not in YAML):\n' + toTbl(removed, ['key','env']));
+          core.info('Changed (value mismatch):\n' + toTbl(changed, ['key','env','yaml']));
 
-            const toTbl = (rows, headers) => {
-              if (!rows.length) return '(none)\n';
-              const h = '|' + headers.join('|') + '|\n|' + headers.map(()=>'---').join('|') + '|\n';
-              const b = rows.map(r => '|' + r.map(x => String(x)).join('|') + '|').join('\n') + '\n';
-              return h + b;
-            };
-
-            core.info(`\n=== Diff for environment: ${envName} ===\n`);
-            core.info('Added (in YAML, not in Environment):\n' + toTbl(added, ['key','yaml']));
-            core.info('Removed (in Environment, not in YAML):\n' + toTbl(removed, ['key','env']));
-            core.info('Changed (value mismatch):\n' + toTbl(changed, ['key','env','yaml']));
-
-            if (added.length || removed.length || changed.length) {
-              core.setFailed(`Drift detected in ${envName}`);
-            } else {
-              core.info(`No drift detected in ${envName} ✅`);
-            }
+          if (added.length || removed.length || changed.length) {
+            core.setFailed(`Drift detected in ${process.env.ENV_NAME}`);
+          } else {
+            core.info(`No drift detected in ${process.env.ENV_NAME} ✅`);
+          }
