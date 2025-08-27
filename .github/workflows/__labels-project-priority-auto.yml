@@ -6,7 +6,7 @@ on:
 permissions:
   issues: write
   contents: read
-  projects: write
+  repository-projects: write
 
 env:
   # Set these two to your user project’s owner + number
