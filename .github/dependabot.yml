@@ -5,6 +5,10 @@ updates:
     schedule: { interval: "weekly" }
     # Dependabot will add these labels to its PRs
     labels: ["type:deps", "bot"]
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
     # Optional: group small bumps to reduce PR noise
     groups:
       minor-and-patch:
@@ -13,3 +17,7 @@ updates:
     directory: "/"
     schedule: { interval: "weekly" }
     labels: ["type:deps", "bot"]
+    commit-message:
+      prefix: "ci"
+      prefix-development: "ci"
+      include: "scope"            # -> "ci(deps): bump actions/…"
