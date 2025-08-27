@@ -1,4 +1,4 @@
-name: mark-deployment-preview
+name: Mark Deployment as Preview
 description: Sets a preview environment for any deployment
 
 inputs:

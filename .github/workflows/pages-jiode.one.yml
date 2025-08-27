@@ -1,5 +1,5 @@
 # .github/workflows/pages-jiode.one.yml
-name: pages-jiode.one
+name: Jiode.one Cloudflare Pages Production
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: jiode.one-pages-release-staging
+name: Jiode.one Pages Release to Staging
 
 on:
   push:
