@@ -1,8 +1,8 @@
-// apps/Core/Portfolio/sesame.jiode.one/scripts/build-worker.mjs
+// apps/core/jiode/sesame.jiode.one/scripts/build-worker.mjs
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 
-const root = resolve(process.cwd(), 'apps/core/portfolio/sesame.jiode.one');
+const root = resolve(process.cwd(), 'apps/core/jiode/sesame.jiode.one');
 const paths = {
   workerSrc: resolve(root, 'sesame-meta-worker/meta-worker.js'),
   tmplFn:    resolve(root, 'templates/page.template.js'),

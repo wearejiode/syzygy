@@ -19,4 +19,4 @@ code=$(curl -s -o /dev/null -w "%{http_code}" "http://${HOST}/images/background.
 echo "HTTP ${code} /images/background.webp"
 
 # Example command (edit host as needed)
-# HOST=localhost:8787 apps/core/portfolio/sesame.jiode.one/tests/smoke-local.sh
+# HOST=localhost:8787 apps/core/jiode/sesame.jiode.one/tests/smoke-local.sh

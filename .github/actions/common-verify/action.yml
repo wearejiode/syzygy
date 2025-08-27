@@ -2,7 +2,7 @@ name: Common Verify (tsc/eslint/tests)
 description: Reusable verify step for apps (typecheck, lint, optional tests)
 inputs:
   app_path:
-    description: Path to the app root (e.g. apps/core/portfolio/sesame.jiode.one)
+    description: Path to the app root (e.g. apps/core/jiode/sesame.jiode.one)
     required: true
   tsc_project:
     description: Path to tsconfig.json (defaults to <app_path>/tsconfig.json if present)

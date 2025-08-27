@@ -1,4 +1,4 @@
-// apps/Core/Portfolio/sesame.jiode.one/templates/page.template.js
+// apps/core/jiode/sesame.jiode.one/templates/page.template.js
 // DO NOT import this in the Worker at runtime.
 // The build step will inline this function into meta-worker.js by replacing /*__RENDER_FUNCTION__*/
 export function renderPage({ data, url, linksHtml, videoLink, imageLink }) {

@@ -8,7 +8,7 @@
         "commands": [
           {
             "command": "vite build",
-            "cwd": "apps/core/portfolio/jiode.one"
+            "cwd": "apps/core/jiode/jiode.one"
           }
         ]
       }

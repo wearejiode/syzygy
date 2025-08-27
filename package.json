@@ -12,7 +12,7 @@
     "deploy:blog": "pnpm -w nx run client-blog:deploy",
     "cf:build:blog": "pnpm -w approve-builds && pnpm -w nx build client-blog --configuration=production",
     "dev:sesame": "pnpm -w nx run sesame.jiode.one:dev:live",
-    "build:sesame": "node apps/core/portfolio/sesame.jiode.one/scripts/build-worker.mjs",
+    "build:sesame": "node apps/core/jiode/sesame.jiode.one/scripts/build-worker.mjs",
     "release:sesame": "pnpm -w nx run sesame.jiode.one:release",
     "r2:list": "wrangler r2 object list --bucket resume-data --prefix resumes/ --config apps/core/portfolio/resume.jiode.one/resume-meta-worker/wrangler.toml",
     "clean:dandelion": "rimraf dist/apps/sesame.jiode.one",

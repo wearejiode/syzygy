@@ -29,12 +29,12 @@
 "area:sesame":
   - changed-files:
       - any-glob-to-any-file:
-          - "apps/core/portfolio/sesame.jiode.one/**"
+          - "apps/core/jiode/sesame.jiode.one/**"
 
 "area:jiode.one":
   - changed-files:
       - any-glob-to-any-file:
-          - "apps/core/portfolio/jiode.one/**"
+          - "apps/core/jiode/jiode.one/**"
 
 "area:genie-session":
   - changed-files:
