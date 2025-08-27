@@ -1,214 +1,213 @@
 name: Auto-Label INTO Project Priority from P0/P1/P2 labels
+
 on:
   issues:
     types: [labeled, unlabeled, opened, edited]
 
+# IMPORTANT:
+# - Project (v2) must be shared with this repo (Project → Share → Add repositories)
+# - This token scope is required to read/write Projects data
 permissions:
   contents: read
-  # repository-projects is for classic Projects; Projects v2 uses "projects"
+  issues: read
+  repository-projects: write
 
 env:
-  # Set these two to your user project’s owner + number
-  PROJECT_OWNER: wearejiode          # user login (not an org)
-  PROJECT_NUMBER: ""
-  PROJECT_TITLE: "Luna-Improvements"
-  PRIORITY_FIELD_NAME: Priority
-
-# NOTE: For *private* user Projects (Projects v2), you must open the Project → Share →
-# “Add repositories”, and add this repository. Otherwise the GITHUB_TOKEN cannot
-# read/write the project and you’ll see GraphQL NOT_FOUND errors.
-
-# When an issue is opened/edited/labeled/unlabeled, we check for labels P0/P1/P2/P3/PZ.
-# We ensure the issue is in your Project, then set the Project’s Priority single-select field accordingly.
-# If no P* label is present, we clear the field.
-# Replace ORG, PROJECT_NUMBER, and (if needed) PRIORITY_FIELD_NAME.
-# In your Project, create a single-select field named Priority with options P0, P1, P2, P3, PZ.
+  # Configure your user project location
+  PROJECT_OWNER: wearejiode           # your GitHub USER login (not org)
+  PROJECT_TITLE: "Luna-Improvements"  # exact title (preferred)
+  PROJECT_NUMBER: ""                  # or a number, leave TITLE empty to use this
+  PRIORITY_FIELD_NAME: Priority       # Project single-select field
+  # Label → Option mapping
+  MAP_P0: P0
+  MAP_P1: P1
+  MAP_P2: P2
+  MAP_P3: P3
+  MAP_PZ: PZ
 
 jobs:
   sync-priority:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # gh will auto-auth with this
     steps:
-      - name: Debug list projects (user)
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const login = process.env.PROJECT_OWNER || context.repo.owner;
-            const data = await github.graphql(
-              `query($login:String!){
+      - name: Show event (debug)
+        run: |
+          jq -C . < "$GITHUB_EVENT_PATH" | sed 's/^/event: /'
+
+      - name: Resolve desired Priority from labels
+        id: want
+        shell: bash
+        run: |
+          # Read labels on this issue from the webhook payload
+          lbls=$(jq -r '.issue.labels[] | .name // empty' "$GITHUB_EVENT_PATH" | tr '\n' ',')
+          echo "labels: $lbls"
+
+          # Map repo labels to project options
+          want=""
+          if echo "$lbls" | grep -q 'P0:Blocking'; then want="${MAP_P0}"; fi
+          if echo "$lbls" | grep -q 'P1:Critical'; then want="${MAP_P1}"; fi
+          if echo "$lbls" | grep -q 'P2:High';     then want="${MAP_P2}"; fi
+          if echo "$lbls" | grep -q 'P3:Med';      then want="${MAP_P3}"; fi
+          if echo "$lbls" | grep -q 'PZ:Low';      then want="${MAP_PZ}"; fi
+
+          echo "want=$want" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Lookup Project (user) by TITLE or NUMBER
+        id: project
+        shell: bash
+        run: |
+          owner="${PROJECT_OWNER:-${GITHUB_REPOSITORY%%/*}}"
+          title="${PROJECT_TITLE}"
+          number="${PROJECT_NUMBER}"
+
+          if [[ -n "$title" ]]; then
+            data=$(gh api graphql -f query='
+              query($login:String!){
                 user(login:$login){
-                  projectsV2(first:50){ nodes { title number }
+                  projectsV2(first:50){
+                    nodes { id title number }
                   }
                 }
-              }`,
-              { login }
-            );
-            core.info(JSON.stringify(data, null, 2));
+              }' -f login="$owner")
+            echo "$data" | jq .
+            proj=$(echo "$data" | jq -r --arg t "$title" '.data.user.projectsV2.nodes[] | select(.title==$t)')
+          else
+            # resolve specific number
+            data=$(gh api graphql -f query='
+              query($login:String!, $num:Int!){
+                user(login:$login){ projectV2(number:$num){ id title number } }
+              }' -f login="$owner" -F num="$number")
+            echo "$data" | jq .
+            proj=$(echo "$data" | jq -r '.data.user.projectV2')
+          fi
 
-      - name: Apply Priority from labels -> Project field
-        uses: actions/github-script@v7
-        with:
-          script: |
-            // --- CONFIG (override via env if you like) ---
-            const OWNER = process.env.PROJECT_OWNER || context.repo.owner; // user login
-            const PROJECT_NUMBER = Number(process.env.PROJECT_NUMBER || 1);
-            const PRIORITY_FIELD_NAME = process.env.PRIORITY_FIELD_NAME || 'Priority';
-            const LABEL_TO_PRIORITY = {
-              'P0:Blocking': 'P0',
-              'P1:Critical': 'P1',
-              'P2:High': 'P2',
-              'P3:Med': 'P3',
-              'PZ:Low': 'PZ',
-            };
-            // ---------------------------------------------
+          if [[ -z "$proj" || "$proj" == "null" ]]; then
+            echo "::error::Project not found for user '$owner' (title=$title, number=$number). Did you share it with this repo?"
+            exit 1
+          fi
 
-            const issue = context.payload.issue;
-            if (!issue) return;
+          proj_id=$(echo "$proj" | jq -r '.id')
+          proj_title=$(echo "$proj" | jq -r '.title')
+          echo "id=$proj_id"       >> "$GITHUB_OUTPUT"
+          echo "title=$proj_title" >> "$GITHUB_OUTPUT"
 
-            // Determine desired priority from labels
-            const lbls = issue.labels.map(l => (typeof l === 'string' ? l : l.name));
-            const desiredLabel = Object.keys(LABEL_TO_PRIORITY).find(name => lbls.includes(name)) || null;
-            const desired = desiredLabel ? LABEL_TO_PRIORITY[desiredLabel] : null;
+      - name: Get Issue node id
+        id: issue
+        shell: bash
+        run: |
+          owner="${GITHUB_REPOSITORY%%/*}"
+          repo="${GITHUB_REPOSITORY##*/}"
+          num=$(jq -r '.issue.number' "$GITHUB_EVENT_PATH")
 
-            const gql = (query, variables) => github.graphql(query, variables);
+          # REST returns node_id which we can use in GraphQL mutations
+          node_id=$(gh api repos/$owner/$repo/issues/$num --jq .node_id)
+          echo "node_id=$node_id" >> "$GITHUB_OUTPUT"
+          echo "issue_num=$num"   >> "$GITHUB_OUTPUT"
 
-            // Helper: resolve a ProjectV2 by title (preferred) or by number for a USER owner
-            async function getUserProject({ login, title, number }) {
-              if (title) {
-                const data = await gql(
-                  `query($login:String!, $title:String!) {
+      - name: Ensure Issue is in Project (add if needed)
+        id: item
+        shell: bash
+        run: |
+          proj="${{ steps.project.outputs.id }}"
+          owner="${GITHUB_REPOSITORY%%/*}"
+          repo="${GITHUB_REPOSITORY##*/}"
+          num="${{ steps.issue.outputs.issue_num }}"
+          issue_node="${{ steps.issue.outputs.node_id }}"
 
-                    user(login:$login) {
-                      projectsV2(first: 50, query: $title) { nodes { id title fields(first:50) {
-                        nodes { ... on ProjectV2FieldCommon { id name }
-                                ... on ProjectV2SingleSelectField { id name options { id name } } }
-                      } } }
+          # Try to find an existing item referencing this issue
+          search=$(gh api graphql -f query='
+            query($proj:ID!, $q:String!){
+              node(id:$proj){
+                ... on ProjectV2 {
+                  items(first:100, query:$q){
+                    nodes { id content { __typename ... on Issue { id } } }
+                  }
+                }
+              }
+            }' -f proj="$proj" -f q="repo:$owner/$repo is:issue #$num")
+          echo "$search" | jq .
+          item_id=$(echo "$search" | jq -r --arg id "$issue_node" '.data.node.items.nodes[] | select(.content.id==$id) | .id')
+
+          if [[ -z "$item_id" ]]; then
+            add=$(gh api graphql -f query='
+              mutation($proj:ID!, $content:ID!){
+                addProjectV2ItemById(input:{projectId:$proj, contentId:$content}) { item { id } }
+              }' -f proj="$proj" -f content="$issue_node")
+            echo "$add" | jq .
+            item_id=$(echo "$add" | jq -r '.data.addProjectV2ItemById.item.id')
+          fi
+
+          echo "item_id=$item_id" >> "$GITHUB_OUTPUT"
+
+      - name: Get Priority field + desired option id
+        id: field
+        shell: bash
+        run: |
+          proj="${{ steps.project.outputs.id }}"
+          want="${{ steps.want.outputs.want }}"
+          field_name="${PRIORITY_FIELD_NAME}"
+
+          fields=$(gh api graphql -f query='
+            query($proj:ID!){
+              node(id:$proj){
+                ... on ProjectV2 {
+                  fields(first:50){
+                    nodes {
+                      __typename
+                      ... on ProjectV2FieldCommon { id name }
+                      ... on ProjectV2SingleSelectField { id name options { id name } }
                     }
-                  }`,
-                  { login, title }
-                );
-                const node = data.user?.projectsV2?.nodes?.find(p => p.title === title) || null;
-                if (node) return node;
+                  }
+                }
               }
-              if (number) {
-                const data = await gql(
-                  `query($login:String!, $num:Int!) {
-                    user(login:$login) { projectV2(number:$num) { id title fields(first:50) {
-                      nodes { ... on ProjectV2FieldCommon { id name }
-                              ... on ProjectV2SingleSelectField { id name options { id name } } }
-                    } } }
-                  }`,
-                  { login, num: number }
-                );
-                return data.user?.projectV2 || null;
-              }
-              return null;
-            }
+            }' -f proj="$proj")
+          echo "$fields" | jq .
 
-            // Helper: resolve a ProjectV2 by title/number for an ORG owner (optional)
-            async function getOrgProject({ login, title, number }) {
-              if (title) {
-                const data = await gql(
-                  `query($login:String!, $title:String!) {
-                    organization(login:$login) {
-                      projectsV2(first: 50, query: $title) { nodes { id title fields(first:50) {
-                        nodes { ... on ProjectV2FieldCommon { id name }
-                                ... on ProjectV2SingleSelectField { id name options { id name } } }
-                      } } }
-                    }
-                  }`,
-                  { login, title }
-                );
-                const node = data.organization?.projectsV2?.nodes?.find(p => p.title === title) || null;
-                if (node) return node;
-              }
-              if (number) {
-                const data = await gql(
-                  `query($login:String!, $num:Int!) {
-                    organization(login:$login) { projectV2(number:$num) { id title fields(first:50) {
-                      nodes { ... on ProjectV2FieldCommon { id name }
-                              ... on ProjectV2SingleSelectField { id name options { id name } } }
-                    } } }
-                  }`,
-                  { login, num: number }
-                );
-                return data.organization?.projectV2 || null;
-              }
-              return null;
-            }
+          field_id=$(echo "$fields" | jq -r --arg n "$field_name" \
+            '.data.node.fields.nodes[] | select(.name==$n and .options) | .id')
+          if [[ -z "$field_id" ]]; then
+            echo "::error::Single-select field '$field_name' not found on project '${{ steps.project.outputs.title }}'."
+            exit 1
+          fi
 
-            // Resolve the Project node (supports private *user* projects if shared with this repo)
-            const ownerLogin = OWNER;
-            const titlePref = process.env.PROJECT_TITLE?.trim() || '';
-            const numberPref = Number.isFinite(PROJECT_NUMBER) ? PROJECT_NUMBER : undefined;
+          if [[ -n "$want" ]]; then
+            opt_id=$(echo "$fields" | jq -r --arg n "$field_name" --arg o "$want" \
+              '.data.node.fields.nodes[] | select(.name==$n and .options) | .options[] | select(.name==$o) | .id')
+          else
+            opt_id=""
+          fi
 
-            let project = await getUserProject({ login: ownerLogin, title: titlePref || undefined, number: titlePref ? undefined : numberPref });
+          echo "field_id=$field_id" >> "$GITHUB_OUTPUT"
+          echo "opt_id=$opt_id"     >> "$GITHUB_OUTPUT"
+          echo "want=$want"         >> "$GITHUB_OUTPUT"
 
-            // If not found on user, optionally try org with the same login (no-op if not an org)
-            if (!project) {
-              try {
-                project = await getOrgProject({ login: ownerLogin, title: titlePref || undefined, number: titlePref ? undefined : numberPref });
-              } catch (_) { /* ignore */ }
-            }
+      - name: Update Project Priority field
+        if: always()
+        shell: bash
+        run: |
+          proj="${{ steps.project.outputs.id }}"
+          item="${{ steps.item.outputs.item_id }}"
+          field="${{ steps.field.outputs.field_id }}"
+          opt="${{ steps.field.outputs.opt_id }}"
+          want="${{ steps.field.outputs.want }}"
 
-            if (!project) {
-              core.setFailed(
-                `Project not found. Looked for user/org '${ownerLogin}' by ` +
-                (titlePref ? `title "${titlePref}"` : `number #${numberPref}`) +
-                `.\n` +
-                `• If this is a *private user project*, open it in GitHub → "Share" → ` +
-                `add repository ${context.repo.owner}/${context.repo.repo} (required for GITHUB_TOKEN).`);
-              return;
-            }
-
-            const priorityField = project.fields.nodes.find(f => f.name === PRIORITY_FIELD_NAME && f.options);
-            if (!priorityField) {
-              core.setFailed(`Field "${PRIORITY_FIELD_NAME}" not found or not single-select in project "${project.title}".`);
-              return;
-            }
-
-            const desiredOptionId = desired ? priorityField.options.find(o => o.name === desired)?.id : null;
-
-            // Ensure the Issue is in the Project (add if needed), get itemId
-            const itemLookup = await gql(
-              `query($owner:String!, $repo:String!, $number:Int!) {
-                repository(owner:$owner, name:$repo) { issue(number:$number) { id } }
-              }`,
-              { owner: context.repo.owner, repo: context.repo.repo, number: issue.number }
-            );
-            const issueId = itemLookup.repository.issue.id;
-
-            const projectId = project.id;
-
-            const searchItem = await gql(
-              `query($proj:ID!, $q:String!) {
-                node(id:$proj) { ... on ProjectV2 { items(first:100, query:$q) { nodes { id content { ... on Issue { id } } } } } }
-              }`,
-              { proj: projectId, q: `repo:${context.repo.owner}/${context.repo.repo} is:issue #${issue.number}` }
-            );
-            let itemId = searchItem.node.items.nodes.find(n => n.content?.id === issueId)?.id;
-
-            if (!itemId) {
-              const addItem = await gql(
-                `mutation($proj:ID!, $content:ID!) { addProjectV2ItemById(input:{projectId:$proj, contentId:$content}) { item { id } } }`,
-                { proj: projectId, content: issueId }
-              );
-              itemId = addItem.addProjectV2ItemById.item.id;
-            }
-
-            if (desiredOptionId) {
-              await gql(
-                `mutation($proj:ID!, $item:ID!, $field:ID!, $option:String!) {
-                  updateProjectV2ItemFieldValue(input:{ projectId:$proj, itemId:$item, fieldId:$field, value:{ singleSelectOptionId:$option } }) { clientMutationId }
-                }`,
-                { proj: projectId, item: itemId, field: priorityField.id, option: desiredOptionId }
-              );
-              core.info(`Set Priority -> ${desired}`);
-            } else {
-              await gql(
-                `mutation($proj:ID!, $item:ID!, $field:ID!) {
-                  updateProjectV2ItemFieldValue(input:{ projectId:$proj, itemId:$item, fieldId:$field, value:{ singleSelectOptionId:null } }) { clientMutationId }
-                }`,
-                { proj: projectId, item: itemId, field: priorityField.id }
-              );
-              core.info('Cleared Priority (no matching Px label present)');
-            }
+          if [[ -n "$opt" ]]; then
+            echo "Setting Priority → $want"
+            gh api graphql -f query='
+              mutation($proj:ID!, $item:ID!, $field:ID!, $opt:String!){
+                updateProjectV2ItemFieldValue(input:{
+                  projectId:$proj, itemId:$item, fieldId:$field,
+                  value:{ singleSelectOptionId: $opt }
+                }) { clientMutationId }
+              }' -f proj="$proj" -f item="$item" -f field="$field" -f opt="$opt"
+          else
+            echo "Clearing Priority (no P* label present)"
+            gh api graphql -f query='
+              mutation($proj:ID!, $item:ID!, $field:ID!){
+                updateProjectV2ItemFieldValue(input:{
+                  projectId:$proj, itemId:$item, fieldId:$field,
+                  value:{ singleSelectOptionId: null }
+                }) { clientMutationId }
+              }' -f proj="$proj" -f item="$item" -f field="$field"
+          fi
