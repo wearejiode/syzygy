@@ -1,12 +1,13 @@
-name: Auto Label PRs by Path
+name: PR Labels by Path
 on:
-  pull_request_target:  # needed so the action can apply labels
-    types: [opened, synchronize, reopened]
-
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
 permissions:
   contents: read
   pull-requests: write
-
+concurrency:
+  group: labels-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 jobs:
   label:
     runs-on: ubuntu-latest
@@ -15,4 +16,4 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           configuration-path: .github/labeler.yml
-          sync-labels: true # remove labels if files no longer match
+          sync-labels: true
