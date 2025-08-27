@@ -1,4 +1,4 @@
-name: Auto-Label Project Priority from P0/P1/P2 labels
+name: Auto-Label INTO Project Priority from P0/P1/P2 labels
 on:
   issues:
     types: [labeled, unlabeled, opened, edited]
@@ -6,13 +6,14 @@ on:
 permissions:
   issues: write
   contents: read
+  repository-projects: write
 
 
-# When an issue is opened/edited/labeled/unlabeled, we check for labels P0/P1/P2.
+# When an issue is opened/edited/labeled/unlabeled, we check for labels P0/P1/P2/P3/PZ.
 # We ensure the issue is in your Project, then set the Project’s Priority single-select field accordingly.
 # If no P* label is present, we clear the field.
 # Replace ORG, PROJECT_NUMBER, and (if needed) PRIORITY_FIELD_NAME.
-# In your Project, create a single-select field named Priority with options P0, P1, P2.
+# In your Project, create a single-select field named Priority with options P0, P1, P2, P3, PZ.
 
 jobs:
   sync-priority:
@@ -22,144 +23,109 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // --- CONFIG ---
-            const ORG = 'wearejiode';             // org or user that owns the Project
-            const PROJECT_NUMBER = 1;             // your project number
-            const PRIORITY_FIELD_NAME = 'Priority'; // must match your field exactly
-            const labelToPriority = {
+            // --- CONFIG (override via env if you like) ---
+            const OWNER = process.env.PROJECT_OWNER || context.repo.owner; // user or org login
+            const PROJECT_NUMBER = Number(process.env.PROJECT_NUMBER || 1);
+            const PRIORITY_FIELD_NAME = process.env.PRIORITY_FIELD_NAME || 'Priority';
+            const LABEL_TO_PRIORITY = {
               'P0:Blocking': 'P0',
               'P1:Critical': 'P1',
               'P2:High': 'P2',
               'P3:Med': 'P3',
               'PZ:Low': 'PZ',
             };
-            // ----------------
+            // ---------------------------------------------
 
             const issue = context.payload.issue;
             if (!issue) return;
 
             // Determine desired priority from labels
             const lbls = issue.labels.map(l => (typeof l === 'string' ? l : l.name));
-            const desired = ['P0:Blocking','P1:Critical','P2:High', 'P3:Med', 'PZ:Low'].find(p => lbls.includes(p)) || null;
+            const desiredLabel = Object.keys(LABEL_TO_PRIORITY).find(name => lbls.includes(name)) || null;
+            const desired = desiredLabel ? LABEL_TO_PRIORITY[desiredLabel] : null;
 
-            // GraphQL helpers
             const gql = (query, variables) => github.graphql(query, variables);
 
-            // 1) Get Project + field + option IDs
-            const projData = await gql(`
-              query($org:String!, $num:Int!) {
-                organization(login:$org) {
-                  projectV2(number:$num) {
-                    id
-                    fields(first:50) {
-                      nodes {
-                        ... on ProjectV2FieldCommon { id name }
-                        ... on ProjectV2SingleSelectField {
-                          id
-                          name
-                          options { id name }
-                        }
-                      }
+            // Helper: get ProjectV2 node for either ORG or USER owners
+            async function getProjectNode(owner, number) {
+              const data = await gql(
+                `query($login:String!, $num:Int!) {
+                  org: organization(login:$login) { projectV2(number:$num) { id fields(first:50) {
+                    nodes {
+                      ... on ProjectV2FieldCommon { id name }
+                      ... on ProjectV2SingleSelectField { id name options { id name } }
                     }
-                  }
-                }
-              }`,
-              { org: ORG, num: PROJECT_NUMBER }
-            );
+                  } } }
+                  user: user(login:$login) { projectV2(number:$num) { id fields(first:50) {
+                    nodes {
+                      ... on ProjectV2FieldCommon { id name }
+                      ... on ProjectV2SingleSelectField { id name options { id name } }
+                    }
+                  } } }
+                }`,
+                { login: owner, num: number }
+              );
+              return data.org?.projectV2 || data.user?.projectV2 || null;
+            }
 
-            const project = projData.organization.projectV2;
+            const project = await getProjectNode(OWNER, PROJECT_NUMBER);
             if (!project) {
-              core.setFailed('Project not found');
+              core.setFailed(`Project #${PROJECT_NUMBER} not found for owner '${OWNER}' (org or user).`);
               return;
             }
 
-            const allFields = project.fields.nodes;
-            const priorityField = allFields.find(f => f.name === PRIORITY_FIELD_NAME && f.options);
+            const priorityField = project.fields.nodes.find(f => f.name === PRIORITY_FIELD_NAME && f.options);
             if (!priorityField) {
-              core.setFailed(`Field "${PRIORITY_FIELD_NAME}" not found or not single-select`);
+              core.setFailed(`Field "${PRIORITY_FIELD_NAME}" not found or not single-select.`);
               return;
             }
 
-            const desiredOptionId = desired
-              ? priorityField.options.find(o => o.name === desired)?.id
-              : null;
+            const desiredOptionId = desired ? priorityField.options.find(o => o.name === desired)?.id : null;
 
-            // 2) Ensure the Issue is in the Project (add if needed), get itemId
-            const itemLookup = await gql(`
-              query($owner:String!, $repo:String!, $number:Int!, $org:String!, $num:Int!) {
-                repository(owner:$owner, name:$repo) {
-                  issue(number:$number) { id }
-                }
-                organization(login:$org) {
-                  projectV2(number:$num) { id }
-                }
+            // Ensure the Issue is in the Project (add if needed), get itemId
+            const itemLookup = await gql(
+              `query($owner:String!, $repo:String!, $number:Int!) {
+                repository(owner:$owner, name:$repo) { issue(number:$number) { id } }
               }`,
-              {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                number: issue.number,
-                org: ORG,
-                num: PROJECT_NUMBER
-              }
+              { owner: context.repo.owner, repo: context.repo.repo, number: issue.number }
             );
-
             const issueId = itemLookup.repository.issue.id;
-            const projectId = itemLookup.organization.projectV2.id;
 
-            // Try to find an existing project item
-            const searchItem = await gql(`
-              query($proj:ID!, $q:String!) {
-                node(id:$proj) {
-                  ... on ProjectV2 {
-                    items(first:100, query:$q) {
-                      nodes { id content { ... on Issue { id } } }
-                    }
-                  }
-                }
+            // We need the Project ID too
+            const projectId = project.id;
+
+            // Try to find an existing project item via items query
+            const searchItem = await gql(
+              `query($proj:ID!, $q:String!) {
+                node(id:$proj) { ... on ProjectV2 { items(first:100, query:$q) { nodes { id content { ... on Issue { id } } } } } }
               }`,
               { proj: projectId, q: `repo:${context.repo.owner}/${context.repo.repo} is:issue #${issue.number}` }
             );
-
             let itemId = searchItem.node.items.nodes.find(n => n.content?.id === issueId)?.id;
 
             if (!itemId) {
-              const addItem = await gql(`
-                mutation($proj:ID!, $content:ID!) {
-                  addProjectV2ItemById(input:{projectId:$proj, contentId:$content}) {
-                    item { id }
-                  }
-                }`,
+              const addItem = await gql(
+                `mutation($proj:ID!, $content:ID!) { addProjectV2ItemById(input:{projectId:$proj, contentId:$content}) { item { id } } }`,
                 { proj: projectId, content: issueId }
               );
               itemId = addItem.addProjectV2ItemById.item.id;
             }
 
-            // 3) Update the Priority field
+            // Update or clear the Priority field
             if (desiredOptionId) {
-              await gql(`
-                mutation($proj:ID!, $item:ID!, $field:ID!, $option: String!) {
-                  updateProjectV2ItemFieldValue(input:{
-                    projectId: $proj
-                    itemId: $item
-                    fieldId: $field
-                    value: { singleSelectOptionId: $option }
-                  }) { clientMutationId }
+              await gql(
+                `mutation($proj:ID!, $item:ID!, $field:ID!, $option:String!) {
+                  updateProjectV2ItemFieldValue(input:{ projectId:$proj, itemId:$item, fieldId:$field, value:{ singleSelectOptionId:$option } }) { clientMutationId }
                 }`,
                 { proj: projectId, item: itemId, field: priorityField.id, option: desiredOptionId }
               );
               core.info(`Set Priority -> ${desired}`);
             } else {
-              // Clear the field (set to null)
-              await gql(`
-                mutation($proj:ID!, $item:ID!, $field:ID!) {
-                  updateProjectV2ItemFieldValue(input:{
-                    projectId: $proj
-                    itemId: $item
-                    fieldId: $field
-                    value: { singleSelectOptionId: null }
-                  }) { clientMutationId }
+              await gql(
+                `mutation($proj:ID!, $item:ID!, $field:ID!) {
+                  updateProjectV2ItemFieldValue(input:{ projectId:$proj, itemId:$item, fieldId:$field, value:{ singleSelectOptionId:null } }) { clientMutationId }
                 }`,
                 { proj: projectId, item: itemId, field: priorityField.id }
               );
-              core.info(`Cleared Priority (no P0/P1/P2 label present)`);
+              core.info('Cleared Priority (no matching Px label present)');
             }

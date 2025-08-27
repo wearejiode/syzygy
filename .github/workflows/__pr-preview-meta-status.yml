@@ -68,7 +68,7 @@ jobs:
               owner, repo,
               deployment_id: dep.data.id,
               state: 'success',
-              environment: 'Preview',
+              environment: 'preview',
               // Link to the PR as a neutral, valid https URL
               environment_url: prUrl
             });
