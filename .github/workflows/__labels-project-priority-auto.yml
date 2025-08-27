@@ -8,6 +8,11 @@ permissions:
   contents: read
   repository-projects: write
 
+env:
+  # Set these two to your user project’s owner + number
+  PROJECT_OWNER: wearejiode          # user login (not an org)
+  PROJECT_NUMBER: 3                  # <-- replace with the number from your project URL
+  PRIORITY_FIELD_NAME: Priority
 
 # When an issue is opened/edited/labeled/unlabeled, we check for labels P0/P1/P2/P3/PZ.
 # We ensure the issue is in your Project, then set the Project’s Priority single-select field accordingly.
