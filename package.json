@@ -23,7 +23,10 @@
     "test:ci": "vitest run --reporter=default",
     "verify:sesame": "pnpm -w -F @jiode/sesame test:ci && pnpm -w -F @jiode/sesame build",
     "verify:jiode.one": "pnpm -w -F @jiode/jiode.one build && vitest run --passWithNoTests",
-    "verify:genie-session": "pnpm -w -F @jiode/genie-session build && pnpm -w -F @jiode/genie-session test:ci"
+    "verify:genie-session": "pnpm -w -F @jiode/genie-session build && pnpm -w -F @jiode/genie-session test:ci",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "publish-packages": "changeset publish"
   },
   "lint-staged": {
     "*.{js,ts,tsx,mjs,cjs}": "pnpm -s eslint --fix",
@@ -59,6 +62,7 @@
     "@astrojs/check": "^0.9.4",
     "@astrojs/mdx": "^4.3.4",
     "@astrojs/starlight": "^0.34.8",
+    "@changesets/cli": "^2.29.6",
     "@nx/angular": "^21.4.0",
     "@nx/cypress": "21.2.0",
     "@nx/eslint": "21.2.0",
