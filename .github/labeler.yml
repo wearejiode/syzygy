@@ -1,31 +1,42 @@
-type:ci:
-  - .github/workflows/**
-  - .github/actions/**
+# GitHub Labeler v5 config — use matcher objects (no bare strings)
+# Labels are applied when ANY of the listed globs match changed files.
 
-type:docs:
-  - '**/*.md'
-  - apps/**/README.md
-
-type-deps:
+"type:ci":
   - changed-files:
-      - any-glob-to-any-file: ["pnpm-lock.yaml", "**/package.json", ".github/workflows/**"]
+      - any-glob-to-any-file:
+          - ".github/workflows/**"
+          - ".github/actions/**"
 
-scope-root:
+"type:docs":
   - changed-files:
-      - any-glob-to-any-file: ["package.json", "pnpm-lock.yaml"]
+      - any-glob-to-any-file:
+          - "**/*.md"
+          - "apps/**/README.md"
 
-scope-sesame:
+"type:deps":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "pnpm-lock.yaml"
+          - "**/package.json"
+          - ".github/workflows/**"
+
+"area:root":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "package.json"
+          - "pnpm-lock.yaml"
+
+"area:sesame":
   - changed-files:
       - any-glob-to-any-file:
           - "apps/core/portfolio/sesame.jiode.one/**"
 
-scope-jiode-one:
+"area:jiode.one":
   - changed-files:
       - any-glob-to-any-file:
           - "apps/core/portfolio/jiode.one/**"
 
-scope-genie-session:
+"area:genie-session":
   - changed-files:
       - any-glob-to-any-file:
           - "apps/core/api/genie-session/**"
-
