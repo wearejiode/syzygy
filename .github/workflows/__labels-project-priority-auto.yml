@@ -29,7 +29,7 @@ jobs:
         with:
           script: |
             // --- CONFIG (override via env if you like) ---
-            const OWNER = process.env.PROJECT_OWNER || context.repo.owner; // user or org login
+            const OWNER = process.env.PROJECT_OWNER || context.repo.owner; // user login
             const PROJECT_NUMBER = Number(process.env.PROJECT_NUMBER || 1);
             const PRIORITY_FIELD_NAME = process.env.PRIORITY_FIELD_NAME || 'Priority';
             const LABEL_TO_PRIORITY = {
@@ -55,12 +55,7 @@ jobs:
             async function getProjectNode(owner, number) {
               const data = await gql(
                 `query($login:String!, $num:Int!) {
-                  org: organization(login:$login) { projectV2(number:$num) { id fields(first:50) {
-                    nodes {
-                      ... on ProjectV2FieldCommon { id name }
-                      ... on ProjectV2SingleSelectField { id name options { id name } }
-                    }
-                  } } }
+
                   user: user(login:$login) { projectV2(number:$num) { id fields(first:50) {
                     nodes {
                       ... on ProjectV2FieldCommon { id name }
@@ -70,12 +65,12 @@ jobs:
                 }`,
                 { login: owner, num: number }
               );
-              return data.org?.projectV2 || data.user?.projectV2 || null;
+              return data.user?.projectV2 || null;
             }
 
             const project = await getProjectNode(OWNER, PROJECT_NUMBER);
             if (!project) {
-              core.setFailed(`Project #${PROJECT_NUMBER} not found for owner '${OWNER}' (org or user).`);
+              core.setFailed(`Project #${PROJECT_NUMBER} not found for owner '${OWNER}' (user).`);
               return;
             }
 
