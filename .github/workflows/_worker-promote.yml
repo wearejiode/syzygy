@@ -58,7 +58,7 @@ jobs:
 
       - name: Verify SLSA attestation
         if: inputs.verify_slsa
-        uses: actions/setup-gh@v4
+        uses: cli/gh-action@v2
       - if: inputs.verify_slsa
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

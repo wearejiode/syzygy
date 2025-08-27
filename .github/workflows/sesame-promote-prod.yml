@@ -5,13 +5,6 @@ permissions:
   contents: read
   id-token: write  # in case downstream reusable workflow uses OIDC (safe to keep)
 
-env:
-  APP_ID: sesame.jiode.one
-  APP_PATH: apps/core/jiode/sesame.jiode.one
-  PUBLIC_DIR: apps/core/jiode/sesame.jiode.one/public
-  WRANGLER_CONFIG: apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.toml
-  PRODUCTION_BUCKET: sesame-data
-  PRODUCTION_HOST: ${{ vars.PRODUCTION_HOST || 'sesame.jiode.one' }}
 
 on:
   workflow_dispatch:
@@ -45,17 +38,25 @@ jobs:
 
   promote:
     needs: preflight
+    strategy:
+      matrix:
+        include:
+          - app_id: sesame.jiode.one
+            app_path: apps/core/jiode/sesame.jiode.one
+            public_dir: apps/core/jiode/sesame.jiode.one/public
+            wrangler_config: apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.toml
+            r2_bucket: sesame-data
     uses: ./.github/workflows/_worker-promote.yml
     with:
-      app_id:          ${{ env.APP_ID }}
-      wrangler_config: ${{ env.WRANGLER_CONFIG }}
+      app_id:          ${{ matrix.app_id }}
+      wrangler_config: ${{ matrix.wrangler_config }}
       release_sha:     ${{ inputs.release_sha }}
       verify_slsa:     true
       environment:     production
       deploy:          true
       seed_r2:         true
-      r2_bucket:       ${{ env.PRODUCTION_BUCKET }}
-      seed_public_dir: ${{ env.PUBLIC_DIR }}
+      r2_bucket:       ${{ matrix.r2_bucket }}
+      seed_public_dir: ${{ matrix.public_dir }}
     secrets:
       CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -65,6 +66,14 @@ jobs:
   post_sync:
     needs: promote
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - app_id: sesame.jiode.one
+            app_path: apps/core/jiode/sesame.jiode.one
+            public_dir: apps/core/jiode/sesame.jiode.one/public
+            wrangler_config: apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.toml
+            r2_bucket: sesame-data
     env:
       CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -83,16 +92,24 @@ jobs:
       - name: Push public assets + data.json to R2 (prod)
         uses: ./.github/actions/sesame/r2-push
         with:
-          bucket:           ${{ env.PRODUCTION_BUCKET }}
-          public_dir:       ${{ env.PUBLIC_DIR }}
-          data_json_path:   ${{ env.APP_PATH }}/data.json
-          wrangler_config:  ${{ env.WRANGLER_CONFIG }}
+          bucket:           ${{ matrix.r2_bucket }}
+          public_dir:       ${{ matrix.public_dir }}
+          data_json_path:   ${{ matrix.app_path }}/data.json
+          wrangler_config:  ${{ matrix.wrangler_config }}
           wrangler_version: '4.31.0'
 
   # Basic smoke tests against production host
   smoke-test:
     needs: promote
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - app_id: sesame.jiode.one
+            app_path: apps/core/jiode/sesame.jiode.one
+            public_dir: apps/core/jiode/sesame.jiode.one/public
+            wrangler_config: apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.toml
+            r2_bucket: sesame-data
     env:
       HOST: ${{ vars.PRODUCTION_HOST }}
     steps:
@@ -100,6 +117,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          HOST="${HOST:-sesame.jiode.one}"
           code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/health")
           echo "HTTP ${code} /health"
           test "$code" = "200"
@@ -111,6 +129,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          HOST="${HOST:-sesame.jiode.one}"
           # These should be safe GETs that your worker exposes for diagnostics (adjust to your routes)
           curl -fsSL "https://${HOST}/__r2get" | grep -qi "GET: OK"
           curl -fsSL "https://${HOST}/__r2list" | grep -qi "data.json"
@@ -119,6 +138,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          HOST="${HOST:-sesame.jiode.one}"
           # Check one representative image you seeded
           code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/images/background.webp")
           echo "HTTP ${code} /images/background.webp"
