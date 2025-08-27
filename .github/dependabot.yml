@@ -3,6 +3,19 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule: { interval: "weekly" }
+<<<<<<< HEAD
+    # Dependabot will add these labels to its PRs
+    labels: ["type:deps", "bot"]
+    # Optional: group small bumps to reduce PR noise
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule: { interval: "weekly" }
+    labels: ["type:deps", "bot"]
+=======
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule: { interval: "weekly" }
+>>>>>>> f4095271f0f4f8404b0356126de3e3e744f09078

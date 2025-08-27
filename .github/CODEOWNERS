@@ -1,0 +1,10 @@
+# Lock critical CI infra to explicit owners
+/.github/workflows/_worker-promote.yml   @wearejiode
+/.github/workflows/_worker-ci.yml        @wearejiode
+/.github/actions/**                      @wearejiode
+
+# Lock CODEOWNERS itself (both typical locations)
+#/CODEOWNERS is used if placed at repo root
+/CODEOWNERS               @wearejiode
+# GitHub also supports it under .github/
+.github/CODEOWNERS        @wearejiode

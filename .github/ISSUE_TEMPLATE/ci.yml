@@ -1,0 +1,24 @@
+name: "CI"
+description: "Workflows, caching, artifacts, labeling, or deploy plumbing"
+title: "ci: <area> — <short summary>"
+labels: ["type:ci", "near-term"]
+assignees: []
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      placeholder: "Speed up installs, pin actions, add checks, etc."
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope / files
+      placeholder: ".github/workflows/<file>.yml, .github/actions/**"
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: Actions pinned by version or SHA
+        - label: Paths filtered to avoid noisy runs
+        - label: Artifacts named and retained appropriately

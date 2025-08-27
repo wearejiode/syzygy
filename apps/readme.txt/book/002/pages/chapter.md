@@ -1,1 +1,0 @@
-Finding community, finally returned.

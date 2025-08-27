@@ -8,3 +8,12 @@ pnpm -w nx run sesame.jiode.one:bundle-worker || exit 1
 pnpm -s exec wrangler deploy dist/apps/sesame.jiode.one/meta-worker.generated.js \
   --config apps/Core/Portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml \
   --no-bundle --dry-run || exit 1
+
+protected="refs/heads/main"
+while read local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "$protected" ] && [ "${I_KNOW_WHAT_IM_DOING:-0}" != "1" ]; then
+    echo "✋ Refusing to push directly to main. Push your branch and open a PR."
+    echo "    (Override with I_KNOW_WHAT_IM_DOING=1 if absolutely necessary.)"
+    exit 1
+  fi
+done

@@ -1,0 +1,21 @@
+# .github/workflows/_guard-ci-plumbing.yml
+name: guard / ci-plumbing
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+
+permissions:
+  contents: read
+
+jobs:
+  require-ack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require label "ci-ok"
+        if: ${{ !contains(join(github.event.pull_request.labels.*.name, ','), 'ci-ok') }}
+        run: |
+          echo "CI plumbing changed but PR lacks label 'ci-ok'."
+          echo "Add the label after review, or split the PR."
+          exit 1

@@ -1,0 +1,23 @@
+name: "Docs"
+description: "README, app guides, ADRs, or developer UX notes"
+title: "docs: <area> — <short summary>"
+labels: ["type:docs"]
+assignees: []
+body:
+  - type: textarea
+    id: audience
+    attributes:
+      label: Audience
+      placeholder: "Contributors / Reviewers / Ops / Users"
+  - type: textarea
+    id: content
+    attributes:
+      label: Content to add/update
+      placeholder: "Pages, sections, examples"
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: Linked from root README
+        - label: Examples compile or run
