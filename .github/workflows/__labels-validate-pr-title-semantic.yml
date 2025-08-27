@@ -12,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: amannn/action-semantic-pull-request@v5
+        if: >
+          github.actor != 'dependabot[bot]'
+          && !contains(join(github.event.pull_request.labels.*.name, ','), 'type:deps')
+          && !contains(join(github.event.pull_request.labels.*.name, ','), 'bot')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
