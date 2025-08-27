@@ -15,7 +15,7 @@ if (!sha) {
 }
 
 const artifact = resolve(repoRoot, `dist/releases/${sha}/meta-worker.generated.js`);
-const configBase = 'apps/Core/Portfolio/sesame.jiode.one/sesame-meta-worker';
+const configBase = 'apps/core/jiode/sesame.jiode.one/sesame-meta-worker';
 
 const config =
   target === 'prod'

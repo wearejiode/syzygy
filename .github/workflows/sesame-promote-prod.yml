@@ -7,9 +7,9 @@ permissions:
 
 env:
   APP_ID: sesame.jiode.one
-  APP_PATH: apps/core/portfolio/sesame.jiode.one
-  PUBLIC_DIR: apps/core/portfolio/sesame.jiode.one/public
-  WRANGLER_CONFIG: apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.toml
+  APP_PATH: apps/core/jiode/sesame.jiode.one
+  PUBLIC_DIR: apps/core/jiode/sesame.jiode.one/public
+  WRANGLER_CONFIG: apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.toml
   PRODUCTION_BUCKET: sesame-data
   PRODUCTION_HOST: ${{ vars.PRODUCTION_HOST || 'sesame.jiode.one' }}
 

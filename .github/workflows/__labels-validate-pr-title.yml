@@ -141,8 +141,8 @@ jobs:
             const changed = files.map(f => f.filename);
 
             const touches = {
-              sesame: changed.some(p => p.startsWith('apps/core/portfolio/sesame.jiode.one/')),
-              'jiode.one': changed.some(p => p.startsWith('apps/core/portfolio/jiode.one/')),
+              sesame: changed.some(p => p.startsWith('apps/core/jiode/sesame.jiode.one/')),
+              'jiode.one': changed.some(p => p.startsWith('apps/core/jiode/jiode.one/')),
               'genie-session': changed.some(p => p.startsWith('apps/core/api/genie-session/')),
             };
             const appTouched = Object.values(touches).some(Boolean);

@@ -5,21 +5,60 @@ on:
 
 permissions:
   pull-requests: write
+  issues: write
   contents: read
 
 jobs:
   size:
     runs-on: ubuntu-latest
     steps:
-      - uses: pascalgn/size-label-action@v0.5.6
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Compute PR size and (re)label
+        uses: actions/github-script@v7
         with:
-          sizes: >
-            {
-              "XS": 0,
-              "S": 50,
-              "M": 200,
-              "L": 500,
-              "XL": 1000
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pr = context.payload.pull_request.number;
+
+            // 1) Page through changed files and sum additions+deletions
+            let page = 1; let per_page = 100; let total = 0;
+            while (true) {
+              const { data } = await github.rest.pulls.listFiles({ owner, repo, pull_number: pr, page, per_page });
+              if (!data.length) break;
+              for (const f of data) total += (f.additions || 0) + (f.deletions || 0);
+              if (data.length < per_page) break; // last page
+              page++;
             }
+
+            // 2) Size thresholds (inclusive upper bounds)
+            const thresholds = [
+              { name: 'XS', max: 49 },
+              { name: 'S',  max: 199 },
+              { name: 'M',  max: 499 },
+              { name: 'L',  max: 999 },
+              { name: 'XL', max: Infinity },
+            ];
+            const labelToApply = `size: ${thresholds.find(t => total <= t.max).name}`;
+
+            core.info(`Total changed lines (additions+deletions): ${total} -> ${labelToApply}`);
+
+            // 3) Ensure label exists (create if missing)
+            async function ensureLabel(name) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name });
+              } catch (e) {
+                if (e.status === 404) {
+                  await github.rest.issues.createLabel({ owner, repo, name, color: 'ededed', description: 'Automatically set from PR size' });
+                } else throw e;
+              }
+            }
+            const allSizeLabels = ['size: XS','size: S','size: M','size: L','size: XL'];
+            await Promise.all(allSizeLabels.map(ensureLabel));
+
+            // 4) Remove old size:* labels, then add the new one
+            const { data: current } = await github.rest.issues.listLabelsOnIssue({ owner, repo, issue_number: pr });
+            const toRemove = current.filter(l => allSizeLabels.includes(l.name) && l.name !== labelToApply).map(l => l.name);
+            for (const name of toRemove) {
+              await github.rest.issues.removeLabel({ owner, repo, issue_number: pr, name }).catch(() => {});
+            }
+            await github.rest.issues.addLabels({ owner, repo, issue_number: pr, labels: [labelToApply] });
