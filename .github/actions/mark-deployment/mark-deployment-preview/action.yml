@@ -2,9 +2,6 @@ name: Mark Deployment as Preview
 description: Sets a preview environment for any deployment
 
 inputs:
-  wrangler_config:
-    description: Optional Wrangler config file path
-    required: false
   preview_host:
     description: The host for the preview environment
     required: false
@@ -24,13 +21,13 @@ runs:
       with:
         script: |
           const { owner, repo } = context.repo;
-          const ref = context.payload.pull_request?.head?.ref || context.ref.replace('refs/heads/','');
+          const ref = context.payload.pull_request?.head?.sha || context.sha; // <-- use SHA
           const res = await github.rest.repos.createDeployment({
             owner, repo,
             ref,
-            environment: 'preview',          // must match branch protection
+            environment: 'preview',           // must match branch protection exactly
             auto_merge: false,
-            required_contexts: [],           // don’t wait for other checks
+            required_contexts: [],            // don't wait for other checks
             transient_environment: true,
             production_environment: false,
             description: 'PR preview (CI-only or real)'
@@ -49,5 +46,6 @@ runs:
             state: 'success',
             environment: 'preview',
             environment_url: 'https://${{ inputs.preview_host }}',
-            log_url: `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`
+            log_url: `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`,
+            auto_inactive: true
           });
