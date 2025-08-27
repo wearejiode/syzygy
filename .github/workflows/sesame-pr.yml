@@ -1,4 +1,4 @@
-name: Sesame PR Preview
+name: Sesame Preview PR Deploy & Verify
 
 on:
   pull_request:
