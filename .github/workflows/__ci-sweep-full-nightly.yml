@@ -2,9 +2,10 @@
 name: ci-sweep-full-nightly
 
 on:
+  workflow_call: {}
   schedule:
     - cron: "30 3 * * *"     # nightly UTC
-  workflow_dispatch:
+
 
 concurrency:
   group: ${{ github.workflow }}
