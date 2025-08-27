@@ -10,8 +10,8 @@ permissions:
 env:
   # Set these two to your user project’s owner + number
   PROJECT_OWNER: wearejiode          # user login (not an org)
-  PROJECT_NUMBER: "3"
-  PROJECT_TITLE: ""
+  PROJECT_NUMBER: ""
+  PROJECT_TITLE: "Luna-Improvements"
   PRIORITY_FIELD_NAME: Priority
 
 # NOTE: For *private* user Projects (Projects v2), you must open the Project → Share →
