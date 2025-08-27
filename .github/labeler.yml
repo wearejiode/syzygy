@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-# areas labeled by path
-=======
-# area labels by path
-area:sesame:
-  - apps/core/portfolio/sesame.jiode.one/**
-
-area:jiode.one:
-  - apps/core/portfolio/jiode.one/**
-
-area:genie-session:
-  - apps/core/api/genie-session/**
->>>>>>> f4095271f0f4f8404b0356126de3e3e744f09078
-
 type:ci:
   - .github/workflows/**
   - .github/actions/**
@@ -19,7 +5,6 @@ type:ci:
 type:docs:
   - '**/*.md'
   - apps/**/README.md
-<<<<<<< HEAD
 
 type-deps:
   - changed-files:
@@ -43,5 +28,4 @@ scope-genie-session:
   - changed-files:
       - any-glob-to-any-file:
           - "apps/core/api/genie-session/**"
-=======
->>>>>>> f4095271f0f4f8404b0356126de3e3e744f09078
+
