@@ -1,0 +1,91 @@
+name: Validate PR Title is Semantic
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+permissions:
+  contents: read
+concurrency:
+  group: semantic-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  semantic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        if: >
+          github.actor != 'dependabot[bot]'
+          && !contains(join(github.event.pull_request.labels.*.name, ','), 'type:deps')
+          && !contains(join(github.event.pull_request.labels.*.name, ','), 'bot')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            Feat
+            Fix
+            Perf
+            Chore
+            Docs
+            Refactor
+            Test
+            Build
+            CI
+          requireScope: true
+          scopes: |
+            sesame
+            jiode.one
+            genie-session
+            global
+            multi
+
+  scope-guard:
+    needs: semantic
+    if: ${{ needs.semantic.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const title = context.payload.pull_request.title || '';
+            const m = title.match(/^(\w+)\(([^)]+)\):/);
+            if (!m) core.setFailed('PR title must start with type(scope): subject');
+            const scope = m?.[2];
+            if (['global','multi'].includes(scope)) return;
+
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+            });
+            const areas = labels.map(l => l.name).filter(n => n.startsWith('area:')).map(n => n.slice(5));
+            if (areas.length === 0) return; // allow if no area label
+            if (areas.length > 1) core.setFailed(`Multiple area labels (${areas.join(', ')}). Use scope "multi" or "global".`);
+            if (areas[0] !== scope) core.setFailed(`Scope "${scope}" != area "${areas[0]}".`);
+
+  nudge-on-fail:
+    if: ${{ always() && needs.semantic.result == 'failure' }}
+    needs: semantic
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: needs:guidelines
+      - uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Thanks for the PR! ❗ The title doesn’t follow our convention.
+
+            **Format:** `type(scope): subject`
+            **Types:** feat, fix, chore, docs, refactor, test, ci
+            **Scopes:** sesame, jiode.one, genie-session, global, multi
+
+            Examples:
+            - `feat(sesame): add image proxy`
+            - `docs(jiode.one): update README`
+            - `ci(global): update shared workflow`
+            - `refactor(multi): align api + worker utils`
