@@ -50,15 +50,17 @@ jobs:
           script: |
             const {owner, repo} = context.repo;
             const ref = context.payload.pull_request.head.sha;
+            const prUrl = context.payload.pull_request?.html_url || `https://github.com/${owner}/${repo}`;
 
             // Create a GitHub Deployment to the "Preview" environment (or rename to match your protection)
             const dep = await github.rest.repos.createDeployment({
               owner, repo, ref,
               auto_merge: false,
               required_contexts: [],              // don't wait for other checks
-              environment: 'Preview',
+              environment: 'preview',
               description: 'CI-only change: no preview deploy needed',
-              transient_environment: true
+              transient_environment: true,
+              production_environment: false,
             });
 
             // Immediately mark it successful
@@ -67,5 +69,6 @@ jobs:
               deployment_id: dep.data.id,
               state: 'success',
               environment: 'Preview',
-              environment_url: 'about:blank'      // neutral URL
+              // Link to the PR as a neutral, valid https URL
+              environment_url: prUrl
             });
