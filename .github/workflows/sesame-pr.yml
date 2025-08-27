@@ -118,6 +118,7 @@ jobs:
             wranglerConfig: 'apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.preview.toml'
             previewBucket: 'sesame-data-preview'
             previewHost: 'jiode.workers.dev'
+
     with:
       app_id: ${{ matrix.app.id }}
       app_path: ${{ matrix.app.path }}
