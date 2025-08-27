@@ -40,3 +40,5 @@
   - changed-files:
       - any-glob-to-any-file:
           - "apps/core/api/genie-session/**"
+
+# Note: This note is just to trigger CI for a test. Remove it when adding additional globs.
