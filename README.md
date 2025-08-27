@@ -1,12 +1,52 @@
 # Resume Worker – Dev Workflow
 
 ## CI / CD Status
+<!-- ===== Syzygy: Build & Security Status ===== -->
+<p align="center">
+  <!-- Preview -->
+  <a href="https://github.com/wearejiode/syzygy/actions/workflows/sesame-pr.yml">
+    <img alt="Sesame PR Checks" src="https://github.com/wearejiode/syzygy/actions/workflows/sesame-pr.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-pr.yml">
+    <img alt="jiode.one Preview (PR)" src="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-pr.yml/badge.svg?branch=main"></a>
+</p>
 
-| Workflow | Status |
-|----------|--------|
-| **PR Checks** | ![PR Checks](https://github.com/wearejiode/syzygy/actions/workflows/sesame-pr.yml/badge.svg?branch=main) |
-| **Staging Deploy** | ![Staging Deploy](https://github.com/wearejiode/syzygy/actions/workflows/sesame-release-staging.yml/badge.svg?branch=main) |
-| **Production Deploy** | ![Production Deploy](https://github.com/wearejiode/syzygy/actions/workflows/sesame-promote-prod.yml/badge.svg?branch=main) |
+<p align="center">
+  <!-- Staging -->
+  <a href="https://github.com/wearejiode/syzygy/actions/workflows/sesame-release-staging.yml">
+    <img alt="Sesame Deploy (Staging)" src="https://github.com/wearejiode/syzygy/actions/workflows/sesame-release-staging.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-release-staging.yml">
+    <img alt="jiode.one Deploy (Staging)" src="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-release-staging.yml/badge.svg?branch=main"></a>
+</p>
+
+  <!-- Production -->
+
+<p align="center">
+  <a href="https://github.com/wearejiode/syzygy/actions/workflows/sesame-promote-prod.yml">
+    <img alt="Sesame Promote → Prod" src="https://github.com/wearejiode/syzygy/actions/workflows/sesame-promote-prod.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-promote-prod.yml">
+    <img alt="jiode.one Promote → Prod" src="https://github.com/wearejiode/syzygy/actions/workflows/jiode.one-pages-promote-prod.yml/badge.svg?branch=main"></a>
+</p>
+
+<p align="center">
+  <!-- Repo meta (optional) -->
+  <a href="https://github.com/wearejiode/syzygy/commits/main">
+    <img alt="Last commit" src="https://img.shields.io/github/last-commit/wearejiode/syzygy/main"></a>
+  <a href="https://github.com/wearejiode/syzygy">
+    <img alt="CI Minutes" src="https://img.shields.io/github/actions/workflow/status/wearejiode/syzygy/sesame-pr.yml?label=CI%20Status&branch=main">
+  <a href="https://github.com/wearejiode/syzygy/actions/workflows/codeql.yml">
+    <img alt="CodeQL" src="https://github.com/wearejiode/syzygy/actions/workflows/codeql.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/wearejiode/syzygy/security/dependabot">
+    <img alt="Dependabot" src="https://img.shields.io/badge/Dependabot-Enabled-brightgreen?logo=dependabot"></a></a>
+<a href="https://docs.github.com/authentication/managing-commit-signature-verification/signing-commits">
+<img alt="Signed-Commits" src="https://img.shields.io/badge/Commits-Signed-brightgreen"></a>
+</p>
+
+<!-- Notes:
+- Replace filenames if your workflows are named differently:
+  sesame-pr.yml, sesame-release-staging.yml, sesame-promote-prod.yml
+  jiode.one-pages-pr.yml, jiode.one-pages-release-staging.yml, jiode.one-pages-promote-prod.yml, codeql.yml
+- ?branch=main keeps badges stable even if default branches change.
+-->
 
 ## Overview
 
