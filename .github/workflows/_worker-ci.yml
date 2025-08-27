@@ -15,12 +15,15 @@ on:
       worker_name:      { required: false, type: string } # for preview overrides
       deploy:           { required: true,  type: boolean } # whether to deploy or just build/test
       allow_hotfix:     { required: false, type: boolean, default: false } # for emergency hotfixes
+      preview_host:     { required: false, type: string,  default: '' } # for preview hostname
+
     secrets:
       CLOUDFLARE_API_TOKEN: { required: false }
       CLOUDFLARE_ACCOUNT_ID: { required: false }
 
 jobs:
   ci:
+    environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,6 +33,7 @@ jobs:
       APP_PATH: ${{ inputs.app_path }}
       CONFIG:   ${{ inputs.wrangler_config }}
       ENV:      ${{ inputs.environment }}
+      PREVIEW_HOST: ${{ inputs.preview_host != '' && inputs.preview_host || vars.PREVIEW_HOST }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
