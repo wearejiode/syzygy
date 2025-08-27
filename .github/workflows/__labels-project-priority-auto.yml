@@ -4,16 +4,14 @@ on:
     types: [labeled, unlabeled, opened, edited]
 
 permissions:
-  issues: write
   contents: read
-  projects: write
-  # repository-projects is for classic Projects; Projects v2 uses "projects"
+  issues: write
 
 env:
   # Set these two to your user project’s owner + number
   PROJECT_OWNER: wearejiode          # user login (not an org)
   PROJECT_NUMBER: 3                  # <-- replace with the number from your project URL
-  PROJECT_TITLE: Luna - Planned Improvements
+  PROJECT_TITLE: ""
   PRIORITY_FIELD_NAME: Priority
 
 # NOTE: For *private* user Projects (Projects v2), you must open the Project → Share →
@@ -30,6 +28,21 @@ jobs:
   sync-priority:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug list projects (user)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const login = process.env.PROJECT_OWNER || context.repo.owner;
+            const data = await github.graphql(
+              `query($login:String!){
+                user(login:$login){
+                  projectsV2(first:50){ nodes { title number }
+                  }
+                }
+              }`,
+              { login }
+            );
+            core.info(JSON.stringify(data, null, 2));
 
       - name: Apply Priority from labels -> Project field
         uses: actions/github-script@v7
