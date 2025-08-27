@@ -32,7 +32,6 @@ jobs:
       APP_PATH: ${{ inputs.app_path }}
       CONFIG: ${{ inputs.wrangler_config }}
       ENV: ${{ inputs.environment }}
-
       PREVIEW_HOST: ${{ inputs.preview_host != '' && inputs.preview_host || vars.PREVIEW_HOST }}
       ARTIFACT_NAME: ${{ inputs.artifact_name != '' && inputs.artifact_name || format('{0}-worker-{1}', inputs.app_id, github.sha) }}
     steps:
