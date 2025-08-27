@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'apps/core/portfolio/sesame.jiode.one/**'
+      - 'apps/core/jiode/sesame.jiode.one/**'
 
 # Ensure only one staging release runs per ref at a time
 concurrency:
@@ -96,14 +96,14 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: >
             r2 object put sesame-data-staging/data.json
-            --file apps/core/portfolio/sesame.jiode.one/data.json
+            --file apps/core/jiode/sesame.jiode.one/data.json
             --remote
 
       - name: Seed images to R2 (staging)
         shell: bash
         run: |
           set -euo pipefail
-          BASE="apps/core/portfolio/sesame.jiode.one/public"
+          BASE="apps/core/jiode/sesame.jiode.one/public"
           if [ -d "$BASE" ]; then
             # Upload all files under public/ to R2 under images/
             find "$BASE" -type f -print0 | while IFS= read -r -d '' f; do
@@ -136,7 +136,7 @@ jobs:
         with:
           command: >
             deploy dist/releases/${{ github.sha }}/meta-worker.generated.js
-            --config apps/core/portfolio/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
+            --config apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
             --no-bundle
           wranglerVersion: '4.31.0'
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
