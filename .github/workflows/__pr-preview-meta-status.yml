@@ -5,6 +5,23 @@ name: PR Auto-Add Deployment Status for Non-App Changes
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review, edited]
+    paths-ignore:
+      - 'apps/**'
+      - 'packages/**'
+      - 'libs/**'
+      - '.github/workflows/sesame-pr.yml'
+      - '.github/workflows/_worker-ci.yml'
+      - '.github/workflows/__pr-preview-meta-status.yml'
+      - '.github/workflows/__labels-project-priority-auto.yml'
+      - 'wrangler.*.toml'
+      - 'Dockerfile*'
+      - 'ci/**'
+      - 'docs/**'
+      - 'tests/**'
+      - '*.md'
+      - '*.txt'
+      - '*.yml'
+      - '*.yaml'
 
 permissions:
   contents: read

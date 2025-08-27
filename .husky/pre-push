@@ -16,7 +16,7 @@ fi
 # if printf "%s\n" "$refs" | grep -qE '\srefs/heads/main$'; then … fi
 
 # --- Your build/dry-run steps (these should come AFTER the guard) ---
-pnpm -w nx run sesame.jiode.one:bundle-worker || exit 1
+pnpm -w nx run @jiode/sesame:bundle-worker || exit 1
 
 pnpm -s exec wrangler deploy dist/apps/sesame.jiode.one/meta-worker.generated.js \
   --config apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.toml \

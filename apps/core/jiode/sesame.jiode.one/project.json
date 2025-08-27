@@ -14,7 +14,7 @@
     "dev:once": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm -w nx run sesame.jiode.one:bundle-worker && wrangler dev dist/apps/sesame.jiode.one/meta-worker.generated.js --config apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.toml --local"
+        "command": "pnpm -w nx run @jiode/sesame:bundle-worker && wrangler dev dist/apps/sesame.jiode.one/meta-worker.generated.js --config apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.toml --local"
       }
     },
     "push:data": {
@@ -36,8 +36,8 @@
         "parallel": true,
         "commands": [
           "wrangler r2 object put sesame-data-preview/data.json --file apps/core/jiode/sesame.jiode.one/data.json --local --config apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.toml",
-          "pnpm -w nx run sesame.jiode.one:bundle-worker",
-          "chokidar apps/core/jiode/sesame.jiode.one/templates/**/* --initial -d 200 -c \"pnpm -w nx run sesame.jiode.one:bundle-worker\"",
+          "pnpm -w nx run @jiode/sesame:bundle-worker",
+          "chokidar apps/core/jiode/sesame.jiode.one/templates/**/* --initial -d 200 -c \"pnpm -w nx run @jiode/sesame:bundle-worker\"",
           "wait-on dist/apps/sesame.jiode.one/meta-worker.generated.js && wrangler dev dist/apps/sesame.jiode.one/meta-worker.generated.js --config apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.toml --local --persist-to .wrangler/state"
         ]
       }
@@ -48,9 +48,9 @@
         "cwd": "{workspaceRoot}",
         "parallel": false,
         "commands": [
-          "pnpm -w nx run sesame.jiode.one:push:data",
-          "pnpm -w nx run sesame.jiode.one:bundle-worker",
-          "pnpm -w nx run sesame.jiode.one:deploy:generated:dist"
+          "pnpm -w nx run @jiode/sesame:push:data",
+          "pnpm -w nx run @jiode/sesame:bundle-worker",
+          "pnpm -w nx run @jiode/sesame:deploy:generated:dist"
         ]
       }
     }
