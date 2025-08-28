@@ -18,6 +18,7 @@ jobs:
           ]
         STAGING_BUCKET: [sesame-data-staging]
     uses: wearejiode/syzygy/.github/workflows/_worker-ci.yml@main
+    secrets: inherit
     permissions:
       contents: read
       id-token: write
@@ -28,9 +29,6 @@ jobs:
       wrangler_config: ${{ matrix.WRANGLER_CONFIG }}
       environment: staging
       deploy: true
-    secrets:
-      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
-      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
 
   post_sync:
     needs: staging
