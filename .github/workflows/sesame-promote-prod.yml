@@ -3,14 +3,13 @@ name: Sesame Promote to Production
 # Principle of least privilege for this workflow
 permissions:
   contents: read
-  id-token: write  # in case downstream reusable workflow uses OIDC (safe to keep)
-
+  id-token: write # in case downstream reusable workflow uses OIDC (safe to keep)
 
 on:
   workflow_dispatch:
     inputs:
       release_sha:
-        description: "Commit SHA to promote (must exist in staging artifacts)"
+        description: 'Commit SHA to promote (must exist in staging artifacts)'
         required: true
         type: string
       confirm:
@@ -48,18 +47,18 @@ jobs:
             r2_bucket: sesame-data
     uses: ./.github/workflows/_worker-promote.yml
     with:
-      app_id:          ${{ matrix.app_id }}
+      app_id: ${{ matrix.app_id }}
       wrangler_config: ${{ matrix.wrangler_config }}
-      release_sha:     ${{ inputs.release_sha }}
-      verify_slsa:     true
-      environment:     production
-      deploy:          true
-      seed_r2:         true
-      r2_bucket:       ${{ matrix.r2_bucket }}
+      release_sha: ${{ inputs.release_sha }}
+      verify_slsa: true
+      environment: production
+      deploy: true
+      seed_r2: true
+      r2_bucket: ${{ matrix.r2_bucket }}
       seed_public_dir: ${{ matrix.public_dir }}
     secrets:
-      CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
     # This targets the protected "production" environment defined inside _worker-promote.yml
 
   # SESAME POST-PROMOTE STEPS (app-specific)
@@ -75,7 +74,7 @@ jobs:
             wrangler_config: apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.toml
             r2_bucket: sesame-data
     env:
-      CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       RELEASE_SHA: ${{ github.event.inputs.release_sha }}
     steps:
@@ -92,10 +91,10 @@ jobs:
       - name: Push public assets + data.json to R2 (prod)
         uses: ./.github/actions/sesame/r2-push
         with:
-          bucket:           ${{ matrix.r2_bucket }}
-          public_dir:       ${{ matrix.public_dir }}
-          data_json_path:   ${{ matrix.app_path }}/data.json
-          wrangler_config:  ${{ matrix.wrangler_config }}
+          bucket: ${{ matrix.r2_bucket }}
+          public_dir: ${{ matrix.public_dir }}
+          data_json_path: ${{ matrix.app_path }}/data.json
+          wrangler_config: ${{ matrix.wrangler_config }}
           wrangler_version: '4.31.0'
 
   # Basic smoke tests against production host
