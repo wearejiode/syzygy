@@ -6,7 +6,7 @@ This Worker serves the Resume app pages by delivering HTML, CSS, and JS assets a
 
 ## 📦 Build + Bundle
 
-We no longer inline HTML/CSS/JS directly. Instead: 
+We no longer inline HTML/CSS/JS directly. Instead:
 
 - Templates live under `templates/`:
 
@@ -106,8 +106,8 @@ Code 4 times as fast in half the time!
 ## 📁 Assets
 
 Images and other static assets are stored in R2 under the prefix `resume-data/images/`.  
-These must be uploaded either via the CI pipeline or manually using Wrangler commands.  
+These must be uploaded either via the CI pipeline or manually using Wrangler commands.
 
 Happy coding ✨
 
-P.S. CI automation in progress... 
+P.S. CI automation in progress...
