@@ -75,18 +75,24 @@ jobs:
         with:
           subject-path: dist/releases/${{ github.sha }}/meta-worker.generated.js
 
-      - name: Ensure preview R2 bucket exists
-        if: inputs.deploy == true
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}µµ
-        run: npx -y wrangler@4.33.0 r2 bucket create sesame-data-staging || true
-      - name: Ensure staging R2 bucket exists
+      - name: Ensure R2 bucket exists for this environment
         if: inputs.deploy == true
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-        run: npx -y wrangler@4.33.0 r2 bucket create sesame-data-preview || true
+          BUCKET_NAME: ${{ inputs.environment == 'prod'
+            && 'sesame-data-prod'
+            || (inputs.environment == 'staging' && 'sesame-data-staging' || 'sesame-data-preview') }}
+        run: |
+          # Optional sanity check to catch hidden chars in the account id
+          if [[ ! "$CLOUDFLARE_ACCOUNT_ID" =~ ^[a-f0-9]{32}$ ]]; then
+            echo "Account ID looks invalid (must be 32 lowercase hex)."
+            printf 'Bytes: ' && printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | od -An -t x1
+            exit 1
+          fi
+
+          echo "Ensuring bucket: $BUCKET_NAME"
+          npx -y wrangler@4.33.0 r2 bucket create "$BUCKET_NAME" || true
 
       - name: Deploy (Workers)
         if: inputs.deploy == true && (inputs.environment != 'prod' || inputs.allow_hotfix == true)
