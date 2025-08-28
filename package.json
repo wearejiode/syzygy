@@ -41,7 +41,7 @@
     "@angular/forms": "~20.0.7",
     "@angular/platform-browser": "~20.0.7",
     "@angular/platform-browser-dynamic": "~20.0.7",
-    "@angular/router": "~20.0.7",
+    "@angular/router": "~20.2.2",
     "express": "^4.21.2",
     "front-matter": "^4.0.2",
     "marked": "^15.0.12",
