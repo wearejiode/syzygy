@@ -8,17 +8,17 @@ name: Worker for Production Promotion
 on:
   workflow_call:
     inputs:
-      app_id:             { required: true,  type: string } # e.g. sesame.jiode.one
-      wrangler_config:    { required: true,  type: string } # prod wrangler.toml
-      release_sha:        { required: true,  type: string }
-      artifact_name:      { required: false, type: string, default: "" } # override if needed
-      sha_artifact_name:  { required: false, type: string, default: "" }
-      environment:        { required: false, type: string, default: "production" }
-      verify_slsa:        { required: false, type: boolean, default: true }
-      wrangler_version:   { required: false, type: string,  default: "4.31.0" }
+      app_id: { required: true, type: string } # e.g. sesame.jiode.one
+      wrangler_config: { required: true, type: string } # prod wrangler.toml
+      release_sha: { required: true, type: string }
+      artifact_name: { required: false, type: string, default: '' } # override if needed
+      sha_artifact_name: { required: false, type: string, default: '' }
+      environment: { required: false, type: string, default: 'production' }
+      verify_slsa: { required: false, type: boolean, default: true }
+      wrangler_version: { required: false, type: string, default: '4.31.0' }
     secrets:
-      CLOUDFLARE_API_TOKEN:  { required: true }
-      CLOUDFLARE_ACCOUNT_ID: { required: true }
+      CF_API_TOKEN: { required: false } # <— generic
+      CF_ACCOUNT_ID: { required: false } # <— generic
 
 jobs:
   promote:
@@ -73,8 +73,8 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           wranglerVersion: ${{ inputs.wrangler_version }}
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: >
             deploy dist/releases/${{ env.SHA }}/meta-worker.generated.js
             --config ${{ inputs.wrangler_config }}

@@ -12,7 +12,10 @@ jobs:
         APP_ID: [sesame.jiode.one]
         APP_PATH: [apps/core/jiode/sesame.jiode.one]
         PUBLIC_DIR: [apps/core/jiode/sesame.jiode.one/public]
-        WRANGLER_CONFIG: [apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml]
+        WRANGLER_CONFIG:
+          [
+            apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml,
+          ]
         STAGING_BUCKET: [sesame-data-staging]
     uses: ./.github/workflows/_worker-ci.yml
     permissions:
@@ -20,14 +23,14 @@ jobs:
       id-token: write
       attestations: write
     with:
-      app_id:          ${{ matrix.APP_ID }}
-      app_path:        ${{ matrix.APP_PATH }}
+      app_id: ${{ matrix.APP_ID }}
+      app_path: ${{ matrix.APP_PATH }}
       wrangler_config: ${{ matrix.WRANGLER_CONFIG }}
-      environment:     staging
-      deploy:          true
+      environment: staging
+      deploy: true
     secrets:
-      CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
 
   post_sync:
     needs: staging
@@ -36,51 +39,54 @@ jobs:
         APP_ID: [sesame.jiode.one]
         APP_PATH: [apps/core/jiode/sesame.jiode.one]
         PUBLIC_DIR: [apps/core/jiode/sesame.jiode.one/public]
-        WRANGLER_CONFIG: [apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml]
+        WRANGLER_CONFIG:
+          [
+            apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml,
+          ]
         STAGING_BUCKET: [sesame-data-staging]
     runs-on: ubuntu-latest
     env:
-      CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
     steps:
       - uses: actions/checkout@v4
       - name: Push public assets + data.json to R2 (staging)
         uses: ./.github/actions/sesame/r2-push
         with:
-          bucket:           ${{ matrix.STAGING_BUCKET }}
-          public_dir:       ${{ matrix.PUBLIC_DIR }}
-          data_json_path:   ${{ matrix.APP_PATH }}/data.json
-          wrangler_config:  ${{ matrix.WRANGLER_CONFIG }}
+          bucket: ${{ matrix.STAGING_BUCKET }}
+          public_dir: ${{ matrix.PUBLIC_DIR }}
+          data_json_path: ${{ matrix.APP_PATH }}/data.json
+          wrangler_config: ${{ matrix.WRANGLER_CONFIG }}
           wrangler_version: '4.31.0'
 
-# app specific testing goes here
+  # app specific testing goes here
   smoke-test:
-      needs: [staging, post_sync]
-      runs-on: ubuntu-latest
-      env:
-        HOST: ${{ vars.STAGING_HOST || 'staging.sesame.jiode.one' }}
-      steps:
-        - name: test /health
-          run: |
-            set -euo pipefail
-            code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/health")
-            echo "HTTP ${code} /health"
-            test "$code" = "200"
-            body=$(curl -s "https://${HOST}/health")
-            echo "Body: $body"
-            [[ "$body" =~ OK|ok ]]
+    needs: [staging, post_sync]
+    runs-on: ubuntu-latest
+    env:
+      HOST: ${{ vars.STAGING_HOST || 'staging.sesame.jiode.one' }}
+    steps:
+      - name: test /health
+        run: |
+          set -euo pipefail
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/health")
+          echo "HTTP ${code} /health"
+          test "$code" = "200"
+          body=$(curl -s "https://${HOST}/health")
+          echo "Body: $body"
+          [[ "$body" =~ OK|ok ]]
 
-        - name: test R2 control endpoints
-          run: |
-            set -euo pipefail
-            # These should be safe GETs that your worker exposes for diagnostics (adjust to your routes)
-            curl -fsSL "https://${HOST}/__r2get" | grep -qi "GET: OK"
-            curl -fsSL "https://${HOST}/__r2list" | grep -qi "data.json"
+      - name: test R2 control endpoints
+        run: |
+          set -euo pipefail
+          # These should be safe GETs that your worker exposes for diagnostics (adjust to your routes)
+          curl -fsSL "https://${HOST}/__r2get" | grep -qi "GET: OK"
+          curl -fsSL "https://${HOST}/__r2list" | grep -qi "data.json"
 
-        - name: test image exists
-          run: |
-            set -euo pipefail
-            # Check one representative image you seeded
-            code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/images/background.webp")
-            echo "HTTP ${code} /images/background.webp"
-            test "$code" = "200"
+      - name: test image exists
+        run: |
+          set -euo pipefail
+          # Check one representative image you seeded
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/images/background.webp")
+          echo "HTTP ${code} /images/background.webp"
+          test "$code" = "200"
