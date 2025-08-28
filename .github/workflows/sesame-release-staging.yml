@@ -1,23 +1,27 @@
-name: Sesame Release to Staging
+# Reusable workflow for CI that uploads Workers to Preview/Staging
+# Production promotion is in _worker-promote.yml
+# In case of emergency, A maintainer can use this to deploy a hotfix to production
+# by setting `allow_hotfix: true` in the workflow call.
+# This is used by sesame.jiode.one
+
+name: worker-ci
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'apps/core/jiode/sesame.jiode.one/**'
+  workflow_call:
+    inputs:
+      app_id: { required: true, type: string } # e.g. sesame.jiode.one
+      app_path: { required: true, type: string } # e.g. apps/core/jiode/sesame.jiode.one
+      wrangler_config: { required: true, type: string } # e.g. apps/.../wrangler.staging.toml
+      environment: { required: true, type: string } # preview|staging|prod
+      worker_name: { required: false, type: string } # for preview overrides
+      deploy: { required: true, type: boolean } # whether to deploy or just build/test
+      allow_hotfix: { required: false, type: boolean, default: false } # for emergency hotfixes
+    secrets:
+      CLOUDFLARE_API_TOKEN: { required: false }
+      CLOUDFLARE_ACCOUNT_ID: { required: false }
 
 jobs:
-  staging:
-    strategy:
-      matrix:
-        APP_ID: [sesame.jiode.one]
-        APP_PATH: [apps/core/jiode/sesame.jiode.one]
-        PUBLIC_DIR: [apps/core/jiode/sesame.jiode.one/public]
-        WRANGLER_CONFIG:
-          [
-            apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml,
-          ]
-        STAGING_BUCKET: [sesame-data-staging]
-    uses: ./.github/workflows/_worker-ci.yml
+  ci:
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
@@ -44,49 +48,57 @@ jobs:
         WRANGLER_CONFIG:
           - apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
         STAGING_BUCKET: [sesame-data-staging]
+
     env:
-      # Map your staging secrets to what wrangler expects at runtime
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
+      APP_PATH: ${{ inputs.app_path }}
+      CONFIG: ${{ inputs.wrangler_config }}
+      ENV: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v4
-      - name: Push public assets + data.json to R2 (staging)
-        uses: ./.github/actions/sesame/r2-push
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+
+      - name: Build
+        run: node $APP_PATH/scripts/build-worker.mjs
+
+      - name: Archive artifact
+        run: |
+          mkdir -p dist/releases/${{ github.sha }}
+          cp dist/apps/${{ inputs.app_id }}/meta-worker.generated.js \
+             dist/releases/${{ github.sha }}/meta-worker.generated.js
+
+      - uses: actions/upload-artifact@v4
         with:
-          bucket: ${{ matrix.STAGING_BUCKET }}
-          public_dir: ${{ matrix.PUBLIC_DIR }}
-          data_json_path: ${{ matrix.APP_PATH }}/data.json
-          wrangler_config: ${{ matrix.WRANGLER_CONFIG }}
-          wrangler_version: '4.31.0'
+          name: ${{ inputs.app_id }}-worker-${{ github.sha }}
+          path: dist/releases/${{ github.sha }}/meta-worker.generated.js
+          retention-days: 30
 
-  # app specific testing goes here
-  smoke-test:
-    needs: [staging, post_sync]
-    runs-on: ubuntu-latest
-    env:
-      HOST: 'staging.jiode.workers.dev'
-    steps:
-      - name: test /health
+      - name: Create checksum
         run: |
-          set -euo pipefail
-          code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/health")
-          echo "HTTP ${code} /health"
-          test "$code" = "200"
-          body=$(curl -s "https://${HOST}/health")
-          echo "Body: $body"
-          [[ "$body" =~ OK|ok ]]
+          cd dist/releases/${{ github.sha }}
+          sha256sum meta-worker.generated.js > meta-worker.sha256
 
-      - name: test R2 control endpoints
-        run: |
-          set -euo pipefail
-          # These should be safe GETs that your worker exposes for diagnostics (adjust to your routes)
-          curl -fsSL "https://${HOST}/__r2get" | grep -qi "GET: OK"
-          curl -fsSL "https://${HOST}/__r2list" | grep -qi "data.json"
+      - name: Upload checksum
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.app_id }}-sha256-${{ github.sha }}
+          path: dist/releases/${{ github.sha }}/meta-worker.sha256
+          retention-days: 30
 
-      - name: test image exists
+      - name: Attest build provenance
+        if: inputs.deploy == true
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: dist/releases/${{ github.sha }}/meta-worker.generated.js
+
+      - name: Deploy (Workers)
+        if: inputs.deploy == true && (inputs.environment != 'prod' || inputs.allow_hotfix == true)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          set -euo pipefail
-          # Check one representative image you seeded
-          code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/images/background.webp")
-          echo "HTTP ${code} /images/background.webp"
-          test "$code" = "200"
+          NAME_OPT=""
+          if [ -n "${{ inputs.worker_name }}" ]; then NAME_OPT="--name ${{ inputs.worker_name }}"; fi
+          npx -y wrangler@4.31.0 deploy \
+            dist/releases/${{ github.sha }}/meta-worker.generated.js \
+            --config "$CONFIG" $NAME_OPT --no-bundle
