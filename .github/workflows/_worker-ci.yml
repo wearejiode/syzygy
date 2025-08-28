@@ -74,6 +74,11 @@ jobs:
         uses: actions/attest-build-provenance@v1
         with:
           subject-path: dist/releases/${{ github.sha }}/meta-worker.generated.js
+      - name: Ensure preview R2 bucket exists
+        run: npx -y wrangler@4.33.0 r2 bucket create sesame-data-preview || true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
 
       - name: Deploy (Workers)
         if: inputs.deploy == true && (inputs.environment != 'prod' || inputs.allow_hotfix == true)
