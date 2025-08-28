@@ -34,22 +34,20 @@ jobs:
 
   post_sync:
     needs: staging
-    environment:
-      name: staging
+    runs-on: ubuntu-latest
+    environment: staging
     strategy:
       matrix:
         APP_ID: [sesame.jiode.one]
         APP_PATH: [apps/core/jiode/sesame.jiode.one]
         PUBLIC_DIR: [apps/core/jiode/sesame.jiode.one/public]
         WRANGLER_CONFIG:
-          [
-            apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml,
-          ]
+          - apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
         STAGING_BUCKET: [sesame-data-staging]
-    runs-on: ubuntu-latest
     env:
-      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
-      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
+      # Map your staging secrets to what wrangler expects at runtime
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
     steps:
       - uses: actions/checkout@v4
       - name: Push public assets + data.json to R2 (staging)
@@ -59,7 +57,7 @@ jobs:
           public_dir: ${{ matrix.PUBLIC_DIR }}
           data_json_path: ${{ matrix.APP_PATH }}/data.json
           wrangler_config: ${{ matrix.WRANGLER_CONFIG }}
-          wrangler_version: '4.33.0'
+          wrangler_version: '4.31.0'
 
   # app specific testing goes here
   smoke-test:
