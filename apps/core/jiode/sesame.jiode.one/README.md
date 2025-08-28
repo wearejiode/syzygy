@@ -3,8 +3,9 @@
 This Worker serves the Resume app pages by delivering HTML, CSS, and JS assets along with data stored in R2.
 
 ---
-
+µµ
 ## 📦 Build + Bundle!!!!!
+
 
 We no longer inline HTML/CSS/JS directly. Instead:
 
