@@ -17,8 +17,11 @@ on:
       allow_hotfix: { required: false, type: boolean, default: false } # for emergency hotfixes
       preview_host: { required: false, type: string, default: '' } # for preview hostname
       artifact_name: { required: false, type: string, default: '' } # optional explicit artifact name
-      CLOUDFLARE_API_TOKEN: { required: false, type: string } # <— generic
-      CLOUDFLARE_ACCOUNT_ID: { required: false, type: string } # <— generic
+    secrets:
+      CF_API_TOKEN:
+        required: true
+      CF_ACCOUNT_ID:
+        required: true
 
 jobs:
   ci:
@@ -74,8 +77,8 @@ jobs:
       - name: Deploy (Workers)
         if: inputs.deploy == true && (inputs.environment != 'prod' || inputs.allow_hotfix == true)
         env:
-          CLOUDFLARE_API_TOKEN: ${{ inputs.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ inputs.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
           NAME_OPT=""
           if [ -n "${{ inputs.worker_name }}" ]; then NAME_OPT="--name ${{ inputs.worker_name }}"; fi
