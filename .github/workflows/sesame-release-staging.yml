@@ -26,6 +26,26 @@ jobs:
       contents: read
       id-token: write
       attestations: write
+    with:
+      app_id: ${{ matrix.APP_ID }}
+      app_path: ${{ matrix.APP_PATH }}
+      wrangler_config: ${{ matrix.WRANGLER_CONFIG }}
+      environment: staging
+      deploy: true
+
+  post_sync:
+    needs: staging
+    runs-on: ubuntu-latest
+    environment: staging
+    strategy:
+      matrix:
+        APP_ID: [sesame.jiode.one]
+        APP_PATH: [apps/core/jiode/sesame.jiode.one]
+        PUBLIC_DIR: [apps/core/jiode/sesame.jiode.one/public]
+        WRANGLER_CONFIG:
+          - apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
+        STAGING_BUCKET: [sesame-data-staging]
+
     env:
       APP_PATH: ${{ inputs.app_path }}
       CONFIG: ${{ inputs.wrangler_config }}
