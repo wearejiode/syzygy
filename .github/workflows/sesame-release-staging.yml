@@ -1,4 +1,5 @@
 name: Sesame Release to Staging
+
 on:
   push:
     branches: [main]
@@ -7,61 +8,45 @@ on:
 
 jobs:
   staging:
-    # bind this job to the staging environment so env secrets flow
-    environment: staging
-    # (optional) keep your matrix for DRY inputs
-    strategy:
-      matrix:
-        APP_ID: [sesame.jiode.one]
-        APP_PATH: [apps/core/jiode/sesame.jiode.one]
-        PUBLIC_DIR: [apps/core/jiode/sesame.jiode.one/public]
-        WRANGLER_CONFIG:
-          - apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
-        STAGING_BUCKET: [sesame-data-staging]
-
-    # call the reusable workflow
+    # This job CALLS a reusable workflow; no strategy/matrix/runs-on here
     uses: wearejiode/syzygy/.github/workflows/_worker-ci.yml@main
 
-    # allow the called workflow to receive all repo/org/env secrets
+    # Bind to the staging environment so environment-scoped secrets flow
+    environment: staging
+
+    # Let the called workflow receive repo/org/env secrets
     secrets: inherit
 
+    # If the called workflow needs elevated perms, set them here
     permissions:
       contents: read
       id-token: write
       attestations: write
 
+    # Inputs to the reusable workflow
     with:
-      app_id: ${{ matrix.APP_ID }}
-      app_path: ${{ matrix.APP_PATH }}
-      wrangler_config: ${{ matrix.WRANGLER_CONFIG }}
-      environment: staging # still fine to pass as an input if the callee uses it
+      app_id: sesame.jiode.one
+      app_path: apps/core/jiode/sesame.jiode.one
+      wrangler_config: apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
+      environment: staging
       deploy: true
 
   post_sync:
     needs: staging
     runs-on: ubuntu-latest
     environment: staging
-    strategy:
-      matrix:
-        APP_ID: [sesame.jiode.one]
-        APP_PATH: [apps/core/jiode/sesame.jiode.one]
-        PUBLIC_DIR: [apps/core/jiode/sesame.jiode.one/public]
-        WRANGLER_CONFIG:
-          - apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
-        STAGING_BUCKET: [sesame-data-staging]
 
-    # if you want to be explicit here (optional), map secrets to env vars wrangler expects
     env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }} # env-scoped (staging)
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }} # env-scoped (staging)
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
     steps:
       - uses: actions/checkout@v4
       - name: Push public assets + data.json to R2 (staging)
         uses: ./.github/actions/sesame/r2-push
         with:
-          bucket: ${{ matrix.STAGING_BUCKET }}
-          public_dir: ${{ matrix.PUBLIC_DIR }}
-          data_json_path: ${{ matrix.APP_PATH }}/data.json
-          wrangler_config: ${{ matrix.WRANGLER_CONFIG }}
+          bucket: sesame-data-staging
+          public_dir: apps/core/jiode/sesame.jiode.one/public
+          data_json_path: apps/core/jiode/sesame.jiode.one/data.json
+          wrangler_config: apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
           wrangler_version: '4.31.0'
