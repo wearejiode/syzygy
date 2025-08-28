@@ -65,13 +65,6 @@ jobs:
             dist/releases/${{ github.sha }}/meta-worker.sha256
           retention-days: 30
 
-      - name: Download build artifact (for deploy path)
-        if: ${{ inputs.deploy == true }}
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: dist/releases/${{ github.sha }}
-
       - name: Attest build provenance
         if: inputs.deploy == true
         uses: actions/attest-build-provenance@v1
