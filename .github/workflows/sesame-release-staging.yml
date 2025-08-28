@@ -34,6 +34,8 @@ jobs:
 
   post_sync:
     needs: staging
+    environment:
+      name: staging
     strategy:
       matrix:
         APP_ID: [sesame.jiode.one]
@@ -57,7 +59,7 @@ jobs:
           public_dir: ${{ matrix.PUBLIC_DIR }}
           data_json_path: ${{ matrix.APP_PATH }}/data.json
           wrangler_config: ${{ matrix.WRANGLER_CONFIG }}
-          wrangler_version: '4.31.0'
+          wrangler_version: '4.33.0'
 
   # app specific testing goes here
   smoke-test:
