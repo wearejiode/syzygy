@@ -10,25 +10,20 @@ jobs:
   staging:
     # This job CALLS a reusable workflow; no strategy/matrix/runs-on here
     uses: wearejiode/syzygy/.github/workflows/_worker-ci.yml@main
-
-    # Bind to the staging environment so environment-scoped secrets flow
-    environment: staging
-
-    # Let the called workflow receive repo/org/env secrets
-    secrets: inherit
-
+    secrets:
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
     # If the called workflow needs elevated perms, set them here
     permissions:
       contents: read
       id-token: write
       attestations: write
-
     # Inputs to the reusable workflow
     with:
+      environment: staging
       app_id: sesame.jiode.one
       app_path: apps/core/jiode/sesame.jiode.one
       wrangler_config: apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
-      environment: staging
       deploy: true
 
   post_sync:
@@ -37,8 +32,8 @@ jobs:
     environment: staging
 
     env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
 
     steps:
       - uses: actions/checkout@v4
@@ -49,4 +44,4 @@ jobs:
           public_dir: apps/core/jiode/sesame.jiode.one/public
           data_json_path: apps/core/jiode/sesame.jiode.one/data.json
           wrangler_config: apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
-          wrangler_version: '4.31.0'
+          wrangler_version: '4.33.0'
