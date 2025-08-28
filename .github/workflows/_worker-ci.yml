@@ -48,7 +48,7 @@ jobs:
       - name: Archive artifact
         run: |
           mkdir -p dist/releases/${{ github.sha }}
-          + cp dist/${APP_PATH}/meta-worker.generated.js \
+          cp dist/${APP_PATH}/meta-worker.generated.js \
           dist/releases/${{ github.sha }}/meta-worker.generated.js
 
       - uses: actions/upload-artifact@v4

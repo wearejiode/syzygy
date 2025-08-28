@@ -20,6 +20,7 @@ jobs:
       attestations: write
     # Inputs to the reusable workflow
     with:
+      preview_host: staging.jiode.workers.dev
       environment: staging
       app_id: sesame.jiode.one
       app_path: apps/core/jiode/sesame.jiode.one
@@ -40,6 +41,7 @@ jobs:
       - name: Push public assets + data.json to R2 (staging)
         uses: ./.github/actions/sesame/r2-push
         with:
+          preview_host: staging.jiode.workers.dev
           bucket: sesame-data-staging
           public_dir: apps/core/jiode/sesame.jiode.one/public
           data_json_path: apps/core/jiode/sesame.jiode.one/data.json
