@@ -1,5 +1,5 @@
 const renderPage = /*__RENDER_FUNCTION__*/ null;
-// Try to pick a large YouTube thumbnail that actually exists (iOS share is picky)!
+// Try to pick a large YouTube thumbnail that actually exists (iOS share is picky)!!
 async function pickYouTubeThumb(videoId) {
   const bases = [
     'https://img.youtube.com/vi/' + videoId + '/maxresdefault.jpg',

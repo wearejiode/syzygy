@@ -43,7 +43,7 @@ jobs:
             publicDir: 'apps/core/jiode/sesame.jiode.one/public'
             wranglerConfig: 'apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.preview.toml'
             previewBucket: 'sesame-data-preview'
-            previewHost: 'jiode.workers.dev'
+            previewHost: 'preview.jiode.workers.dev'
     steps:
       - uses: actions/checkout@v4
 
@@ -95,8 +95,9 @@ jobs:
             publicDir: 'apps/core/jiode/sesame.jiode.one/public'
             wranglerConfig: 'apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.preview.toml'
             previewBucket: 'sesame-data-preview'
-            previewHost: 'jiode.workers.dev'
+            previewHost: 'preview.jiode.workers.dev'
     with:
+      preview_host: preview.jiode.workers.dev
       app_id: ${{ matrix.app.id }}
       app_path: ${{ matrix.app.path }}
       wrangler_config: ${{ matrix.app.wranglerConfig }}
@@ -124,7 +125,7 @@ jobs:
             publicDir: 'apps/core/jiode/sesame.jiode.one/public'
             wranglerConfig: 'apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.preview.toml'
             previewBucket: 'sesame-data-preview'
-            previewHost: 'jiode.workers.dev'
+            previewHost: 'preview.jiode.workers.dev'
     with:
       environment: preview
       app_id: ${{ matrix.app.id }}
@@ -132,7 +133,7 @@ jobs:
       wrangler_config: ${{ matrix.app.wranglerConfig }}
       deploy: true
       worker_name: sesame-pr-${{ github.event.pull_request.number }}
-      preview_host: ${{ matrix.app.previewHost }}
+      preview_host: preview.jiode.workers.dev
       artifact_name: ${{ matrix.app.id }}-worker-${{ github.sha }}
 
   mark-deployment:
