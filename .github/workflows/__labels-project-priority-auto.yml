@@ -9,9 +9,9 @@ permissions:
 
 env:
   # Set these two to your user project’s owner + number
-  PROJECT_OWNER: wearejiode          # user login (not an org)
-  PROJECT_NUMBER: ""
-  PROJECT_TITLE: "Luna-Improvements"
+  PROJECT_OWNER: wearejiode # user login (not an org)
+  PROJECT_NUMBER: ''
+  PROJECT_TITLE: 'Luna-Improvements'
   PRIORITY_FIELD_NAME: Priority
 
 # NOTE: For *private* user Projects (Projects v2), you must open the Project → Share →
@@ -28,187 +28,73 @@ jobs:
   sync-priority:
     runs-on: ubuntu-latest
     steps:
-      - name: Debug list projects (user)
-        uses: actions/github-script@v7
+      - uses: actions/github-script@v7
         with:
           script: |
-            const login = process.env.PROJECT_OWNER || context.repo.owner;
-            const data = await github.graphql(
-              `query($login:String!){
-                user(login:$login){
-                  projectsV2(first:50){ nodes { title number }
+            const projectTitle = 'Luna - Planned Improvements'; // or use number
+            const priorityField = 'Priority';
+            const map = { 'P0:Blocking':'P0', 'P1:Critical':'P1', 'P2:High':'P2', 'P3:Med':'P3', 'PZ:Low':'PZ' };
+
+            const labels = (context.payload.issue.labels || []).map(l => typeof l === 'string' ? l : l.name);
+            const chosen = Object.keys(map).find(n => labels.includes(n));
+            const desired = chosen ? map[chosen] : null;
+
+            const q = (query, vars) => github.graphql(query, vars);
+
+            // 1) Find user project by title (repo must be linked to this project)
+            const { user } = await q(`
+              query($login:String!, $title:String!) {
+                user(login:$login) {
+                  projectsV2(first:50, query:$title) {
+                    nodes { id title fields(first:50) {
+                      nodes { ... on ProjectV2FieldCommon { id name }
+                              ... on ProjectV2SingleSelectField { id name options { id name } } }
+                    } }
                   }
                 }
               }`,
-              { login }
+              { login: context.repo.owner, title: projectTitle }
             );
-            core.info(JSON.stringify(data, null, 2));
+            const project = user.projectsV2.nodes.find(p => p.title === projectTitle);
+            if (!project) core.setFailed(`Project "${projectTitle}" not found or repo not linked.`);
 
-      - name: Apply Priority from labels -> Project field
-        uses: actions/github-script@v7
-        with:
-          script: |
-            // --- CONFIG (override via env if you like) ---
-            const OWNER = process.env.PROJECT_OWNER || context.repo.owner; // user login
-            const PROJECT_NUMBER = Number(process.env.PROJECT_NUMBER || 1);
-            const PRIORITY_FIELD_NAME = process.env.PRIORITY_FIELD_NAME || 'Priority';
-            const LABEL_TO_PRIORITY = {
-              'P0:Blocking': 'P0',
-              'P1:Critical': 'P1',
-              'P2:High': 'P2',
-              'P3:Med': 'P3',
-              'PZ:Low': 'PZ',
-            };
-            // ---------------------------------------------
-
-            const issue = context.payload.issue;
-            if (!issue) return;
-
-            // Determine desired priority from labels
-            const lbls = issue.labels.map(l => (typeof l === 'string' ? l : l.name));
-            const desiredLabel = Object.keys(LABEL_TO_PRIORITY).find(name => lbls.includes(name)) || null;
-            const desired = desiredLabel ? LABEL_TO_PRIORITY[desiredLabel] : null;
-
-            const gql = (query, variables) => github.graphql(query, variables);
-
-            // Helper: resolve a ProjectV2 by title (preferred) or by number for a USER owner
-            async function getUserProject({ login, title, number }) {
-              if (title) {
-                const data = await gql(
-                  `query($login:String!, $title:String!) {
-
-                    user(login:$login) {
-                      projectsV2(first: 50, query: $title) { nodes { id title fields(first:50) {
-                        nodes { ... on ProjectV2FieldCommon { id name }
-                                ... on ProjectV2SingleSelectField { id name options { id name } } }
-                      } } }
-                    }
-                  }`,
-                  { login, title }
-                );
-                const node = data.user?.projectsV2?.nodes?.find(p => p.title === title) || null;
-                if (node) return node;
-              }
-              if (number) {
-                const data = await gql(
-                  `query($login:String!, $num:Int!) {
-                    user(login:$login) { projectV2(number:$num) { id title fields(first:50) {
-                      nodes { ... on ProjectV2FieldCommon { id name }
-                              ... on ProjectV2SingleSelectField { id name options { id name } } }
-                    } } }
-                  }`,
-                  { login, num: number }
-                );
-                return data.user?.projectV2 || null;
-              }
-              return null;
-            }
-
-            // Helper: resolve a ProjectV2 by title/number for an ORG owner (optional)
-            async function getOrgProject({ login, title, number }) {
-              if (title) {
-                const data = await gql(
-                  `query($login:String!, $title:String!) {
-                    organization(login:$login) {
-                      projectsV2(first: 50, query: $title) { nodes { id title fields(first:50) {
-                        nodes { ... on ProjectV2FieldCommon { id name }
-                                ... on ProjectV2SingleSelectField { id name options { id name } } }
-                      } } }
-                    }
-                  }`,
-                  { login, title }
-                );
-                const node = data.organization?.projectsV2?.nodes?.find(p => p.title === title) || null;
-                if (node) return node;
-              }
-              if (number) {
-                const data = await gql(
-                  `query($login:String!, $num:Int!) {
-                    organization(login:$login) { projectV2(number:$num) { id title fields(first:50) {
-                      nodes { ... on ProjectV2FieldCommon { id name }
-                              ... on ProjectV2SingleSelectField { id name options { id name } } }
-                    } } }
-                  }`,
-                  { login, num: number }
-                );
-                return data.organization?.projectV2 || null;
-              }
-              return null;
-            }
-
-            // Resolve the Project node (supports private *user* projects if shared with this repo)
-            const ownerLogin = OWNER;
-            const titlePref = process.env.PROJECT_TITLE?.trim() || '';
-            const numberPref = Number.isFinite(PROJECT_NUMBER) ? PROJECT_NUMBER : undefined;
-
-            let project = await getUserProject({ login: ownerLogin, title: titlePref || undefined, number: titlePref ? undefined : numberPref });
-
-            // If not found on user, optionally try org with the same login (no-op if not an org)
-            if (!project) {
-              try {
-                project = await getOrgProject({ login: ownerLogin, title: titlePref || undefined, number: titlePref ? undefined : numberPref });
-              } catch (_) { /* ignore */ }
-            }
-
-            if (!project) {
-              core.setFailed(
-                `Project not found. Looked for user/org '${ownerLogin}' by ` +
-                (titlePref ? `title "${titlePref}"` : `number #${numberPref}`) +
-                `.\n` +
-                `• If this is a *private user project*, open it in GitHub → "Share" → ` +
-                `add repository ${context.repo.owner}/${context.repo.repo} (required for GITHUB_TOKEN).`);
-              return;
-            }
-
-            const priorityField = project.fields.nodes.find(f => f.name === PRIORITY_FIELD_NAME && f.options);
-            if (!priorityField) {
-              core.setFailed(`Field "${PRIORITY_FIELD_NAME}" not found or not single-select in project "${project.title}".`);
-              return;
-            }
-
-            const desiredOptionId = desired ? priorityField.options.find(o => o.name === desired)?.id : null;
-
-            // Ensure the Issue is in the Project (add if needed), get itemId
-            const itemLookup = await gql(
-              `query($owner:String!, $repo:String!, $number:Int!) {
-                repository(owner:$owner, name:$repo) { issue(number:$number) { id } }
+            // 2) Ensure the issue is in the project
+            const { repository } = await q(`
+              query($owner:String!, $repo:String!, $num:Int!) {
+                repository(owner:$owner, name:$repo) { issue(number:$num) { id } }
               }`,
-              { owner: context.repo.owner, repo: context.repo.repo, number: issue.number }
+              { owner: context.repo.owner, repo: context.repo.repo, num: context.payload.issue.number }
             );
-            const issueId = itemLookup.repository.issue.id;
+            const issueId = repository.issue.id;
 
-            const projectId = project.id;
-
-            const searchItem = await gql(
-              `query($proj:ID!, $q:String!) {
-                node(id:$proj) { ... on ProjectV2 { items(first:100, query:$q) { nodes { id content { ... on Issue { id } } } } } }
+            const search = await q(`
+              query($proj:ID!, $q:String!) {
+                node(id:$proj) { ... on ProjectV2 { items(first:100, query:$q) {
+                  nodes { id content { ... on Issue { id } } } } }
               }`,
-              { proj: projectId, q: `repo:${context.repo.owner}/${context.repo.repo} is:issue #${issue.number}` }
+              { proj: project.id, q: `repo:${context.repo.owner}/${context.repo.repo} is:issue #${context.payload.issue.number}` }
             );
-            let itemId = searchItem.node.items.nodes.find(n => n.content?.id === issueId)?.id;
-
+            let itemId = search.node.items.nodes.find(n => n.content?.id === issueId)?.id;
             if (!itemId) {
-              const addItem = await gql(
-                `mutation($proj:ID!, $content:ID!) { addProjectV2ItemById(input:{projectId:$proj, contentId:$content}) { item { id } } }`,
-                { proj: projectId, content: issueId }
-              );
-              itemId = addItem.addProjectV2ItemById.item.id;
+              const add = await q(`
+                mutation($proj:ID!, $content:ID!) {
+                  addProjectV2ItemById(input:{projectId:$proj, contentId:$content}) { item { id } }
+                }`, { proj: project.id, content: issueId });
+              itemId = add.addProjectV2ItemById.item.id;
             }
 
-            if (desiredOptionId) {
-              await gql(
-                `mutation($proj:ID!, $item:ID!, $field:ID!, $option:String!) {
-                  updateProjectV2ItemFieldValue(input:{ projectId:$proj, itemId:$item, fieldId:$field, value:{ singleSelectOptionId:$option } }) { clientMutationId }
-                }`,
-                { proj: projectId, item: itemId, field: priorityField.id, option: desiredOptionId }
-              );
-              core.info(`Set Priority -> ${desired}`);
-            } else {
-              await gql(
-                `mutation($proj:ID!, $item:ID!, $field:ID!) {
-                  updateProjectV2ItemFieldValue(input:{ projectId:$proj, itemId:$item, fieldId:$field, value:{ singleSelectOptionId:null } }) { clientMutationId }
-                }`,
-                { proj: projectId, item: itemId, field: priorityField.id }
-              );
-              core.info('Cleared Priority (no matching Px label present)');
-            }
+            // 3) Set Priority (if label mapped)
+            const field = project.fields.nodes.find(f => f.name === priorityField && f.options);
+            if (!field) core.setFailed(`Project field "${priorityField}" not found or not single-select.`);
+            const optId = desired ? field.options.find(o => o.name === desired)?.id : null;
+
+            await q(`
+              mutation($proj:ID!, $item:ID!, $field:ID!, $opt:String) {
+                updateProjectV2ItemFieldValue(input:{
+                  projectId:$proj, itemId:$item, fieldId:$field,
+                  value:{ singleSelectOptionId:$opt }
+                }) { clientMutationId }
+              }`,
+              { proj: project.id, item: itemId, field: field.id, opt: optId || null }
+            );
+            core.info(`Priority set to ${desired ?? 'cleared'}.`);

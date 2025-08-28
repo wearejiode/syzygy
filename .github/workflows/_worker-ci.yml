@@ -4,12 +4,12 @@
 # by setting `allow_hotfix: true` in the workflow call.
 # This is used by sesame.jiode.one
 
-name: Shared Worker for Preview and Staging CI
+name: worker-ci
 on:
   workflow_call:
     inputs:
-      app_id: { required: true, type: string } # e.g. sREBASE;)
-      app_path: { required: true, type: string } # e.g. Simulate REBASE
+      app_id: { required: true, type: string } # e.g. sesame.jiode.one
+      app_path: { required: true, type: string } # e.g. apps/core/jiode/sesame.jiode.one
       wrangler_config: { required: true, type: string } # e.g. apps/.../wrangler.staging.toml
       environment: { required: true, type: string } # preview|staging|prod
       worker_name: { required: false, type: string } # for preview overrides
@@ -17,14 +17,12 @@ on:
       allow_hotfix: { required: false, type: boolean, default: false } # for emergency hotfixes
       preview_host: { required: false, type: string, default: '' } # for preview hostname
       artifact_name: { required: false, type: string, default: '' } # optional explicit artifact name
-
     secrets:
       CLOUDFLARE_API_TOKEN: { required: false }
       CLOUDFLARE_ACCOUNT_ID: { required: false }
 
 jobs:
   ci:
-    environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -34,6 +32,7 @@ jobs:
       APP_PATH: ${{ inputs.app_path }}
       CONFIG: ${{ inputs.wrangler_config }}
       ENV: ${{ inputs.environment }}
+
       PREVIEW_HOST: ${{ inputs.preview_host != '' && inputs.preview_host || vars.PREVIEW_HOST }}
       ARTIFACT_NAME: ${{ inputs.artifact_name != '' && inputs.artifact_name || format('{0}-worker-{1}', inputs.app_id, github.sha) }}
     steps:
@@ -44,25 +43,28 @@ jobs:
       - name: Build
         run: node $APP_PATH/scripts/build-worker.mjs
 
-      - name: Prepare release folder
+      - name: Archive artifact
         run: |
           mkdir -p dist/releases/${{ github.sha }}
           cp dist/apps/${{ inputs.app_id }}/meta-worker.generated.js \
              dist/releases/${{ github.sha }}/meta-worker.generated.js
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.app_id }}-worker-${{ github.sha }}
+          path: dist/releases/${{ github.sha }}/meta-worker.generated.js
+          retention-days: 30
 
       - name: Create checksum
         run: |
           cd dist/releases/${{ github.sha }}
           sha256sum meta-worker.generated.js > meta-worker.sha256
 
-      - name: Upload build artifact (JS + checksum)
-        if: ${{ inputs.deploy != true }}
+      - name: Upload checksum
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: |
-            dist/releases/${{ github.sha }}/meta-worker.generated.js
-            dist/releases/${{ github.sha }}/meta-worker.sha256
+          name: ${{ inputs.app_id }}-sha256-${{ github.sha }}
+          path: dist/releases/${{ github.sha }}/meta-worker.sha256
           retention-days: 30
 
       - name: Attest build provenance
@@ -74,8 +76,8 @@ jobs:
       - name: Deploy (Workers)
         if: inputs.deploy == true && (inputs.environment != 'prod' || inputs.allow_hotfix == true)
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
         run: |
           NAME_OPT=""
           if [ -n "${{ inputs.worker_name }}" ]; then NAME_OPT="--name ${{ inputs.worker_name }}"; fi
