@@ -29,8 +29,8 @@ jobs:
       environment: staging
       deploy: true
     secrets:
-      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
-      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
 
   post_sync:
     needs: staging
@@ -64,7 +64,7 @@ jobs:
     needs: [staging, post_sync]
     runs-on: ubuntu-latest
     env:
-      HOST: ${{ vars.STAGING_HOST || 'staging.sesame.jiode.one' }}
+      HOST: 'staging.jiode.workers.dev'
     steps:
       - name: test /health
         run: |
