@@ -77,14 +77,16 @@ jobs:
   ci:
     name: sesame / CI build
     uses: wearejiode/syzygy/.github/workflows/_worker-ci.yml@main
-    secrets: inherit
+    if: ${{ needs.changes.outputs.app == 'true' }}
+    secrets:
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
     permissions:
       contents: read
       deployments: write
       id-token: write
       attestations: write
     needs: changes
-    if: ${{ needs.changes.outputs.app == 'true' }}
     strategy:
       matrix:
         app:
@@ -102,11 +104,13 @@ jobs:
       deploy: false
       artifact_name: ${{ matrix.app.id }}-worker-${{ github.sha }}
   preview:
+    uses: wearejiode/syzygy/.github/workflows/_worker-ci.yml@main
+    needs: [changes, ci]
     name: sesame / deploy preview
     if: ${{ !github.event.pull_request.head.repo.fork && needs.changes.outputs.app == 'true' }}
-    needs: [changes, ci]
-    uses: wearejiode/syzygy/.github/workflows/_worker-ci.yml@main
-    secrets: inherit
+    secrets:
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
     permissions:
       contents: read
       deployments: write
@@ -122,10 +126,10 @@ jobs:
             previewBucket: 'sesame-data-preview'
             previewHost: 'jiode.workers.dev'
     with:
+      environment: preview
       app_id: ${{ matrix.app.id }}
       app_path: ${{ matrix.app.path }}
       wrangler_config: ${{ matrix.app.wranglerConfig }}
-      environment: preview
       deploy: true
       worker_name: sesame-pr-${{ github.event.pull_request.number }}
       preview_host: ${{ matrix.app.previewHost }}
