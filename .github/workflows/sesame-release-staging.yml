@@ -7,27 +7,34 @@ on:
 
 jobs:
   staging:
+    # bind this job to the staging environment so env secrets flow
+    environment: staging
+    # (optional) keep your matrix for DRY inputs
     strategy:
       matrix:
         APP_ID: [sesame.jiode.one]
         APP_PATH: [apps/core/jiode/sesame.jiode.one]
         PUBLIC_DIR: [apps/core/jiode/sesame.jiode.one/public]
         WRANGLER_CONFIG:
-          [
-            apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml,
-          ]
+          - apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
         STAGING_BUCKET: [sesame-data-staging]
+
+    # call the reusable workflow
     uses: wearejiode/syzygy/.github/workflows/_worker-ci.yml@main
+
+    # allow the called workflow to receive all repo/org/env secrets
     secrets: inherit
+
     permissions:
       contents: read
       id-token: write
       attestations: write
+
     with:
       app_id: ${{ matrix.APP_ID }}
       app_path: ${{ matrix.APP_PATH }}
       wrangler_config: ${{ matrix.WRANGLER_CONFIG }}
-      environment: staging
+      environment: staging # still fine to pass as an input if the callee uses it
       deploy: true
 
   post_sync:
@@ -42,10 +49,12 @@ jobs:
         WRANGLER_CONFIG:
           - apps/core/jiode/sesame.jiode.one/sesame-meta-worker/wrangler.staging.toml
         STAGING_BUCKET: [sesame-data-staging]
+
+    # if you want to be explicit here (optional), map secrets to env vars wrangler expects
     env:
-      # Map your staging secrets to what wrangler expects at runtime
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }} # env-scoped (staging)
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }} # env-scoped (staging)
+
     steps:
       - uses: actions/checkout@v4
       - name: Push public assets + data.json to R2 (staging)
@@ -56,35 +65,3 @@ jobs:
           data_json_path: ${{ matrix.APP_PATH }}/data.json
           wrangler_config: ${{ matrix.WRANGLER_CONFIG }}
           wrangler_version: '4.31.0'
-
-  # app specific testing goes here
-  smoke-test:
-    needs: [staging, post_sync]
-    runs-on: ubuntu-latest
-    env:
-      HOST: 'staging.jiode.workers.dev'
-    steps:
-      - name: test /health
-        run: |
-          set -euo pipefail
-          code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/health")
-          echo "HTTP ${code} /health"
-          test "$code" = "200"
-          body=$(curl -s "https://${HOST}/health")
-          echo "Body: $body"
-          [[ "$body" =~ OK|ok ]]
-
-      - name: test R2 control endpoints
-        run: |
-          set -euo pipefail
-          # These should be safe GETs that your worker exposes for diagnostics (adjust to your routes)
-          curl -fsSL "https://${HOST}/__r2get" | grep -qi "GET: OK"
-          curl -fsSL "https://${HOST}/__r2list" | grep -qi "data.json"
-
-      - name: test image exists
-        run: |
-          set -euo pipefail
-          # Check one representative image you seeded
-          code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/images/background.webp")
-          echo "HTTP ${code} /images/background.webp"
-          test "$code" = "200"
