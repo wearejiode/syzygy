@@ -20,15 +20,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           types: |
-            Feat
-            Fix
-            Perf
-            Chore
-            Docs
-            Refactor
-            Test
-            Build
-            CI
+            feat
+            fix
+            perf
+            chore
+            docs
+            refactor
+            test
+            build
+            cI
           requireScope: true
           scopes: |
             sesame
