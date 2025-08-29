@@ -137,8 +137,10 @@ jobs:
       artifact_name: ${{ matrix.app.id }}-worker-${{ github.sha }}
 
   mark-deployment:
+    environment: preview
     permissions:
       contents: read
+      deployments: write
       pull-requests: write # <-- needed to comment on PRs
       issues: write # <-- also needed for create/update comment
     needs: [changes, preview]
