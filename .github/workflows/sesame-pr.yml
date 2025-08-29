@@ -137,6 +137,10 @@ jobs:
       artifact_name: ${{ matrix.app.id }}-worker-${{ github.sha }}
 
   mark-deployment:
+    permissions:
+      contents: read
+      pull-requests: write # <-- needed to comment on PRs
+      issues: write # <-- also needed for create/update comment
     needs: [changes, preview]
     if: ${{ needs.preview.result == 'success' && needs.changes.outputs.app == 'true' }}
     runs-on: ubuntu-latest
