@@ -51,7 +51,9 @@ jobs:
           cp "dist/apps/${{ inputs.app_id }}/meta-worker.generated.js" \
              "dist/releases/${{ github.sha }}/meta-worker.generated.js"
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifact
+        if: inputs.deploy != true
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_NAME }}
           path: dist/releases/${{ github.sha }}/meta-worker.generated.js
@@ -63,6 +65,7 @@ jobs:
           sha256sum meta-worker.generated.js > meta-worker.sha256
 
       - name: Upload checksum
+        if: inputs.deploy != true
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.app_id }}-sha256-${{ github.sha }}
