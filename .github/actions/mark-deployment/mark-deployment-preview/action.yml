@@ -3,15 +3,21 @@ description: Sets a preview environment for any deployment
 
 inputs:
   preview_host:
-    description: The host for the preview environment
+    description: The host for the preview environment (e.g. preview.jiode.workers.dev)
     required: false
-    default: 'preview.jiode.one'
-
+    default: 'preview.jiode.workers.dev'
+  service_prefix:
+    description: Subdomain prefix for per-PR previews (e.g. "sesame-pr-")
+    required: false
+    default: 'sesame-pr-'
+  apps_root:
+    description: Path prefix that indicates app code (used to decide if a real preview exists)
+    required: false
+    default: 'apps/'
 
 runs:
   using: composite
   steps:
-
     - name: Ensure code present
       uses: actions/checkout@v4
 
@@ -21,18 +27,63 @@ runs:
       with:
         script: |
           const { owner, repo } = context.repo;
-          const ref = context.payload.pull_request?.head?.sha || context.sha; // <-- use SHA
+          const ref = context.payload.pull_request?.head?.sha || context.sha; // SHA for PR or push
           const res = await github.rest.repos.createDeployment({
-            owner, repo,
-            ref,
-            environment: 'preview',           // must match branch protection exactly
+            owner, repo, ref,
+            environment: 'preview',
             auto_merge: false,
-            required_contexts: [],            // don't wait for other checks
+            required_contexts: [],
             transient_environment: true,
             production_environment: false,
             description: 'PR preview (CI-only or real)'
           });
           core.setOutput('id', res.data.id);
+
+    # Decide whether this PR actually changed app code (under apps_root).
+    - name: Detect if app files changed
+      id: detect
+      if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const number = context.payload.pull_request?.number;
+          if (!number) {
+            core.setOutput('apps_changed', 'false');
+            return;
+          }
+          const appsRoot = `${{ toJSON(inputs.apps_root) }}`;
+          const { owner, repo } = context.repo;
+          const files = await github.paginate(github.rest.pulls.listFiles, {
+            owner, repo, pull_number: number, per_page: 100
+          });
+          const changed = files.some(f => f.filename.startsWith(appsRoot));
+          core.info(`apps_root=${appsRoot} changed=${changed}`);
+          core.setOutput('apps_changed', changed ? 'true' : 'false');
+
+    # Compute the URL to publish: per-PR preview if apps changed; otherwise link to the PR.
+    - name: Compute preview URL
+      id: url
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { owner, repo } = context.repo;
+          const pr = context.payload.pull_request;
+          if (!pr) {
+            // Fallback for non-PR events: just point to repo Actions run
+            const url = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`;
+            core.setOutput('url', url);
+            core.setOutput('is_pr', 'false');
+            return;
+          }
+          const number = pr.number;
+          const appsChanged = (core.getInput('apps_root') && '${{ steps.detect.outputs.apps_changed }}' === 'true');
+          const host = '${{ inputs.preview_host }}';
+          const prefix = '${{ inputs.service_prefix }}';
+          const previewUrl = appsChanged
+            ? `https://${prefix}${number}.${host}`
+            : `https://github.com/${owner}/${repo}/pull/${number}`; // generic link (CI-only change)
+          core.setOutput('url', previewUrl);
+          core.setOutput('is_pr', 'true');
 
     - name: Mark Deployment success
       uses: actions/github-script@v7
@@ -40,12 +91,43 @@ runs:
         script: |
           const { owner, repo } = context.repo;
           const deployment_id = '${{ steps.create.outputs.id }}';
+          const environment_url = '${{ steps.url.outputs.url }}';
           await github.rest.repos.createDeploymentStatus({
             owner, repo,
             deployment_id,
             state: 'success',
             environment: 'preview',
-            environment_url: 'https://${{ inputs.preview_host }}',
+            environment_url, // must be http(s)
             log_url: `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`,
             auto_inactive: true
           });
+
+    - name: Upsert preview URL comment
+      if: ${{ steps.url.outputs.is_pr == 'true' }}
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { owner, repo } = context.repo;
+          const number = context.payload.pull_request?.number;
+          if (!number) return;
+
+          const marker = '<!-- preview-link-marker -->';
+          const url = '${{ steps.url.outputs.url }}';
+          const body = [
+            marker,
+            '✅ **Preview deployed** to `preview`',
+            '',
+            `🔗 ${url}`,
+            `🧪 Build: https://github.com/${owner}/${repo}/actions/runs/${context.runId}`
+          ].join('\n');
+
+          const { data: comments } = await github.rest.issues.listComments({
+            owner, repo, issue_number: number, per_page: 100
+          });
+          const existing = comments.find(c => c.user?.type === 'Bot' && c.body?.includes(marker));
+
+          if (existing) {
+            await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+          } else {
+            await github.rest.issues.createComment({ owner, repo, issue_number: number, body });
+          }
