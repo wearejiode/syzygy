@@ -56,8 +56,10 @@ runs:
           const files = await github.paginate(github.rest.pulls.listFiles, {
             owner, repo, pull_number: number, per_page: 100
           });
-          const changed = files.some(f => f.filename.startsWith(appsRoot));
+          const names = files.map(f => f.filename);
+          const changed = names.some(n => n.startsWith(appsRoot));
           core.info(`apps_root=${appsRoot} changed=${changed}`);
+          core.info(`sample files: ${names.slice(0,10).join(', ')}`);
           core.setOutput('apps_changed', changed ? 'true' : 'false');
 
     # Compute the URL to publish: per-PR preview if apps changed; otherwise link to the PR.
@@ -69,19 +71,22 @@ runs:
           const { owner, repo } = context.repo;
           const pr = context.payload.pull_request;
           if (!pr) {
-            // Fallback for non-PR events: just point to repo Actions run
             const url = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`;
             core.setOutput('url', url);
             core.setOutput('is_pr', 'false');
+            core.info(`Non-PR event → linking to Actions run: ${url}`);
             return;
           }
           const number = pr.number;
-          const appsChanged = (core.getInput('apps_root') && '${{ steps.detect.outputs.apps_changed }}' === 'true');
+          // Only trust the detector output.
+          const appsChanged = '${{ steps.detect.outputs.apps_changed }}' === 'true';
           const host = '${{ inputs.preview_host }}';
           const prefix = '${{ inputs.service_prefix }}';
           const previewUrl = appsChanged
             ? `https://${prefix}${number}.${host}`
-            : `https://github.com/${owner}/${repo}/pull/${number}`; // generic link (CI-only change)
+            : `https://github.com/${owner}/${repo}/pull/${number}`;
+
+          core.info(`apps_changed=${appsChanged} → url=${previewUrl}`);
           core.setOutput('url', previewUrl);
           core.setOutput('is_pr', 'true');
 
