@@ -108,8 +108,17 @@ runs:
       with:
         script: |
           const { owner, repo } = context.repo;
-          const number = context.payload.pull_request?.number;
-          if (!number) return;
+          const pr = context.payload.pull_request;
+          if (!pr) return;
+
+          // Skip commenting on forked PRs (token has read-only perms there).
+          const headFull = pr.head?.repo?.full_name || '';
+          const baseFull = `${owner}/${repo}`;
+          const isFork = headFull.toLowerCase() !== baseFull.toLowerCase();
+          if (isFork) {
+            core.info(`PR originates from fork (${headFull}); skipping comment to avoid 403.`);
+            return;
+          }
 
           const marker = '<!-- preview-link-marker -->';
           const url = '${{ steps.url.outputs.url }}';
@@ -121,13 +130,23 @@ runs:
             `🧪 Build: https://github.com/${owner}/${repo}/actions/runs/${context.runId}`
           ].join('\n');
 
-          const { data: comments } = await github.rest.issues.listComments({
-            owner, repo, issue_number: number, per_page: 100
-          });
-          const existing = comments.find(c => c.user?.type === 'Bot' && c.body?.includes(marker));
+          try {
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number: pr.number, per_page: 100
+            });
+            const existing = comments.find(c => c.user?.type === 'Bot' && c.body?.includes(marker));
 
-          if (existing) {
-            await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
-          } else {
-            await github.rest.issues.createComment({ owner, repo, issue_number: number, body });
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+              core.info(`Updated preview link comment on PR #${pr.number}.`);
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });
+              core.info(`Posted preview link comment on PR #${pr.number}.`);
+            }
+          } catch (e) {
+            if (e.status === 403) {
+              core.warning(`Skipping comment due to permissions (likely forked PR). Details: ${e.message}`);
+              return;
+            }
+            throw e;
           }
