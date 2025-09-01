@@ -41,7 +41,7 @@ jobs:
       run: echo "FILE=.github/env/${{ matrix.env_name }}.vars.yml" >> "$GITHUB_OUTPUT"
 
     - name: Install yq
-      uses: mikefarah/yq@v4.44.3
+      uses: mikefarah/yq@v4.47.1
 
     - name: Load YAML → JSON (desired)
       id: desired
@@ -109,7 +109,7 @@ jobs:
       run: echo "FILE=.github/env/${{ matrix.env_name }}.vars.yml" >> "$GITHUB_OUTPUT"
 
     - name: Install yq
-      uses: mikefarah/yq@v4.44.3
+      uses: mikefarah/yq@v4.47.1
 
     - name: Load YAML → JSON (desired)
       id: desired
