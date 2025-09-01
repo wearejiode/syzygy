@@ -74,7 +74,7 @@ jobs:
 
       - name: Attest build provenance
         if: inputs.deploy == true
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: dist/releases/${{ github.sha }}/meta-worker.generated.js
 
