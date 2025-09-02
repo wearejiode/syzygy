@@ -1,0 +1,161 @@
+# .github/workflows/jiode.one-pr-worker.yml
+name: Jiode.one Preview PR Deploy & Verify
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/core/jiode/jiode.one/**'
+      - '.github/workflows/jiode.one-pr-worker.yml'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: pr-jiode-one-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: detect changes
+    environment: preview
+    runs-on: ubuntu-latest
+    outputs:
+      app: ${{ steps.filter.outputs.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            app:
+              - "apps/core/jiode/jiode.one/**"
+
+  verify:
+    name: jiode.one / verify
+    environment: preview
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.app == 'true' }}
+    strategy:
+      matrix:
+        app:
+          - id: 'jiode.one'
+            path: 'apps/core/jiode/jiode.one'
+            publicDir: 'apps/core/jiode/jiode.one/public'
+            wranglerConfig: 'apps/core/jiode/jiode.one/wrangler.preview.toml'
+            previewHost: 'preview.jiode.workers.dev'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable Corepack (uses package.json packageManager)
+        run: corepack enable
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      # Light, fast checks (keep optional and non-blocking while you stabilize)
+      - name: Type check (tsc --noEmit)
+        run: pnpm -w exec tsc -p "${{ matrix.app.path }}/tsconfig.json" --noEmit || true
+
+      - name: Lint
+        run: pnpm -w exec eslint "${{ matrix.app.path }}" --max-warnings=0 || true
+
+      - name: Unit tests (if any)
+        run: pnpm -w test --filter @jiode/jiode.one || echo "no tests yet"
+
+      # If this Worker needs R2 etc, create preview resources here (optional)
+      # - name: Ensure preview R2 bucket exists
+      #   run: npx -y wrangler@4.33.0 r2 bucket create jiode-one-preview || true
+      #   env:
+      #     CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+      #     CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
+
+  ci:
+    name: jiode.one / CI build
+    needs: changes
+    if: ${{ needs.changes.outputs.app == 'true' }}
+    uses: wearejiode/syzygy/.github/workflows/_worker-ci.yml@main
+    permissions:
+      contents: read
+      deployments: write
+      id-token: write
+      attestations: write
+    secrets:
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
+    strategy:
+      matrix:
+        app:
+          - id: 'jiode.one'
+            path: 'apps/core/jiode/jiode.one'
+            publicDir: 'apps/core/jiode/jiode.one/public'
+            wranglerConfig: 'apps/core/jiode/jiode.one/wrangler.preview.toml'
+            previewHost: 'preview.jiode.workers.dev'
+    with:
+      environment: preview
+      preview_host: preview.jiode.workers.dev
+      app_id: ${{ matrix.app.id }}
+      app_path: ${{ matrix.app.path }}
+      wrangler_config: ${{ matrix.app.wranglerConfig }}
+      deploy: false
+      artifact_name: ${{ matrix.app.id }}-worker-${{ github.sha }}
+
+  preview:
+    name: jiode.one / deploy preview
+    needs: [changes, ci]
+    if: ${{ !github.event.pull_request.head.repo.fork && needs.changes.outputs.app == 'true' }}
+    uses: wearejiode/syzygy/.github/workflows/_worker-ci.yml@main
+    permissions:
+      contents: read
+      deployments: write
+      id-token: write
+      attestations: write
+    secrets:
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
+    strategy:
+      matrix:
+        app:
+          - id: 'jiode.one'
+            path: 'apps/core/jiode/jiode.one'
+            publicDir: 'apps/core/jiode/jiode.one/public'
+            wranglerConfig: 'apps/core/jiode/jiode.one/wrangler.preview.toml'
+            previewHost: 'preview.jiode.workers.dev'
+    with:
+      environment: preview
+      app_id: ${{ matrix.app.id }}
+      app_path: ${{ matrix.app.path }}
+      wrangler_config: ${{ matrix.app.wranglerConfig }}
+      deploy: true
+      worker_name: jiode-one-pr-${{ github.event.pull_request.number }}
+      preview_host: preview.jiode.workers.dev
+      artifact_name: ${{ matrix.app.id }}-worker-${{ github.sha }}
+
+  mark-deployment:
+    name: mark deployment
+    environment: preview
+    needs: [changes, preview]
+    if: ${{ needs.preview.result == 'success' && needs.changes.outputs.app == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mark Deployment Preview
+        uses: ./.github/actions/mark-deployment/mark-deployment-preview

@@ -1,0 +1,14 @@
+name = "marketing-sesame"
+main = "meta-worker.js"
+compatibility_date = "2025-06-09"
+
+routes = [
+  { pattern = "jiode.one", custom_domain = true }
+]
+
+[vars]
+ENVIRONMENT = "production"
+
+[[r2_buckets]]
+binding = "MARKETING_DATA"
+bucket_name = "marketing-data"

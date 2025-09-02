@@ -3,6 +3,7 @@ packages:
   - libs/**
   - tools/**
   - packages/**
+  - docs
   - .
   - apps/core/jiode/jiode.one
   - apps/core/jiode/sesame.jiode.one

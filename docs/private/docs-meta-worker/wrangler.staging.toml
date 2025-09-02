@@ -1,0 +1,10 @@
+name = "staging-jiode-private-docs"
+main = "meta-worker.js"
+compatibility_date = "2025-06-09"
+
+[vars]
+ENVIRONMENT = "staging"
+
+[[r2_buckets]]
+binding = "PRIVATE_DOCS_DATA"
+bucket_name = "private-docs-data-staging"

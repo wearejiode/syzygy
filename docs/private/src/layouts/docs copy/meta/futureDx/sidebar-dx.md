@@ -1,4 +1,5 @@
 ---
+<<<<<<< Updated upstream
 title: 'Sidebar Sync & Editor Devtool'
 description: 'DX idea: detect missing docs in the sidebar or manage them visually in dev mode.'
 tags: [meta, sidebar, DX, devtools, starlight]
@@ -6,21 +7,45 @@ tags: [meta, sidebar, DX, devtools, starlight]
 
 ## 🛠 Sidebar Sync & Editor Devtool (Future Feature)
 
+=======
+title: "Sidebar Sync & Editor Devtool"
+description: "DX idea: detect missing docs in the sidebar or manage them visually in dev mode."
+tags: [meta, sidebar, DX, devtools, starlight]
+
+---
+
+## Overview
+
+> > > > > > > Stashed changes
+
 > “Don’t fear the chaos — automate the order.”
 
 ### 🧭 Sidebar Check Utility
 
+<<<<<<< Updated upstream
+
 Create a small CLI script to scan `src/content/docs` and compare it against `sidebar.mjs`.
 
 **Features:**
+
+=======
+Create a small CLI script to scan `src/content/docs` and compare it against `sidebar.mjs`.
+
+**Features:**
+
+> > > > > > > Stashed changes
 
 - Recursively list `.md` and `.mdx` files
 - Compare with paths in `sidebar.mjs`
 - Print out any missing or orphaned entries
 
 **Prompt to build this:**
+<<<<<<< Updated upstream
 
-> “Write a Node.js script that walks `src/content/docs`, extracts valid doc paths, compares them to entries in `sidebar.mjs`, and logs any that are missing. Highlight orphaned files too.”
+=======
+
+> > > > > > > Stashed changes
+> > > > > > > “Write a Node.js script that walks `src/content/docs`, extracts valid doc paths, compares them to entries in `sidebar.mjs`, and logs any that are missing. Highlight orphaned files too.”
 
 ---
 
@@ -34,16 +59,32 @@ In dev mode, spin up an internal page at `/dev/sidebar` with:
 - (Optional) Live preview sidebar reload
 
 **Prompt to build this:**
+<<<<<<< Updated upstream
 
-> “Create a local-only admin route `/dev/sidebar` in Astro that renders a tree-view of all markdown files in `src/content/docs`, and lets you check/uncheck which files appear in the sidebar. On save, rewrite `sidebar.mjs` to reflect changes.”
+=======
+
+> > > > > > > Stashed changes
+> > > > > > > “Create a local-only admin route `/dev/sidebar` in Astro that renders a tree-view of all markdown files in `src/content/docs`, and lets you check/uncheck which files appear in the sidebar. On save, rewrite `sidebar.mjs` to reflect changes.”
 
 ---
 
 ## 🌱 Status
+
+<<<<<<< Updated upstream
+
+=======
+
+> > > > > > > Stashed changes
 
 - [ ] CLI Sidebar Sync Tool
 - [ ] Sidebar Editor UI Devtool
 
 ## 🧘‍♂️ Impact
 
+<<<<<<< Updated upstream
+
+# This is one of those tools that pays off _every time_ you add a doc. Cleaner process, fewer forgotten pages, better DX.
+
 This is one of those tools that pays off _every time_ you add a doc. Cleaner process, fewer forgotten pages, better DX.
+
+> > > > > > > Stashed changes

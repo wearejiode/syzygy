@@ -1,0 +1,72 @@
+{
+  "openai": {
+    "title": "✨ Jacob’s Pitch to OpenAI ✨",
+    "description": "Why I’m the right fit to build the future of intelligence.This pitch isn’t tied to a single company — it’s for *you*, wherever you are.This pitch isn’t tied to a single company — it’s for *you*, wherever you are.",
+    "videoSlug": "dQw4w9WgXcQ",
+    "links": [
+      {
+        "label": "🔥 Resume",
+        "url": "https://resume.fahrnbach.one/openai",
+        "style": "first"
+      },
+      {
+        "label": "🧑‍🏫 Book Time",
+        "url": "https://calendly.com/jacob-fahrnbach/30min",
+        "style": "second"
+      },
+      {
+        "label": "🧑‍🏫 Book Time2",
+        "url": "https://calendly.com/jacob-fahrnbach/30min",
+        "style": "second"
+      },
+      {
+        "label": "🧑‍🏫 Book Time2",
+        "url": "https://calendly.com/jacob-fahrnbach/30min",
+        "style": "second"
+      },
+      {
+        "label": "🧑‍🏫 Book Time2",
+        "url": "https://calendly.com/jacob-fahrnbach/30min",
+        "style": "second"
+      },
+      {
+        "label": "🧑‍🏫 CHOP",
+        "url": "https://calendly.com/jacob-fahrnbach/30min",
+        "style": "second"
+      },
+      {
+        "label": "🧑‍🏫 CHOP",
+        "url": "https://calendly.com/jacob-fahrnbach/30min",
+        "style": "second"
+      },
+      {
+        "label": "🧑‍🏫 CHOP",
+        "url": "https://calendly.com/jacob-fahrnbach/30min",
+        "style": "second"
+      }
+    ]
+  },
+  "google": {
+    "title": "✨ Jacob’s Pitch to Google ✨",
+    "description": "Creative engineering :), high-scale systems, and human-first design.",
+    "videoSlug": "dQw4w9WgXcQ",
+    "links": "default"
+  },
+  "open": {
+    "title": "✨ A Little Magic from Jacob ✨",
+    "description": "This pitch isn’t tied to a single company — it’s for *you*, wherever you are.This pitch isn’t tied to a single company — it’s for *you*, wherever you are.",
+    "videoSlug": "CzodLqjIWrU",
+    "links": [
+      { "label": "🔥 Resume", "url": "/assets/resume.pdf", "style": "first" }
+    ]
+  },
+  "open2": {
+    "title": "✨ A Little Magic from Jacob ✨",
+    "description": "This personalized pitch isn’t tied to a single company — it’s for *you*, wherever you are."
+  },
+  "ricky": {
+    "title": "🎸 Never gonna give you up…",
+    "description": "We're no strangers to love...",
+    "videoSlug": "dQw4w9WgXcQ"
+  }
+}

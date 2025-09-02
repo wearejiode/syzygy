@@ -1,10 +1,22 @@
 ---
+<<<<<<< Updated upstream
 title: 'Lint Frontmatter Quote Consistency'
 description: 'DX idea: Lint Frontmatter Quote Consistency.'
 tags: [meta, sidebar, DX, devtools, lint]
 ---
 
 ## 🛠️ Future DX: Lint Frontmatter Quote Consistency
+
+=======
+title: "Lint Frontmatter Quote Consistency"
+description: "DX idea: Lint Frontmatter Quote Consistency."
+tags: [meta, sidebar, DX, devtools, lint]
+
+---
+
+## Overview
+
+> > > > > > > Stashed changes
 
 We’ve run into YAML parsing errors when using **single quotes** (`'`) in frontmatter values — particularly when those strings also contain apostrophes (e.g., `description: 'Jacob's blog post'`). YAML interprets this as a malformed mapping.
 
@@ -15,15 +27,25 @@ To avoid this, we’ve adopted a **best practice** of always using **double quot
 Eventually, we want to **automatically enforce** this quoting rule across all `.md`/`.mdx` content files. Options include:
 
 - ✅ **Build a custom lint rule** using [`remark-lint`](https://github.com/remarkjs/remark-lint) and [`remark-frontmatter`](https://github.com/remarkjs/remark-frontmatter`)
+  <<<<<<< Updated upstream
 
-  - Pros: Integrates directly into our content pipeline, can be run in CI
-  - Cons: Requires writing a plugin that parses and validates YAML nodes
+=======
+
+> > > > > > > Stashed changes
+
+- Pros: Integrates directly into our content pipeline, can be run in CI
+- Cons: Requires writing a plugin that parses and validates YAML nodes
 
 - ✅ **Write a standalone script** that scans frontmatter blocks and flags:
+  <<<<<<< Updated upstream
 
-  - Any single-quoted (`'`) values
-  - Any unquoted values (barewords)
-  - Optionally, values missing quotes altogether
+=======
+
+> > > > > > > Stashed changes
+
+- Any single-quoted (`'`) values
+- Any unquoted values (barewords)
+- Optionally, values missing quotes altogether
 
 - ✅ Optionally integrate into a `pre-commit` hook using [`lint-staged`](https://github.com/okonet/lint-staged)
 
@@ -32,4 +54,9 @@ Eventually, we want to **automatically enforce** this quoting rule across all `.
 pnpm lint:frontmatter
 ```
 
-This will help us avoid subtle formatting bugs and ensure our markdown is always safe and predictable — especially as the number of contributors grows.
+<<<<<<< Updated upstream
+
+=======
+
+> > > > > > > Stashed changes
+> > > > > > > This will help us avoid subtle formatting bugs and ensure our markdown is always safe and predictable — especially as the number of contributors grows.

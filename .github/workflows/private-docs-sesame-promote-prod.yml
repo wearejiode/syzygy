@@ -1,0 +1,144 @@
+name: Sesame Promote to Production
+
+# Principle of least privilege for this workflow
+permissions:
+  contents: read
+  id-token: write # in case downstream reusable workflow uses OIDC (safe to keep)
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_sha:
+        description: 'Commit SHA to promote (must exist in staging artifacts)'
+        required: true
+        type: string
+      confirm:
+        description: 'Type "I understand" to deploy to prod'
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-prod
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate confirmation & inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event.inputs.confirm }}" != "I understand" ]]; then
+            echo "Confirmation mismatch. Aborting." >&2; exit 1; fi
+          sha='${{ github.event.inputs.release_sha }}'
+          if [[ ! "$sha" =~ ^[a-f0-9]{7,40}$ ]]; then
+            echo "Invalid release_sha: must be 7–40 hex characters." >&2; exit 1; fi
+
+  promote:
+    needs: preflight
+    strategy:
+      matrix:
+        include:
+          - app_id: docs.jiode.one
+            app_path: docs/src
+            public_dir: docs/public
+            wrangler_config: docs/docs-meta-worker/wrangler.tom;
+            r2_bucket: private-docs-data
+    uses: ./.github/workflows/_worker-promote.yml
+    with:
+      app_id: ${{ matrix.app_id }}
+      wrangler_config: ${{ matrix.wrangler_config }}
+      release_sha: ${{ inputs.release_sha }}
+      verify_slsa: true
+      environment: production
+      deploy: true
+      seed_r2: true
+      r2_bucket: ${{ matrix.r2_bucket }}
+      seed_public_dir: ${{ matrix.public_dir }}
+    secrets:
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PREVIEW }}
+      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PREVIEW }}
+    # This targets the protected "production" environment defined inside _worker-promote.yml
+
+  # SESAME POST-PROMOTE STEPS (app-specific)
+  post_sync:
+    needs: promote
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - app_id: docs.jiode.one
+            app_path: docs/src
+            public_dir: docs/src/public
+            wrangler_config: docs/docs-meta-worker/wrangler.toml
+            r2_bucket: private-docs-data
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      RELEASE_SHA: ${{ github.event.inputs.release_sha }}
+    steps:
+      - name: Checkout repo (required for local composite actions)
+        uses: actions/checkout@v4
+
+      - name: Download promoted artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sesame-worker-${{ env.RELEASE_SHA }}
+          path: dist/releases/${{ env.RELEASE_SHA }}
+          if-no-files-found: error
+
+      - name: Push public assets + data.json to R2 (prod)
+        uses: ./.github/actions/sesame/r2-push
+        with:
+          bucket: ${{ matrix.r2_bucket }}
+          public_dir: ${{ matrix.public_dir }}
+          data_json_path: ${{ matrix.app_path }}/data.json
+          wrangler_config: ${{ matrix.wrangler_config }}
+          wrangler_version: '4.31.0'
+
+  # Basic smoke tests against production host
+  smoke-test:
+    needs: promote
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - app_id: docs.jiode.one
+            app_path: docs/src
+            public_dir: docs/public
+            wrangler_config: docs/docs-meta-worker/wrangler.toml
+            r2_bucket: private-docs-data
+    env:
+      HOST: ${{ vars.PRODUCTION_HOST }}
+    steps:
+      - name: test /health
+        shell: bash
+        run: |
+          set -euo pipefail
+          HOST="${HOST:-sesame.jiode.one}"
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/health")
+          echo "HTTP ${code} /health"
+          test "$code" = "200"
+          body=$(curl -s "https://${HOST}/health")
+          echo "Body: $body"
+          [[ "$body" =~ OK|ok ]]
+
+      - name: test R2 control endpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          HOST="${HOST:-docs.jiode.one}"
+          # These should be safe GETs that your worker exposes for diagnostics (adjust to your routes)
+          curl -fsSL "https://${HOST}/__r2get" | grep -qi "GET: OK"
+          curl -fsSL "https://${HOST}/__r2list" | grep -qi "data.json"
+
+      - name: test image exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          HOST="${HOST:-sesame.jiode.one}"
+          # Check one representative image you seeded
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://${HOST}/favicon.svg")
+          echo "HTTP ${code} /images/background.webp"
+          test "$code" = "200"

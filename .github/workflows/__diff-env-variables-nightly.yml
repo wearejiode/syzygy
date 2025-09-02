@@ -1,19 +1,23 @@
+# Checks that env variables match the .yml files in .github/env/
+# can check up to 100 variables per environment
+# Run daily on schedule for all envs; can also run manually for one env
+
 name: Diff Environment Variables
 
 on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "Environment to diff"
+        description: 'Environment to diff'
         type: choice
         required: true
         options: [preview, staging, production]
   schedule:
-    - cron: "0 7 * * *" # daily drift check
+    - cron: '0 7 * * *' # daily drift check
   push:
     paths:
-      - ".github/env/*.vars.yml"
-      - ".github/workflows/__diff-env-variables-nightly.yml"
+      - '.github/env/*.vars.yml'
+      - '.github/workflows/__diff-env-variables-nightly.yml'
 
 permissions:
   contents: read
@@ -32,134 +36,136 @@ jobs:
       fail-fast: false
       matrix:
         env_name: [preview, staging, production]
+    environment: ${{ matrix.env_name }}
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Pick vars file
-      id: pick
-      run: echo "FILE=.github/env/${{ matrix.env_name }}.vars.yml" >> "$GITHUB_OUTPUT"
+      - name: Pick vars file
+        id: pick
+        run: echo "FILE=.github/env/${{ matrix.env_name }}.vars.yml" >> "$GITHUB_OUTPUT"
 
-    - name: Install yq
-      uses: mikefarah/yq@v4.44.3
+      - name: Install yq
+        uses: mikefarah/yq@v4.44.3
 
-    - name: Load YAML → JSON (desired)
-      id: desired
-      env:
-        FILE: ${{ steps.pick.outputs.FILE }}
-      run: |
-        echo "json=$(yq -o=json '.' "$FILE" | tr -d '\n' | jq -c .)" >> "$GITHUB_OUTPUT"
+      - name: Load YAML → JSON (desired)
+        id: desired
+        env:
+          FILE: ${{ steps.pick.outputs.FILE }}
+        run: |
+          echo "json=$(yq -o=json '.' "$FILE" | tr -d '\n' | jq -c .)" >> "$GITHUB_OUTPUT"
 
-    - name: Diff ${{ matrix.env_name }}
-      uses: actions/github-script@v7
-      env:
-        ENV_NAME: ${{ matrix.env_name }}
-        DESIRED_JSON: ${{ steps.desired.outputs.json }}
-      with:
-        script: |
-          const desired = JSON.parse(process.env.DESIRED_JSON || '{}');
+      - name: Diff ${{ matrix.env_name }}
+        uses: actions/github-script@v7
+        env:
+          ENV_NAME: ${{ matrix.env_name }}
+          DESIRED_JSON: ${{ steps.desired.outputs.json }}
+        with:
+          script: |
+            const desired = JSON.parse(process.env.DESIRED_JSON || '{}');
 
-          const { data: list } = await github.request(
-            'GET /repos/{owner}/{repo}/environments/{environment_name}/variables',
-            { owner: context.repo.owner, repo: context.repo.repo, environment_name: process.env.ENV_NAME, per_page: 100 }
-          );
-
-          const actual = {};
-          for (const v of list.variables || []) {
-            const { data } = await github.request(
-              'GET /repos/{owner}/{repo}/environments/{environment_name}/variables/{name}',
-              { owner: context.repo.owner, repo: context.repo.repo, environment_name: process.env.ENV_NAME, name: v.name }
+            const { data: list } = await github.request(
+              'GET /repos/{owner}/{repo}/environments/{environment_name}/variables',
+              { owner: context.repo.owner, repo: context.repo.repo, environment_name: process.env.ENV_NAME, per_page: 100 }
             );
-            actual[v.name] = data.value ?? '';
-          }
 
-          const added = [], removed = [], changed = [];
-          const all = new Set([...Object.keys(desired), ...Object.keys(actual)]);
-          for (const k of all) {
-            if (!(k in actual)) added.push([k, desired[k]]);
-            else if (!(k in desired)) removed.push([k, actual[k]]);
-            else if (String(actual[k]) !== String(desired[k])) changed.push([k, actual[k], desired[k]]);
-          }
+            const actual = {};
+            for (const v of list.variables || []) {
+              const { data } = await github.request(
+                'GET /repos/{owner}/{repo}/environments/{environment_name}/variables/{name}',
+                { owner: context.repo.owner, repo: context.repo.repo, environment_name: process.env.ENV_NAME, name: v.name }
+              );
+              actual[v.name] = data.value ?? '';
+            }
 
-          const toTbl = (rows, hdrs) => rows.length
-            ? '|' + hdrs.join('|') + '|\n|' + hdrs.map(()=>'---').join('|') + '|\n' +
-              rows.map(r => '|' + r.map(x => String(x)).join('|') + '|').join('\n') + '\n'
-            : '(none)\n';
+            const added = [], removed = [], changed = [];
+            const all = new Set([...Object.keys(desired), ...Object.keys(actual)]);
+            for (const k of all) {
+              if (!(k in actual)) added.push([k, desired[k]]);
+              else if (!(k in desired)) removed.push([k, actual[k]]);
+              else if (String(actual[k]) !== String(desired[k])) changed.push([k, actual[k], desired[k]]);
+            }
 
-          core.info(`\n=== Diff for environment: ${process.env.ENV_NAME} ===\n`);
-          core.info('Added (in YAML, not in Environment):\n' + toTbl(added, ['key','yaml']));
-          core.info('Removed (in Environment, not in YAML):\n' + toTbl(removed, ['key','env']));
-          core.info('Changed (value mismatch):\n' + toTbl(changed, ['key','env','yaml']));
+            const toTbl = (rows, hdrs) => rows.length
+              ? '|' + hdrs.join('|') + '|\n|' + hdrs.map(()=>'---').join('|') + '|\n' +
+                rows.map(r => '|' + r.map(x => String(x)).join('|') + '|').join('\n') + '\n'
+              : '(none)\n';
 
-          if (added.length || removed.length || changed.length) {
-            core.setFailed(`Drift detected in ${process.env.ENV_NAME}`);
-          } else {
-            core.info(`No drift detected in ${process.env.ENV_NAME} ✅`);
-          }
+            core.info(`\n=== Diff for environment: ${process.env.ENV_NAME} ===\n`);
+            core.info('Added (in YAML, not in Environment):\n' + toTbl(added, ['key','yaml']));
+            core.info('Removed (in Environment, not in YAML):\n' + toTbl(removed, ['key','env']));
+            core.info('Changed (value mismatch):\n' + toTbl(changed, ['key','env','yaml']));
+
+            if (added.length || removed.length || changed.length) {
+              core.setFailed(`Drift detected in ${process.env.ENV_NAME}`);
+            } else {
+              core.info(`No drift detected in ${process.env.ENV_NAME} ✅`);
+            }
 
   # Runs on manual dispatch for ONE env (no matrix, so no 'matrix' refs)
   drift-one:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Pick vars file
-      id: pick
-      run: echo "FILE=.github/env/${{ matrix.env_name }}.vars.yml" >> "$GITHUB_OUTPUT"
+      - name: Pick vars file
+        id: pick
+        run: echo "FILE=.github/env/${{ github.event.inputs.environment }}.vars.yml" >> "$GITHUB_OUTPUT"
 
-    - name: Install yq
-      uses: mikefarah/yq@v4.44.3
+      - name: Install yq
+        uses: mikefarah/yq@v4.44.3
 
-    - name: Load YAML → JSON (desired)
-      id: desired
-      env:
-        FILE: ${{ steps.pick.outputs.FILE }}
-      run: |
-        echo "json=$(yq -o=json '.' "$FILE" | tr -d '\n' | jq -c .)" >> "$GITHUB_OUTPUT"
+      - name: Load YAML → JSON (desired)
+        id: desired
+        env:
+          FILE: ${{ steps.pick.outputs.FILE }}
+        run: |
+          echo "json=$(yq -o=json '.' "$FILE" | tr -d '\n' | jq -c .)" >> "$GITHUB_OUTPUT"
 
-    - name: Diff ${{ github.event.inputs.environment }}
-      uses: actions/github-script@v7
-      env:
-        ENV_NAME: ${{ github.event.inputs.environment }}
-        DESIRED_JSON: ${{ steps.desired.outputs.json }}
-      with:
-        script: |
-          const desired = JSON.parse(process.env.DESIRED_JSON || '{}');
+      - name: Diff ${{ github.event.inputs.environment }}
+        uses: actions/github-script@v7
+        env:
+          ENV_NAME: ${{ github.event.inputs.environment }}
+          DESIRED_JSON: ${{ steps.desired.outputs.json }}
+        with:
+          script: |
+            const desired = JSON.parse(process.env.DESIRED_JSON || '{}');
 
-          const { data: list } = await github.request(
-            'GET /repos/{owner}/{repo}/environments/{environment_name}/variables',
-            { owner: context.repo.owner, repo: context.repo.repo, environment_name: process.env.ENV_NAME, per_page: 100 }
-          );
-
-          const actual = {};
-          for (const v of list.variables || []) {
-            const { data } = await github.request(
-              'GET /repos/{owner}/{repo}/environments/{environment_name}/variables/{name}',
-              { owner: context.repo.owner, repo: context.repo.repo, environment_name: process.env.ENV_NAME, name: v.name }
+            const { data: list } = await github.request(
+              'GET /repos/{owner}/{repo}/environments/{environment_name}/variables',
+              { owner: context.repo.owner, repo: context.repo.repo, environment_name: process.env.ENV_NAME, per_page: 100 }
             );
-            actual[v.name] = data.value ?? '';
-          }
 
-          const added = [], removed = [], changed = [];
-          const all = new Set([...Object.keys(desired), ...Object.keys(actual)]);
-          for (const k of all) {
-            if (!(k in actual)) added.push([k, desired[k]]);
-            else if (!(k in desired)) removed.push([k, actual[k]]);
-            else if (String(actual[k]) !== String(desired[k])) changed.push([k, actual[k], desired[k]]);
-          }
+            const actual = {};
+            for (const v of list.variables || []) {
+              const { data } = await github.request(
+                'GET /repos/{owner}/{repo}/environments/{environment_name}/variables/{name}',
+                { owner: context.repo.owner, repo: context.repo.repo, environment_name: process.env.ENV_NAME, name: v.name }
+              );
+              actual[v.name] = data.value ?? '';
+            }
 
-          const toTbl = (rows, hdrs) => rows.length
-            ? '|' + hdrs.join('|') + '|\n|' + hdrs.map(()=>'---').join('|') + '|\n' +
-              rows.map(r => '|' + r.map(x => String(x)).join('|') + '|').join('\n') + '\n'
-            : '(none)\n';
+            const added = [], removed = [], changed = [];
+            const all = new Set([...Object.keys(desired), ...Object.keys(actual)]);
+            for (const k of all) {
+              if (!(k in actual)) added.push([k, desired[k]]);
+              else if (!(k in desired)) removed.push([k, actual[k]]);
+              else if (String(actual[k]) !== String(desired[k])) changed.push([k, actual[k], desired[k]]);
+            }
 
-          core.info(`\n=== Diff for environment: ${process.env.ENV_NAME} ===\n`);
-          core.info('Added (in YAML, not in Environment):\n' + toTbl(added, ['key','yaml']));
-          core.info('Removed (in Environment, not in YAML):\n' + toTbl(removed, ['key','env']));
-          core.info('Changed (value mismatch):\n' + toTbl(changed, ['key','env','yaml']));
+            const toTbl = (rows, hdrs) => rows.length
+              ? '|' + hdrs.join('|') + '|\n|' + hdrs.map(()=>'---').join('|') + '|\n' +
+                rows.map(r => '|' + r.map(x => String(x)).join('|') + '|').join('\n') + '\n'
+              : '(none)\n';
 
-          if (added.length || removed.length || changed.length) {
-            core.setFailed(`Drift detected in ${process.env.ENV_NAME}`);
-          } else {
-            core.info(`No drift detected in ${process.env.ENV_NAME} ✅`);
-          }
+            core.info(`\n=== Diff for environment: ${process.env.ENV_NAME} ===\n`);
+            core.info('Added (in YAML, not in Environment):\n' + toTbl(added, ['key','yaml']));
+            core.info('Removed (in Environment, not in YAML):\n' + toTbl(removed, ['key','env']));
+            core.info('Changed (value mismatch):\n' + toTbl(changed, ['key','env','yaml']));
+
+            if (added.length || removed.length || changed.length) {
+              core.setFailed(`Drift detected in ${process.env.ENV_NAME}`);
+            } else {
+              core.info(`No drift detected in ${process.env.ENV_NAME} ✅`);
+            }

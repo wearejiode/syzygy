@@ -1,0 +1,5 @@
+services/**
+infra/**
+ops/**
+docs/internal/**
+apps/api/core/**

@@ -1,0 +1,4 @@
+services/ export-ignore
+infra/ export-ignore
+ops/ export-ignore
+docs/internal/ export-ignore

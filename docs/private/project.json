@@ -1,28 +1,30 @@
 {
-  "name": "docs",
+  "name": "@jiode/docs",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/spark-docs/src",
+  "sourceRoot": "docs/src",
   "projectType": "application",
+  "private": true,
   "targets": {
     "dev": {
       "executor": "nx:run-commands",
       "options": {
         "command": "astro dev",
-        "cwd": "apps/spark-docs"
+        "cwd": "docs/"
       }
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
         "command": "astro build",
-        "cwd": "apps/spark-docs"
+        "cwd": "docs/",
+        "outputs": ["{workspaceRoot}/dist/apps/docs/spark-docs"]
       }
     },
     "preview": {
       "executor": "nx:run-commands",
       "options": {
         "command": "astro preview",
-        "cwd": "apps/spark-docs"
+        "cwd": "docs/"
       }
     }
   },

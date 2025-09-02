@@ -1,3 +1,20 @@
 #!/usr/bin/env sh
-# Husky v9+: no .husky/_/husky.sh
-pnpm -s lint-staged
+. "$(dirname "$0")/_/husky.sh"
+
+set -e
+
+# 🔒 Safety backup (one-line, cheap). If commit fails, you can restore from this.
+STAMP="pre-commit-backup-$(date +%s)"
+git stash push -u -k -m "$STAMP" >/dev/null 2>&1 || true
+
+# ✅ Run lint-staged without stashing, so your work stays in the working tree
+npx lint-staged --no-stash
+STATUS=$?
+
+if [ $STATUS -ne 0 ]; then
+  echo "❌ Pre-commit failed. Your work is safe in: git stash list  (look for $STAMP)"
+  exit $STATUS
+else
+  # Clean up the backup if we succeeded
+  git stash drop "stash^{/$STAMP}" >/dev/null 2>&1 || true
+fi

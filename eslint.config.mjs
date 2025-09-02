@@ -5,7 +5,11 @@ export default [
   ...nx.configs['flat/typescript'],
   ...nx.configs['flat/javascript'],
   {
-    ignores: ['**/dist'],
+    ignores: [
+      '**/dist',
+      'apps/nomad.jiode.one/src/js/confetti.min.js',
+      'apps/web/auth/src/js/confetti.min.js'
+    ],
   },
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
@@ -23,6 +27,13 @@ export default [
           ],
         },
       ],
+            // allow `{}` in generated types
+      '@typescript-eslint/no-empty-object-type': 'off',
+      // generated types often use `any`
+      '@typescript-eslint/no-explicit-any': 'off',
+      // triple-slash is common in generated d.ts
+      '@typescript-eslint/triple-slash-reference': 'off',
+      '@typescript-eslint/no-empty-function': 'off'
     },
   },
   {
