@@ -1,0 +1,64 @@
+{
+  "name": "client-blog",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/blog/client/src",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{workspaceRoot}/dist/apps/client-blog"],
+      "options": {
+        "outputPath": "dist/apps/client-blog",
+        "index": "apps/blog/client/src/index.html",
+        "browser": "apps/blog/client/src/main.ts",
+        "tsConfig": "apps/blog/client/tsconfig.app.json",
+        "baseHref": "/",
+        "assets": [
+          "apps/blog/client/src/assets",
+          {
+            "glob": "**/*",
+            "input": "apps/blog/client/src/public",
+            "output": "/"
+          },
+          {
+            "glob": "favicon.*",
+            "input": "apps/blog/client/src",
+            "output": "/"
+          }
+        ],
+        "styles": ["apps/blog/client/src/styles.css"],
+        "scripts": [],
+        "ssr": false,
+        "prerender": false
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "sourceMap": true,
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "wrangler dev --config apps/blog/wrangler.toml --local",
+        "cwd": "."
+      }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "wrangler deploy --config apps/blog/wrangler.toml",
+        "cwd": "."
+      }
+    }
+  },
+  "tags": ["scope:web", "type:spa"]
+}

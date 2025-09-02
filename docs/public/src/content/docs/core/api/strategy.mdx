@@ -1,0 +1,77 @@
+---
+title: "GraphQL & REST Strategy"
+description: "The API strategy behind the fahrnbach.one ecosystem"
+tags: ["api", "graphql", "rest", "strategy", "content-federation", "yoga", "architecture"]
+author: "Jacob Fahrnbach"
+ai_used: true
+model: "ChatGPT 4o-Turbo"
+status: "draft"
+created: "2025-06-19"
+updated: "2025-06-19"
+revision: 1.0
+alignment: 10
+confidence: 10
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+The API strategy behind the fahrnbach.one ecosystem focuses on balancing flexibility, developer experience, and long-term scalability. At the heart of our content layer — particularly for blog posts, user interactions, and frontend CMS functionality — we’ve chosen **GraphQL**, powered by the [Yoga GraphQL server](https://the-guild.dev/graphql/yoga-server).
+
+This page outlines our reasoning behind choosing GraphQL as the foundation for key services, when it might be appropriate to opt for REST or other API models, and how our evolving architecture accommodates both.
+
+<Aside type="note">
+GraphQL is a query language, not a database — it sits as a smart layer between frontend and data stores like D1, R2, and eventually more distributed sources.
+</Aside>
+
+## Why GraphQL?
+
+We opted for GraphQL for the blog and CMS systems primarily due to:
+
+- **Content Federation**: The ability to stitch together structured content from Markdown files, D1 SQLite databases, and other systems (e.g., user data or analytics).
+- **Single Flexible Endpoint**: Instead of managing dozens of REST routes, we expose one query/mutation entry point with a strongly typed schema.
+- **Precise Data Fetching**: Clients can ask for exactly what they need — and nothing more. This leads to faster UI rendering and lower payload sizes.
+- **Schema-Driven Contracts**: Strongly typed APIs enforced by both TypeScript and our Zod schema validator (see: `/api/schema`).
+- **Tooling and DX**: GraphQL integrates cleanly with Angular and the growing developer ecosystem around code generation, type safety, and playgrounds.
+- **Nexus Module Reusability**: We use Nexus to construct a modular, composable schema — enabling plug-and-play components across services.
+
+## When We Might Use REST
+
+GraphQL is powerful, but not always ideal. There are still good reasons to reach for REST endpoints in our architecture:
+
+| Use Case                          | Why REST Wins                         |
+|----------------------------------|---------------------------------------|
+| File uploads (e.g. R2 buckets)   | Simple POST with `multipart/form-data` |
+| Webhooks from 3rd parties        | REST is the default interface         |
+| Extremely simple data pipes      | Avoids the complexity of GraphQL     |
+| Public APIs with caching/CDN     | REST integrates more easily with HTTP caching layers |
+| Admin tasks or tooling scripts   | Easier to script/test with `curl` or Postman |
+
+<Aside type="tip">
+If the operation is one-way (like “submit form” or “trigger server restart”), REST might be the simpler, more intuitive fit.
+</Aside>
+
+## Hybrid Strategy
+
+Our long-term architecture will support a **hybrid model** — with GraphQL as the backbone of dynamic, content-driven features, and REST endpoints for static file services, admin control flows, and external integrations.
+
+This lets us:
+
+- Expose public RESTful routes for things like `resume.fahrnbach.one`
+- Keep a type-safe developer interface for core CMS editing
+- Gradually move monolithic API logic into smaller composable modules
+
+## Future Considerations
+
+- Consider adding GraphQL Federation for multi-service schemas
+- Explore REST-to-GraphQL wrappers for external APIs (e.g., GitHub)
+- Build DX tools for easily toggling between REST/GraphQL in client code
+
+<Aside type="caution">
+While GraphQL is elegant, it requires discipline: you must keep your schema clean, avoid overfetching, and build strong client-side caching where needed.
+</Aside>
+
+To view the GraphQL schema → [api/schema](../schema)
+For the Zod validation layer → [api/zod](../zod)
+And for SQL structure → [api/sql](../sql)
