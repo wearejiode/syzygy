@@ -1,0 +1,13 @@
+{
+  "*.{ts,tsx,js,jsx}": [
+    "eslint --fix --quiet",
+    "git add"
+  ],
+  "*.{md,css,scss,json,yml,yaml}": [
+    "prettier --write",
+    "git add"
+  ],
+  // Ignore generated & minified
+  "!docs/private/.astro/**": "true",
+  "!**/*.min.js": "true"
+}
