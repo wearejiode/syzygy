@@ -1,1 +1,0 @@
-actionlint -color || exit 1
