@@ -51,7 +51,7 @@ jobs:
         echo "json=$(yq -o=json '.' "$FILE" | tr -d '\n' | jq -c .)" >> "$GITHUB_OUTPUT"
 
     - name: Diff ${{ matrix.env_name }}
-      uses: actions/github-script@v7
+      uses: actions/github-script@v8
       env:
         ENV_NAME: ${{ matrix.env_name }}
         DESIRED_JSON: ${{ steps.desired.outputs.json }}
@@ -119,7 +119,7 @@ jobs:
         echo "json=$(yq -o=json '.' "$FILE" | tr -d '\n' | jq -c .)" >> "$GITHUB_OUTPUT"
 
     - name: Diff ${{ github.event.inputs.environment }}
-      uses: actions/github-script@v7
+      uses: actions/github-script@v8
       env:
         ENV_NAME: ${{ github.event.inputs.environment }}
         DESIRED_JSON: ${{ steps.desired.outputs.json }}

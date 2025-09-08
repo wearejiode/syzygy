@@ -97,7 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Enforce scope matches area label(s)
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const title = context.payload.pull_request.title || '';
@@ -141,7 +141,7 @@ jobs:
             }
 
       - name: Require area label when app files change
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const { data: files } = await github.rest.pulls.listFiles({
