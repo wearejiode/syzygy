@@ -54,3 +54,9 @@ Thumbs.db
 
 .angular
 echo-protocol
+dist/
+build/
+out/
+target/
+**/target/
+apps/**/src-tauri/target/
