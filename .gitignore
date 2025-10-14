@@ -5,6 +5,12 @@ dist
 dist/*
 tmp
 out-tsc
+build/
+out/
+target/
+**/target/
+apps/**/src-tauri/target/
+apps/**/src-tauri/gen/
 
 # dependencies
 node_modules

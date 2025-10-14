@@ -1,17 +1,11 @@
-set -e
+set -euo pipefail
 
-# 🔒 Safety backup (one-line, cheap). If commit fails, you can restore from this.
-STAMP="pre-commit-backup-$(date +%s)"
-git stash push -u -k -m "$STAMP" >/dev/null 2>&1 || true
-
-# ✅ Run lint-staged without stashing, so your work stays in the working tree
-npx lint-staged --no-stash
-STATUS=$?
-
-if [ $STATUS -ne 0 ]; then
-  echo "❌ Pre-commit failed. Your work is safe in: git stash list  (look for $STAMP)"
-  exit $STATUS
-else
-  # Clean up the backup if we succeeded
-  git stash drop "stash^{/$STAMP}" >/dev/null 2>&1 || true
+# Block if build artifacts are staged
+if git diff --cached --name-only | grep -Eq '(^|/)(dist|build|out|target)(/|$)'; then
+  echo "❌ Build artifacts detected in the index (dist/build/out/target). Unstage them first."
+  git diff --cached --name-only | grep -E '(^|/)(dist|build|out|target)(/|$)'
+  exit 1
 fi
+
+# Safe: let lint-staged manage its own stash/restore
+pnpm lint-staged

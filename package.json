@@ -29,8 +29,14 @@
     "publish-packages": "changeset publish"
   },
   "lint-staged": {
-    "*.{js,ts,tsx,mjs,cjs}": "pnpm -s eslint --fix",
-    "*.{css,md,json,yml,yaml}": "pnpm -s prettier --write"
+    "*.{js,ts,tsx,mjs,cjs}": [
+      "pnpm -s eslint --fix --max-warnings=0 --ignore-path .eslintignore",
+      "git add"
+    ],
+    "*.{css,md,json,yml,yaml}": [
+      "pnpm -s prettier --write",
+      "git add"
+    ]
   },
   "private": true,
   "dependencies": {

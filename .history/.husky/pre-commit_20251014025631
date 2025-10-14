@@ -1,0 +1,10 @@
+set -euo pipefail
+
+# Guard: don’t let build artifacts get staged
+if git diff --cached --name-only | grep -E '(^|/)(dist|build|out|target)(/|$)'; then
+  echo "❌ Build artifacts detected in the index (dist/build/out/target). Unstage them first."
+  exit 1
+fi
+
+# Let lint-staged handle safety (it stashes/restore automatically)
+pnpm lint-staged
