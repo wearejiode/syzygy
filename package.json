@@ -30,12 +30,10 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx,mjs,cjs}": [
-      "pnpm -s eslint --fix --max-warnings=0 --ignore-path .eslintignore",
-      "git add"
+      "pnpm -s eslint --fix --max-warnings=0 --ignore-path .eslintignore"
     ],
     "*.{css,md,json,yml,yaml}": [
-      "pnpm -s prettier --write",
-      "git add"
+      "pnpm -s prettier --write"
     ]
   },
   "private": true,
