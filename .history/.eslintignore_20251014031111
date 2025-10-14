@@ -1,0 +1,5 @@
+**/dist/**
+**/build/**
+**/out/**
+**/target/**
+apps/**/src-tauri/target/**
