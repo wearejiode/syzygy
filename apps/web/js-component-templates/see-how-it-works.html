@@ -1,0 +1,46 @@
+<!doctype html><html lang="en"><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Choice Makes Worlds</title>
+<style>
+  :root{--bg:#0B0B10;--hue:220;--orbit:120px}
+  body{margin:0;background:var(--bg);color:#fff;font:500 16px/1.5 system-ui,sans-serif;display:grid;place-items:center;min-height:100svh}
+  .demo{display:grid;gap:18px;text-align:center}
+  .world{position:relative;width:260px;height:260px;margin-inline:auto}
+  .sun,.p,.slice{position:absolute;border-radius:50%;transition:all .6s ease}
+  .sun{width:64px;height:64px;top:50%;left:50%;transform:translate(-50%,-50%);background:hsl(var(--hue) 100% 55%/1);box-shadow:0 0 40px hsl(var(--hue) 100% 55%/1)}
+  .p{width:30px;height:30px;top:50%;left:50%;transform-origin: calc(-1 * var(--orbit)) center; background:hsl(calc(var(--hue)+80) 100% 60%/1); animation:orb 6s linear infinite paused}
+  .slice{width:24px;height:24px;top:50%;left:50%;transform-origin: calc(-1 * var(--orbit) / 1.5) center; background:hsl(calc(var(--hue)+160) 100% 60%/1); animation:orb 4s linear infinite paused}
+  @keyframes orb{to{transform:rotate(360deg)}}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+  .controls label{display:flex;gap:6px;align-items:center;background:#151522;border:1px solid #ffffff22;padding:6px 10px;border-radius:999px}
+  .msg{opacity:.85}
+</style>
+<section class="demo">
+  <h2>Choice Builds Worlds</h2>
+  <div class="world">
+    <div class="sun"></div><div class="p"></div><div class="slice"></div>
+  </div>
+  <div class="controls">
+    <label><input id="motion" type="checkbox"> Motion</label>
+    <label><input id="color"  type="checkbox"> Color</label>
+    <label><input id="gravity"type="checkbox"> Gravity</label>
+    <label><input id="mood"   type="checkbox"> Mood</label>
+  </div>
+  <p class="msg" id="m">Toggle a setting to reshape your world.</p>
+</section>
+<script>
+  const msg=document.getElementById('m'), root=document.documentElement;
+  const els=[...document.querySelectorAll('.p,.slice')];
+  function update(){
+    const motion=motionEl.checked, color=colorEl.checked, gravity=gravityEl.checked, mood=moodEl.checked;
+    els.forEach(e=>e.style.animationPlayState=motion?'running':'paused');
+    root.style.setProperty('--hue', color? Math.floor(Math.random()*360) : 220);
+    root.style.setProperty('--orbit', gravity? '90px':'140px');
+    document.body.style.cursor = mood ? 'crosshair' : 'auto';
+    const n=[motion,color,gravity,mood].filter(Boolean).length;
+    msg.textContent = n ? `You just changed ${n} variable${n>1?'s':''} — a new world formed.` : 'Toggle a setting to reshape your world.';
+  }
+  const motionEl=motion,colorEl=color,gravityEl=gravity,moodEl=mood;
+  [motionEl,colorEl,gravityEl,moodEl].forEach(i=>i.addEventListener('change',update));
+</script>
+</html>

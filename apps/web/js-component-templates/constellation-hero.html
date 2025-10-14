@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Constellation Hero</title>
+<style>
+  :root{--bg:#0B0B10}
+  body{margin:0;background:var(--bg);color:#fff;font:500 16px/1.5 system-ui,sans-serif;display:grid;place-items:center;min-height:100svh}
+  .hero{position:relative;width:min(960px,92vw);border-radius:20px;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.5)}
+  .v{width:100%;height:auto;display:block;background:linear-gradient(135deg,#1a1a2a,#0c0c14)}
+  .planet{position:absolute;width:56px;height:56px;border-radius:50%;backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.25);box-shadow:0 8px 24px rgba(0,0,0,.35);cursor:pointer}
+  .card{position:absolute;right:12px;bottom:12px;max-width:360px;padding:14px 16px;border-radius:14px;
+    background:rgba(255,255,255,.08);backdrop-filter:blur(12px);display:none}
+  .btn{display:inline-block;margin-top:8px;padding:8px 12px;border:1px solid #ffffff55;border-radius:999px;color:#fff;text-decoration:none}
+</style>
+<section class="hero" id="hero">
+  <!-- replace poster/src with real assets later -->
+  <video class="v" autoplay muted loop playsinline poster="" id="vid">
+    <source src="" type="video/mp4">
+  </video>
+  <button class="planet" style="left:18%;top:28%" data-id="oven" aria-label="The Oven"></button>
+  <button class="planet" style="left:74%;top:22%" data-id="labs" aria-label="The Labs"></button>
+  <button class="planet" style="left:62%;top:68%" data-id="studio" aria-label="Studio"></button>
+  <button class="planet" style="left:32%;top:64%" data-id="community" aria-label="Community"></button>
+  <aside class="card" id="card"><h3 id="title"></h3><p id="desc"></p><a id="cta" class="btn" href="#">Learn more</a></aside>
+</section>
+<script>
+  const clips={
+    oven:{label:'The Oven',desc:'Peek at the engine.',t0:0.8,t1:3.2,href:'#'},
+    labs:{label:'The Labs',desc:'Serious tools, neon soul.',t0:3.3,t1:6.1,href:'#'},
+    studio:{label:'Studio',desc:'Hands-on help from devs.',t0:6.2,t1:8.8,href:'#'},
+    community:{label:'Community',desc:'Builders at the table.',t0:8.9,t1:10.9,href:'#'}
+  };
+  const v=document.getElementById('vid'), card=document.getElementById('card'),
+        title=document.getElementById('title'), desc=document.getElementById('desc'), cta=document.getElementById('cta');
+  let playing=null, timer=null;
+  document.querySelectorAll('.planet').forEach(p=>p.onclick=()=>focusClip(clips[p.dataset.id]));
+  function focusClip(c){ playing=c; v.currentTime=c.t0; v.play(); clearInterval(timer);
+    timer=setInterval(()=>{ if(!playing) return; if(v.currentTime>=c.t1){ v.pause(); show(c); clearInterval(timer);} },60); }
+  function show(c){ title.textContent=c.label; desc.textContent=c.desc; cta.href=c.href; card.style.display='block'; }
+</script>
+</html>

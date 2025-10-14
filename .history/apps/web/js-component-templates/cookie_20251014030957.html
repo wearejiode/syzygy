@@ -1,0 +1,362 @@
+<!doctype html><html lang="en"><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Cookie Consent — Swing Sidebar</title>
+<style>
+    :root{
+    --bg:#0B0B10;
+    --glass:rgba(255,255,255,.08);
+    --glass2:rgba(39, 109, 120, 0.58);
+    --checker-dark: rgba(0,0,0,0.80);  /* 80% black */
+    --checker-light: rgba(255,255,255,0.0); /* 20% white */
+    --checker-size: 40px;              /* tile size */
+  }
+  html,body{height:100%} body{margin:0;background:var(--bg);color:#fff;font:500 16px/1.5 system-ui,sans-serif}
+  .stage{display:flex;flex-direction:column;align-items:center;position:fixed;inset:0;z-index:9999}
+  .gradient-backdrop{position:absolute; width:0%; height:100%;z-index:-1;background:conic-gradient(from 0deg at 50% 50%, #ff00ff, #00ffff, #ffff00, #ff00ff);
+          position:relative; animation:backgroundReveal 2s ease-in-out forwards}
+  .checker-backdrop {
+      background-image:
+      linear-gradient(45deg, var(--checker-dark) 25%, var(--checker-light) 25%),
+      linear-gradient(-45deg, var(--checker-dark) 25%, var(--checker-light) 25%),
+      linear-gradient(45deg, var(--checker-light) 75%, var(--checker-dark) 75%),
+      linear-gradient(-45deg, var(--checker-light) 75%, var(--checker-dark) 75%);
+
+    /* 4-layer checkerboard on top, animated conic gradient behind */
+    background-size:
+      var(--checker-size) var(--checker-size),
+      var(--checker-size) var(--checker-size),
+      var(--checker-size) var(--checker-size),
+      var(--checker-size) var(--checker-size),
+      0% 0%; /* start tiny, grow to fill */
+    background-position:
+      0 0,
+      0 calc(var(--checker-size)/2),
+      calc(var(--checker-size)/2) calc(-1 * var(--checker-size)/2),
+      calc(-1 * var(--checker-size)/2) 0,
+      center;
+    background-repeat:
+      repeat,
+      repeat,
+      repeat,
+      repeat,
+      no-repeat;
+    overflow:hidden;
+    height: 100lvh;
+    transform: scale(100%);
+    animation: grow 10s ease-in-out infinite alternate
+  }
+
+  @keyframes revealPage{
+    0%{ background-size: 0% 0%; }
+    100%{ background-size: 240% 240%;
+        clip-path: circle(150% at 50% 18%); }
+  }
+  .cookie-flex-container{display: flex; align-self:center; justify-self:center; align-items:center; justify-content: center; height:100%;width:100lvw;isolation:isolate}
+  .cookie{width:100%;height:auto;position:relative;z-index:1;filter:drop-shadow(0 0 24px #cc66ff66); transform: scale(180%);}
+  .cookie-wrap{position:absolute;width:50vw; height:auto;isolation:isolate; animation: rotateGradient 6s infinite;}
+  .cookie-wrap::before{
+    content:"";position:absolute;inset:-50%;z-index:0;border-radius:50%;
+    background:conic-gradient(from 0deg, violet, indigo, blue, green, yellow, orange, red, violet);
+    filter:blur(22px) saturate(140%);
+    opacity:.75;
+    /* transform: scale(75%); */
+  }
+  @keyframes rotateGradient{to{transform:rotate(360deg)}}
+  @keyframes backgroundReveal{to{width: 100%;}}
+  @keyframes darken{to{background: #202020dd;}}
+  @keyframes grow{to{transform: scale(110%)};}
+
+  /* Mobile bottom panel (shows on <960px) */
+  .bottom{width:100lvw; display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:42vh;    background: #20202000;backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.12); box-shadow: 0 -10px 15px rgba(0,0,0,.5); animation: darken 3s ease-in-out forwards;}
+  .bottom-inner{text-align:center;padding:24px;display:grid;gap:12px}
+
+  .side{height: 100lvh;inset:0 auto 0 0;width:min(440px,52vw);background:var(--glass);backdrop-filter:blur(14px);
+    border-right:1px solid rgba(255,255,255,.12);box-shadow:0 40px 120px rgba(0,0,0,.5);
+    transform-origin:left center;}
+  .open .side{opacity:1;transform:perspective(1200px) rotateY(0deg);transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .4s}
+  .inner{height:100%;display:grid;align-content:center;gap:14px;padding:28px}
+  .form{display:grid;gap:8px} .form label{display:flex;gap:8px;align-items:center;opacity:.9}
+  .row{display:flex;gap:10px;margin-top:6px}
+  .btn{border:0;border-radius:999px;padding:.6rem 1rem;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+  .btn:hover{background:rgba(255,255,255,.24)}
+
+  /* Welcome badge (mobile: top-center; desktop: bottom-right) */
+  .welcome-badge{
+    display: flex;
+    justify-self: center;
+    align-self: center;
+    position: absolute;
+    inset: auto 1% 1% auto; /* desktop: bottom-right */
+    z-index:10000; /* above checker but under dialogs if any */
+    inset: 0;
+    height: 99%;
+    width: 90%;
+    padding:15px 19px; border-radius:14px;
+    background: rgba(255,255,255,.2);
+    border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(10px) saturate(140%) contrast(0.85) brightness(.5);
+    box-shadow: 0 10px 30px rgba(0,0,0,.55);
+    color:#fff; opacity:0;
+  }
+  .welcome-badge strong{ font-weight:700; letter-spacing:.2px; }
+  .welcome-sub{
+
+    padding: 1rem;
+    opacity:.85;
+    font-size: 1rem;
+    text-wrap: wrap;
+    width: 80vw;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  /* Animate in from left */
+  .welcome-badge.show{ opacity:1; transition: opacity .6s ease; }
+  .welcome-badge.show .welcome-inner{ opacity:1; transform: translateX(0); transition: transform .6s cubic-bezier(.2,.8,.2,1), opacity .6s ease; }
+
+  .welcome-inner{
+    display: grid;
+    grid-template-columns: 0;
+    grid-template-rows: 1fr 5fr 1fr 1fr;
+    gap:8px;
+    white-space:nowrap;
+    opacity:0;
+    transform: translateX(-24px);
+    height:100%;
+    width:100%; }
+
+  .welcome-title {
+    grid-column: auto / span 2;
+    font-weight: 700;
+    font-size: 10vw;
+    letter-spacing: .2px;
+    width: 100%;
+    /* text-decoration: underline; */
+    border-bottom: #ffffff99 2px solid;
+  }
+
+  .profile-wraper{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    bottom: 0px;
+    width: 90%;
+    margin-left: auto;
+    grid-row: 3 / span 1;
+    grid-column: 1 / span 2 ;
+  }
+
+  .profile-photo{
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: url('https://jiode.one/assets/jiode-azul-profile.jpg') center/cover no-repeat;
+    box-shadow: 0 0 8px #00000088;
+    flex-shrink: 0;
+    background-image: conic-gradient(from 0deg, violet, indigo, blue, green, yellow, orange, red, violet), url('https://jiode.one/assets/jiode-azul-profile.jpg');
+  }
+
+  .profile-name{
+    font-weight: 600;
+    font-size: 1.1rem;
+    opacity: .95;
+  }
+
+  .profile-subline{
+    font-size: .9rem;
+    opacity: .75;
+    margin-top: -4px;
+  }
+
+  .profile-name-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%
+  }
+
+  .welcome-button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+    /* align-self: center; */
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: .8rem 1.4rem;
+    background: rgba(255,255,255,.14);
+    border: none;
+    border-radius: 999px;
+    box-shadow: 0 0 12px #ffffff55;
+    cursor: pointer;
+    grid-row: 4 / span 1;
+    grid-column: 1 / span 2 ;
+    height: 50%;
+  }
+
+  .welcome-sub > p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+
+  .welcome-sub > p:last-of-type {
+    margin-bottom: 0;
+  }
+    /* Hide bottom on desktop; show sidebar on desktop */
+  @media (min-width:960px){
+    .cookie-wrap{width:20vw}
+    .stage{flex-direction: row;}
+    .bottom{display:none}
+    .welcome-title  { font-size: 7rem; grid-column: 1/ span 1;}
+    .welcome-badge{ position: absolute; inset: 0; left: 0; width: 95%; height: 80%; transform: translateX(2rem);}
+    .welcome-sub{ width: 50vw; height: 100%; font-size: 1.4rem; grid-row: 2 / span 2; grid-column:  1 / span 1;}
+    .profile-wraper{position: relative; width: 100%; margin-top: auto; margin-left: auto; margin-right: 0; height: 20%;     grid-row: 2 / span 1; grid-column: 2 / span 1; flex-direction: column;}
+    .profile-name{ font-size: 1.5rem; }
+    .profile-subline{ font-size: 1.5rem; }
+    .profile-photo{ width: 7rem; height: 7rem;}
+    .welcome-button{ font-size: 1.4rem; width: 50vw; padding: 1rem 2rem; margin-top: 2rem; margin-right: auto; grid-column: auto / span 1;}
+    .welcome-inner{     display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr 3fr 1fr;
+    }
+  }
+
+  /* Reduced motion: appear without slide */
+  @media (prefers-reduced-motion: reduce){
+    .welcome-inner{ transform:none !important; }
+  }
+
+  @media (max-width:959px){
+    .side{display:none}
+  }
+</style>
+<div class="gradient-backdrop"></div>
+<div class="checker open" role="dialog" aria-modal="true" aria-labelledby="h"></div>
+<div class="stage">
+  <div class="checker-backdrop">
+    <div class="cookie-flex-container" aria-hidden="true">
+  <div class="cookie-wrap" aria-hidden="true">
+    <svg class="cookie" viewBox="0 0 200 200">
+      <defs><radialGradient id="g" cx="50%" cy="45%" r="60%"><stop offset="0%" stop-color="#E8BC74"/><stop offset="100%" stop-color="#C69554"/></radialGradient></defs>
+      <circle cx="100" cy="100" r="88" fill="url(#g)"/>
+      <g fill="#5c3b1d"><circle cx="58" cy="70" r="7"/><circle cx="120" cy="62" r="9"/><circle cx="90" cy="110" r="8"/><circle cx="135" cy="115" r="6"/><circle cx="70" cy="135" r="9"/><circle cx="112" cy="145" r="7"/></g>
+    </svg>
+  </div>
+  </div>
+  </div>
+  <!-- Mobile bottom consent panel -->
+  <div class="bottom glass" role="group" aria-labelledby="h-mobile">
+    <div class="bottom-inner">
+      <h2 id="h-mobile">Join our experiment. Have a cookie 🍪</h2>
+      <p>This site uses cookies to improve your experience. <a href="#" style="color:#0ff">Read more</a>.</p>
+      <form class="form form-mobile" onsubmit="return false;">
+        <label><input type="checkbox" checked disabled> Essential (always on)</label>
+        <label><input id="a-mobile" type="checkbox"> Analytics</label>
+        <label><input id="p-mobile" type="checkbox"> Personalization</label>
+        <div class="row">
+          <button class="btn accept-mobile" type="button">Accept all</button>
+          <button class="btn save-mobile" type="button">Save settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <aside class="side">
+    <div class="inner">
+      <h2 id="h">Join our experiment. Have a cookie 🍪</h2>
+      <p>This site uses cookies to improve your experience. <a href="#" style="color:#0ff">Read more</a>.</p>
+      <form class="form" onsubmit="return false;">
+        <label><input type="checkbox" checked disabled> Essential (always on)</label>
+        <label><input class="a" type="checkbox"> Analytics</label>
+        <label><input class="p" type="checkbox"> Personalization</label>
+        <div class="row">
+          <button class="btn accept" type="button">Accept all</button>
+          <button class="btn save" type="button">Save settings</button>
+        </div>
+      </form>
+    </div>
+</aside>
+</section>
+
+</div>
+<!-- Welcome badge -->
+<div class="welcome-badge" role="status" aria-live="polite">
+  <div class="welcome-inner">
+    <div class="welcome-title">Welcome</div>
+    <span class="welcome-sub">
+      <p>🪐 Welcome to Jiode.one</p>
+    <p>
+We built this space for the dreamers —
+for the builders, creators, and founders
+who believe that imagination is a real force.
+</p>
+<p>
+You can explore, experiment, and evolve —
+together with others who see a world of possibility in everything.
+</p>
+<p>
+It’s a place to take your ideas from thought to motion,
+to bridge your world with the ocean of tomorrow.
+</p>
+We’re so glad you're here.
+<p>
+Are you ready?
+</p>
+<br>
+</span>
+<div class="profile-wraper">
+  <div class="profile-photo"></div>
+  <div class="profile-name-group">
+    <div class="profile-name">— Jiō Azul</div>
+    <div class="profile-subline">Founder & CEO, Jiode.one</div>
+  </div>
+</div>
+<button class="btn welcome-button" type="button">Let's Do It!</button>
+  </div>
+</div>
+
+<script>
+  const KEY='jiode_cookie_consent';
+  const stage=document.querySelector('.stage');
+
+  // If consent exists, remove scene; otherwise open desktop swing when applicable
+  if(localStorage.getItem(KEY)){
+    stage.remove();
+  } else {
+    const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isDesktop = matchMedia('(min-width: 960px)').matches;
+    if(isDesktop && !prefersReduced){ requestAnimationFrame(()=>stage.classList.add('open')); }
+    // Welcome badge reveal (slight delay)
+    const wb = document.querySelector('.welcome-badge');
+    if(wb){
+      const showBadge = () => wb.classList.add('show');
+      if(prefersReduced){ showBadge(); }
+      else { setTimeout(showBadge, 350); }
+    }
+  }
+
+  // Helper to persist + dismiss
+  const save = (o)=>{ localStorage.setItem(KEY, JSON.stringify(o)); dismiss(); };
+  const dismiss = ()=>{ stage.style.opacity=0; setTimeout(()=>stage.remove(),600); };
+
+  // Desktop sidebar controls
+  const side = document.querySelector('.side');
+  side?.querySelector('.accept')?.addEventListener('click', ()=> save({analytics:true, personal:true}));
+  side?.querySelector('.save')?.addEventListener('click', ()=>{
+    const a = !!side.querySelector('.a')?.checked;
+    const p = !!side.querySelector('.p')?.checked;
+    save({analytics:a, personal:p});
+  });
+
+  // Mobile bottom controls
+  const bottom = document.querySelector('.bottom');
+  bottom?.querySelector('.accept-mobile')?.addEventListener('click', ()=> save({analytics:true, personal:true}));
+  bottom?.querySelector('.save-mobile')?.addEventListener('click', ()=>{
+    const a = !!document.getElementById('a-mobile')?.checked;
+    const p = !!document.getElementById('p-mobile')?.checked;
+    save({analytics:a, personal:p});
+  });
+</script>
+</html>
