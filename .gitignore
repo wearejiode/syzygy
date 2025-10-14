@@ -12,6 +12,12 @@ target/
 apps/**/src-tauri/target/
 apps/**/src-tauri/gen/
 
+# JS/TS deps & caches
+node_modules/
+**/node_modules/
+.pnpm-store/
+.pnpm/
+
 # dependencies
 node_modules
 
