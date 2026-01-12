@@ -125,7 +125,7 @@ if (url.pathname === '/__r2get') {
   const defaultLinks = [
     { label: '🚀 Resume', url: `https://resume.fahrnbach.one/${slug}`, style: 'first' },
     { label: '✨ Portfolio', url: 'https://fahrnbach.one', style: 'second' },
-    { label: '📅 Book Time', url: 'https://calendly.com/jacob-fahrnbach/30min', style: 'third' },
+    { label: '📅 Book-Time', url: 'https://calendly.com/jacob-fahrnbach/30min', style: 'third' },
     { label: '💻 GitHub', url: 'https://github.com/fahrnbach', style: 'fourth' },
     { label: '🔗 LinkedIn', url: 'https://linkedin.com/in/fahrnbach', style: 'fifth' },
   ];

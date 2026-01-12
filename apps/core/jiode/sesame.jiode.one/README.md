@@ -4,7 +4,7 @@ This Worker serves the Resume app pages by delivering HTML, CSS, and JS assets a
 
 ---
 
-## 📦 Build + Bundle!!!! :D
+## 📦 Build + Bundle!!!! :D !
 
 We no longer inline HTML/CSS/JS directly. Instead:
 
